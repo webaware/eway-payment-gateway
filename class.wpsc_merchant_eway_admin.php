@@ -52,15 +52,15 @@ class wpsc_merchant_eway_admin {
 	<tr>
 		<td>Use Testing Enviroment</td>
 		<td>
-			<label><input type='radio' value='1' name='eway_test' $eway_cvn_yes /> $yes</label> &nbsp;
-			<label><input type='radio' value='0' name='eway_test' $eway_cvn_no /> $no</label>
+			<label><input type='radio' value='1' name='eway_test' $eway_test_yes /> $yes</label> &nbsp;
+			<label><input type='radio' value='0' name='eway_test' $eway_test_no /> $no</label>
 		</td>
 	</tr>
 	<tr>
 		<td>Use CVN Security</td>
 		<td>
-			<label><input type='radio' value='1' name='eway_cvn' $eway_test_yes /> $yes</label> &nbsp;
-			<label><input type='radio' value='0' name='eway_cvn' $eway_test_no /> $no</label>
+			<label><input type='radio' value='1' name='eway_cvn' $eway_cvn_yes /> $yes</label> &nbsp;
+			<label><input type='radio' value='0' name='eway_cvn' $eway_cvn_no /> $no</label>
 		</td>
 	</tr>
 	<tr>
@@ -156,7 +156,7 @@ EOT;
 	public static function addPluginDetailsLinks($links, $file) {
 		// add settings link
 		if ($file == WPSC_MERCH_EWAY_PLUGIN_NAME) {
-			$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6" title="If you like this plugin and would like to help support its maintenance and further development, please consider making a donation.">'
+			$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6" title="Please consider making a donation to help support maintenance and further development of this plugin.">'
 				. __('Donate') . '</a>';
 		}
 

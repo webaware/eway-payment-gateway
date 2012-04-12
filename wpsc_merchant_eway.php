@@ -1,8 +1,9 @@
 <?php
 /*
 Plugin Name: eWay Payment Gateway
+Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
 Description: eWay payment gateway for wp-e-commerce
-Version: 2.0.0
+Version: 2.0.1
 Author: WebAware
 Author URI: http://www.webaware.com.au/
 */

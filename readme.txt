@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: wp e-commerce, eway
 Requires at least: 3.0.1
 Tested up to: 3.3.1
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 
 Add a credit card payment gateway for eWay to the wp-e-commerce shopping cart plugin
 
@@ -54,6 +54,9 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 * SimpleXML
 
 == Changelog ==
+
+= 2.0.1 [2012-04-12] =
+* fixed: admin transposed Use Testing Environment and Use CVN Security
 
 = 2.0.0 [2012-04-08] =
 * final cleanup and refactor for public release
