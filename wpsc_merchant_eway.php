@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: eWay Payment Gateway
+Plugin Name: eWAY Payment Gateway
 Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
-Description: eWay payment gateway for wp-e-commerce
-Version: 2.0.1
+Description: eWAY payment gateway for wp-e-commerce
+Version: 2.0.2
 Author: WebAware
 Author URI: http://www.webaware.com.au/
 */
@@ -73,7 +73,7 @@ function wpsc_merchant_eway_register($gateways) {
 			'class_name' => 'wpsc_merchant_eway',
 			'has_recurring_billing' => FALSE,
 			'wp_admin_cannot_cancel' => FALSE,
-			'display_name' => 'eWay Credit Card Payment',
+			'display_name' => 'eWAY Credit Card Payment',
 			'form' => 'wpsc_merchant_eway_admin_configForm',	// must call proxy to admin method due to wp-e-commerce shortcomings
 			'submit_function' => array('wpsc_merchant_eway_admin', 'saveConfig'),
 			'payment_type' => 'credit_card',

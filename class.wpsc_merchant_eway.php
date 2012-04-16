@@ -18,7 +18,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			'expiry_year' => stripslashes($_POST['expiry_year']),
 			'c_v_n' => stripslashes($_POST['cvn']),
 
-			// additional fields from checkout, required for eWay processing
+			// additional fields from checkout, required for eWAY processing
 			'address' => @stripslashes($_POST['collected_data'][get_option('eway_form_address')]),
 			'city' => @stripslashes($_POST['collected_data'][get_option('eway_form_city')]),
 			'state' => @stripslashes($_POST['collected_data'][get_option('eway_form_state')]),
@@ -123,7 +123,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			. ' ' . $this->collected_gateway_data['country']);
 		$eway->postcode = $this->collected_gateway_data['post_code'];
 
-		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWay will fail
+		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$total = $purchase_logs['totalprice'];
 		$eway->amount = $isLiveSite ? $total : ceil($total);
 
@@ -175,23 +175,23 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		// try to get the collected data from the form post, if any
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$values = array(
-				'card_number' => htmlspecialchars(stripslashes($_POST['card_number'])),
-				'card_name' => htmlspecialchars(stripslashes($_POST['card_name'])),
-				'expiry_month' => htmlspecialchars(stripslashes($_POST['expiry_month'])),
-				'expiry_year' => htmlspecialchars(stripslashes($_POST['expiry_year'])),
-				'c_v_n' => htmlspecialchars(stripslashes($_POST['cvn'])),
+				'card_number' => @htmlspecialchars(stripslashes($_POST['card_number'])),
+				'card_name' => @htmlspecialchars(stripslashes($_POST['card_name'])),
+				'expiry_month' => @htmlspecialchars(stripslashes($_POST['expiry_month'])),
+				'expiry_year' => @htmlspecialchars(stripslashes($_POST['expiry_year'])),
+				'c_v_n' => @htmlspecialchars(stripslashes($_POST['cvn'])),
 			);
 		}
 		else {
 			$values = array(
-				'card_number' => '', 'expiry_month' => '', 'expiry_year' => '', 'c_v_n' => '',
+				'card_number' => '', 'card_name' => '', 'expiry_month' => '', 'expiry_year' => '', 'c_v_n' => '',
 			);
 		}
 
 		$optMonths = '';
 		foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
 			$optMonths .= '<option value="' . htmlentities($option) . '"';
-			if ($option == $value)
+			if ($option == $values['expiry_month'])
 				$optMonths .= ' selected="selected"';
 			$optMonths .= '>' . htmlentities($option) . "</option>\n";
 		}

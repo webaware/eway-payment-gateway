@@ -1,12 +1,12 @@
 <?php
 
 /**
-* admin functions for eWay Payment Gateway
+* admin functions for eWAY Payment Gateway
 */
 class wpsc_merchant_eway_admin {
 
 	/**
-	* hook billing details display on admin, to show eWay transaction number
+	* hook billing details display on admin, to show eWAY transaction number
 	*/
 	public static function actionBillingDetailsBottom() {
 		global $purchlogitem;
@@ -44,7 +44,7 @@ class wpsc_merchant_eway_admin {
 
 		return <<<EOT
 	<tr>
-		<td>eWay Customer ID</td>
+		<td>eWAY Customer ID</td>
 		<td>
 			<input type='text' size='10' value="$ewayCustomerID" name='ewayCustomerID_id' />
 		</td>
