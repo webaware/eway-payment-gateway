@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: wp e-commerce, eway
 Requires at least: 3.0.1
 Tested up to: 3.3.2
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 
 Add a credit card payment gateway for eWAY to the wp-e-commerce shopping cart plugin
 
@@ -54,6 +54,9 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 * SimpleXML
 
 == Changelog ==
+
+= 2.0.3 [2012-05-05] =
+* fixed: optional fields for address, email are no longer required for eway payment
 
 = 2.0.2 [2012-04-16] =
 * fixed: undeclared array index errors
