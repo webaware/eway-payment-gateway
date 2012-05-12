@@ -18,7 +18,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			'expiry_year' => stripslashes($_POST['expiry_year']),
 			'c_v_n' => stripslashes($_POST['cvn']),
 
-			// additional fields from checkout, required for eWAY processing
+			// additional fields from checkout
 			'address' => @stripslashes($_POST['collected_data'][get_option('eway_form_address')]),
 			'city' => @stripslashes($_POST['collected_data'][get_option('eway_form_city')]),
 			'state' => @stripslashes($_POST['collected_data'][get_option('eway_form_state')]),
@@ -95,12 +95,11 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		// get purchase logs
 		if ($this->purchase_id > 0) {
 			$purchase_logs = $wpdb->get_row(
-				$wpdb->prepare('select * from `' . WPSC_TABLE_PURCHASE_LOGS . '` where id = %d', $this->purchase_id),
-				ARRAY_A);
+				$wpdb->prepare('select totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where id = %d', $this->purchase_id), ARRAY_A);
 		}
 		elseif (!empty($this->session_id)) {
 			$purchase_logs = $wpdb->get_row(
-				$wpdb->prepare('select * from `' . WPSC_TABLE_PURCHASE_LOGS . '` where sessionid = %s limit 1', $this->session_id),
+				$wpdb->prepare('select id,totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where sessionid = %s limit 1', $this->session_id),
 				ARRAY_A);
 
 			$this->purchase_id = $purchase_logs['id'];
@@ -110,7 +109,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		$isLiveSite = !get_option('eway_test');
 		$eway = new wpsc_merchant_eway_payment(get_option('ewayCustomerID_id'), $isLiveSite);
 		$eway->invoiceDescription = get_bloginfo('name');
-		$eway->transactionNumber = $purchase_logs['id'];
+		$eway->invoiceReference = $this->purchase_id;
 		$eway->cardHoldersName = $this->collected_gateway_data['card_name'];
 		$eway->cardNumber = $this->collected_gateway_data['card_number'];
 		$eway->cardExpiryMonth = $this->collected_gateway_data['expiry_month'];
