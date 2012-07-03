@@ -3,7 +3,7 @@
 Plugin Name: eWAY Payment Gateway
 Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
 Description: eWAY payment gateway for wp-e-commerce
-Version: 2.0.4
+Version: 2.1.0
 Author: WebAware
 Author URI: http://www.webaware.com.au/
 */
@@ -67,7 +67,7 @@ function wpsc_merchant_eway_register($gateways) {
 
 	// register the gateway class and additional functions
 	$gateways[] = array(
-			'name' => 'eWay payment gateway',
+			'name' => 'eWAY payment gateway',
 			'api_version' => 2.0,
 			'internalname' => $gateway_name,
 			'class_name' => 'wpsc_merchant_eway',

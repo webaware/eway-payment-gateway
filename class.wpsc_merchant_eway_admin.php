@@ -19,10 +19,6 @@ class wpsc_merchant_eway_admin {
 	* display additional fields for gateway config form
 	*/
 	public static function configForm() {
-		$eway_cvn = get_option('eway_cvn');
-		$eway_cvn_yes = $eway_cvn ? 'checked="checked"' : '';
-		$eway_cvn_no  = $eway_cvn ? '' : 'checked="checked"';
-
 		$eway_test = get_option('eway_test');
 		$eway_test_yes = $eway_test ? 'checked="checked"' : '';
 		$eway_test_no  = $eway_test ? '' : 'checked="checked"';
@@ -35,6 +31,8 @@ class wpsc_merchant_eway_admin {
 		$yes = TXT_WPSC_YES;
 		$no = TXT_WPSC_NO;
 
+		$eway_form_first_name_fields = nzshpcrt_form_field_list(get_option('eway_form_first_name'));
+		$eway_form_last_name_fields = nzshpcrt_form_field_list(get_option('eway_form_last_name'));
 		$eway_form_address_fields = nzshpcrt_form_field_list(get_option('eway_form_address'));
 		$eway_form_city_fields = nzshpcrt_form_field_list(get_option('eway_form_city'));
 		$eway_form_state_fields = nzshpcrt_form_field_list(get_option('eway_form_state'));
@@ -57,13 +55,6 @@ class wpsc_merchant_eway_admin {
 		</td>
 	</tr>
 	<tr>
-		<td>Use CVN Security</td>
-		<td>
-			<label><input type='radio' value='1' name='eway_cvn' $eway_cvn_yes /> $yes</label> &nbsp;
-			<label><input type='radio' value='0' name='eway_cvn' $eway_cvn_no /> $no</label>
-		</td>
-	</tr>
-	<tr>
 		<td>Use TH for field labels</td>
 		<td>
 			<label><input type='radio' value='1' name='eway_th' $eway_th_yes /> $yes</label> &nbsp;
@@ -71,6 +62,22 @@ class wpsc_merchant_eway_admin {
 		</td>
 	</tr>
 
+	<tr>
+		<td>First Name</td>
+		<td>
+			<select name='eway_form[first_name]'>
+				$eway_form_first_name_fields
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>Last Name</td>
+		<td>
+			<select name='eway_form[last_name]'>
+				$eway_form_last_name_fields
+			</select>
+		</td>
+	</tr>
 	<tr>
 		<td>Address Field</td>
 		<td>
@@ -129,10 +136,6 @@ EOT;
 	public static function saveConfig() {
 		if ($_POST['ewayCustomerID_id'] != null) {
 			update_option('ewayCustomerID_id', $_POST['ewayCustomerID_id']);
-		}
-
-		if ($_POST['eway_cvn'] != null) {
-			update_option('eway_cvn', $_POST['eway_cvn']);
 		}
 
 		if ($_POST['eway_test'] != null) {

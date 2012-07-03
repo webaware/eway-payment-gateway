@@ -19,6 +19,8 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			'c_v_n' => stripslashes($_POST['cvn']),
 
 			// additional fields from checkout
+			'first_name' => @stripslashes($_POST['collected_data'][get_option('eway_form_first_name')]),
+			'last_name' => @stripslashes($_POST['collected_data'][get_option('eway_form_last_name')]),
 			'address' => @stripslashes($_POST['collected_data'][get_option('eway_form_address')]),
 			'city' => @stripslashes($_POST['collected_data'][get_option('eway_form_city')]),
 			'state' => @stripslashes($_POST['collected_data'][get_option('eway_form_state')]),
@@ -80,7 +82,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			}
 		}
 
-		if (get_option('eway_cvn') && empty($this->collected_gateway_data['c_v_n'])) {
+		if (empty($this->collected_gateway_data['c_v_n'])) {
 			$this->set_error_message('Please enter CVN (Card Verification Number)');
 			$errors++;
 		}
@@ -115,6 +117,8 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		$eway->cardExpiryMonth = $this->collected_gateway_data['expiry_month'];
 		$eway->cardExpiryYear = $this->collected_gateway_data['expiry_year'];
 		$eway->cardVerificationNumber = $this->collected_gateway_data['c_v_n'];
+		$eway->firstName = $this->collected_gateway_data['first_name'];
+		$eway->lastName = $this->collected_gateway_data['last_name'];
 		$eway->emailAddress = $this->collected_gateway_data['email'];
 		$eway->address = trim($this->collected_gateway_data['address']
 			. ' ' . $this->collected_gateway_data['city']
@@ -226,16 +230,12 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	<td style='white-space: nowrap'>
 	<select class='wpsc_ccBox' name='expiry_month' style='width: 4em'>
 		$optMonths
-	</select>/<select class='wpsc_ccBox' name='expiry_year' style='width: 5em'>
+	</select><span>/</span><select class='wpsc_ccBox' name='expiry_year' style='width: 5em'>
 		$optYears
 	</select>
 	</td>
 </tr>
 
-EOT;
-
-		if (get_option('eway_cvn')) {
-			$checkoutFields .= <<<EOT
 <tr class='wpsc-merch-eway-row'>
 	<$th><label id='eway_cvn'>CVN <span class='asterix'>*</span></label></$th>
 	<td>
@@ -244,7 +244,6 @@ EOT;
 </tr>
 
 EOT;
-		}
 
 		return $checkoutFields;
 	}

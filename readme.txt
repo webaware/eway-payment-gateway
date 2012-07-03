@@ -6,22 +6,30 @@ Author URI: http://www.webaware.com.au/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
 Tags: wp e-commerce, eway
 Requires at least: 3.0.1
-Tested up to: 3.3.2
-Stable tag: 2.0.4
+Tested up to: 3.4.1
+Stable tag: 2.1.0
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Add a credit card payment gateway for eWAY to the wp-e-commerce shopping cart plugin
 
 == Description ==
 
-The eWAY Payment Gateway adds a credit card payment gateway for [eWAY in Australia](http://www.eway.com.au/) to the [wp-e-commerce](http://wordpress.org/extend/plugins/wp-e-commerce/) shopping cart plugin, without requiring the Gold Cart option.
+The eWAY Payment Gateway adds a credit card payment gateway for [eWAY in Australia](http://www.eway.com.au/) [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html) to the [wp-e-commerce](http://wordpress.org/extend/plugins/wp-e-commerce/) shopping cart plugin, without requiring the Gold Cart option.
 
 **Features:**
 
-* allows the card holder's name to be different to the purchaser's name
-* performs some basic data validation before submitting to eWAY
-* displays eWAY transaction ID on purchases log, for successful payments
+* card holder's name can be different to the purchaser's name
+* basic data validation performed before submitting to eWAY
+* eWAY transaction ID is displayed on purchases log, for successful payments
 * drop-in compatible with eWAY payment gateway from the Gold Cart plugin (except recurring billing -- see FAQ)
 * it's free!
+
+= Requirements: =
+* you need to install [wp-e-commerce](http://wordpress.org/extend/plugins/wp-e-commerce/)
+* you need an SSL certificate for your hosting account
+* you need an account with eWAY Australia
+* this plugin uses eWAY's [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html), and does not support eWAY's hosted payment form
 
 == Installation ==
 
@@ -42,6 +50,14 @@ Not yet. I know it can be done but I haven't had a website that needs it yet, so
 
 Not yet. Basically, I haven't even looked at the other eWAY gateways, so I have no idea what's involved in supporting them. I reckon I'll get around to them one day though, so check back in 2013 maybe.
 
+= Can I use the eWAY hosted payment form with this plugin? =
+
+No, this plugin only supports the [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html).
+
+= Where do I find the eWAY transaction number? =
+
+Successful transaction details including the eWAY transaction number are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
+
 = Can I use this plugin with the Gold Cart? =
 
 I have not tried it myself, but you should be able to deactivate the Gold Cart's payment gateway and activate this one. The settings from the Gold Cart payment gateway will be picked up by this gateway automatically (they are stored in the same places). Let me know if you do, and I'll update this FAQ.
@@ -53,7 +69,15 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 * XMLWriter
 * SimpleXML
 
+== Screenshots ==
+
+1. wp-e-commerce payments settings
+
 == Changelog ==
+
+= 2.1.0 [2012-07-03] =
+* changed: CVN is now a required field, no option to omit; Australian banks are all moving to require CVN and some already do
+* added: customer name is now supported, if configured in wp-e-commerce payment admin; card holder name is not not seen in eWAY notification emails, so customer name is required for showing who made the purchase
 
 = 2.0.4 [2012-05-13] =
 * fixed: invoice number recorded in eWAY invoice reference field
@@ -72,3 +96,8 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 
 = 1.0.0 [2011-09-15] =
 * private version, not released to public
+
+== Upgrade Notice ==
+
+= 2.1.0 [2012-07-03] =
+CVN is now a required field, no option to omit
