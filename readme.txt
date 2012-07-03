@@ -99,5 +99,5 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 
 == Upgrade Notice ==
 
-= 2.1.0 [2012-07-03] =
+= 2.1.0 =
 CVN is now a required field, no option to omit
