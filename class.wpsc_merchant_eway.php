@@ -28,6 +28,11 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			'post_code' => @stripslashes($_POST['collected_data'][get_option('eway_form_post_code')]),
 			'email' => @stripslashes($_POST['collected_data'][get_option('eway_form_email')]),
 		);
+
+		// convert wp-e-commerce country code into country name
+		if ($this->collected_gateway_data['country']) {
+			$this->collected_gateway_data['country'] = wpsc_get_country($this->collected_gateway_data['country']);
+		}
 	}
 
 	/**
@@ -120,15 +125,39 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		$eway->firstName = $this->collected_gateway_data['first_name'];
 		$eway->lastName = $this->collected_gateway_data['last_name'];
 		$eway->emailAddress = $this->collected_gateway_data['email'];
-		$eway->address = trim($this->collected_gateway_data['address']
-			. ' ' . $this->collected_gateway_data['city']
-			. ' ' . $this->collected_gateway_data['state']
-			. ' ' . $this->collected_gateway_data['country']);
 		$eway->postcode = $this->collected_gateway_data['post_code'];
+
+		// aggregate street, city, state, country into a single string
+		$eway->address = array_reduce(
+			array (
+				$this->collected_gateway_data['address'],
+				$this->collected_gateway_data['city'],
+				$this->collected_gateway_data['state'],
+				$this->collected_gateway_data['country'],
+			),
+			array(__CLASS__, 'reduceAddress'),
+			''
+		);
+
+		// use cardholder name for last name if no customer name entered
+		if (empty($eway->firstName) && empty($eway->lastName)) {
+			$eway->lastName = $eway->cardHoldersName;
+		}
+
+		// allow plugins/themes to modify invoice description and reference, and set option fields
+		$eway->invoiceDescription = apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription);
+		$eway->invoiceReference = apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference);
+		$eway->option1 = apply_filters('wpsc_merchant_eway_option1', '');
+		$eway->option2 = apply_filters('wpsc_merchant_eway_option2', '');
+		$eway->option3 = apply_filters('wpsc_merchant_eway_option3', '');
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$total = $purchase_logs['totalprice'];
 		$eway->amount = $isLiveSite ? $total : ceil($total);
+
+//~ $this->set_error_message(htmlspecialchars($eway->getPaymentXML()));
+//~ $this->set_purchase_processed_by_purchid(1);
+//~ return;
 
 		try {
 			$response = $eway->processPayment();
@@ -139,14 +168,14 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
-				$this->set_error_message($response->error);
+				$this->set_error_message(htmlspecialchars($response->error));
 				$this->set_purchase_processed_by_purchid(1);	// failed
 				return;
 			}
 		}
 		catch (Exception $e) {
 			// an exception occured, so record the error
-			$this->set_error_message($e->getMessage());
+			$this->set_error_message(htmlspecialchars($e->getMessage()));
 			$this->set_purchase_processed_by_purchid(1);	// failed
 			return;
 		}
@@ -246,6 +275,21 @@ class wpsc_merchant_eway extends wpsc_merchant {
 EOT;
 
 		return $checkoutFields;
+	}
+
+	/**
+	* reduce array of address fields to a single string
+	* @param mixed $result
+	* @param mixed $item
+	*/
+	public static function reduceAddress(&$result, $item) {
+		if (!empty($item)) {
+			if ($result !== '')
+				$result .= ', ';
+			$result .= $item;
+		}
+
+		return $result;
 	}
 
 }

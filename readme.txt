@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: wp e-commerce, eway
 Requires at least: 3.0.1
 Tested up to: 3.4.1
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,16 @@ The eWAY Payment Gateway adds a credit card payment gateway for [eWAY in Austral
 * you need an SSL certificate for your hosting account
 * you need an account with eWAY Australia
 * this plugin uses eWAY's [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html), and does not support eWAY's hosted payment form
+
+= Filter hooks =
+
+Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
+
+* `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
+* `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
+* `wpsc_merchant_eway_option1` for setting the option1 field
+* `wpsc_merchant_eway_option2` for setting the option2 field
+* `wpsc_merchant_eway_option3` for setting the option3 field
 
 == Installation ==
 
@@ -75,9 +85,16 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 
 == Changelog ==
 
+= 2.2.0 [2012-09-25] =
+* fixed: country name used in eWAY address field, not country code
+* changed: remote SSL certificate is verified (i.e. eWAY's certificate)
+* added: prevent XML injection attacks when loading eWAY response (security hardening)
+* added: filter hooks for invoice description and reference
+* added: if customer name isn't mandatory and not given, will use cardholder's name
+
 = 2.1.0 [2012-07-03] =
 * changed: CVN is now a required field, no option to omit; Australian banks are all moving to require CVN and some already do
-* added: customer name is now supported, if configured in wp-e-commerce payment admin; card holder name is not not seen in eWAY notification emails, so customer name is required for showing who made the purchase
+* added: customer name is now supported, if configured in wp-e-commerce payment admin; card holder name is not seen in eWAY notification emails, so customer name is required for showing who made the purchase
 
 = 2.0.4 [2012-05-13] =
 * fixed: invoice number recorded in eWAY invoice reference field

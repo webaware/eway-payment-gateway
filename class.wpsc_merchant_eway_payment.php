@@ -15,6 +15,12 @@ class wpsc_merchant_eway_payment {
 	*/
 	public $isLiveSite;
 
+	/**
+	* default TRUE, whether to validate the remote SSL certificate
+	* @var boolean
+	*/
+	public $sslVerifyPeer;
+
 	// payment specific members
 	/**
 	* account name / email address at eWAY
@@ -131,13 +137,13 @@ class wpsc_merchant_eway_payment {
 	public $option3;
 
 	/** host for the eWAY Real Time API in the developer sandbox environment */
-	const REALTIME_API_SANDBOX = "https://www.eway.com.au/gateway/xmltest/testpage.asp";
+	const REALTIME_API_SANDBOX = 'https://www.eway.com.au/gateway/xmltest/testpage.asp';
 	/** host for the eWAY Real Time API in the production environment */
-	const REALTIME_API_LIVE = "https://www.eway.com.au/gateway/xmlpayment.asp";
+	const REALTIME_API_LIVE = 'https://www.eway.com.au/gateway/xmlpayment.asp';
 	/** host for the eWAY Real Time API with CVN verification in the developer sandbox environment */
-	const REALTIME_CVN_API_SANDBOX = "https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp";
+	const REALTIME_CVN_API_SANDBOX = 'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp';
 	/** host for the eWAY Real Time API with CVN verification in the production environment */
-	const REALTIME_CVN_API_LIVE = "https://www.eway.com.au/gateway_cvn/xmlpayment.asp";
+	const REALTIME_CVN_API_LIVE = 'https://www.eway.com.au/gateway_cvn/xmlpayment.asp';
 
 	/**
 	* populate members with defaults, and set account and environment information
@@ -146,6 +152,7 @@ class wpsc_merchant_eway_payment {
 	* @param boolean $isLiveSite running on the live (production) website
 	*/
 	public function __construct($accountID, $isLiveSite = FALSE) {
+		$this->sslVerifyPeer = TRUE;
 		$this->isLiveSite = $isLiveSite;
 		$this->accountID = $accountID;
 	}
@@ -212,7 +219,7 @@ class wpsc_merchant_eway_payment {
 		}
 
 		if (strlen($errmsg) > 0)
-			throw new Exception(__CLASS__ . ":\n" . $errmsg);
+			throw new Exception($errmsg);
 	}
 
 	/**
@@ -220,7 +227,7 @@ class wpsc_merchant_eway_payment {
 	*
 	* @return string
 	*/
-	private function getPaymentXML() {
+	public function getPaymentXML() {
 		$xml = new XMLWriter();
 		$xml->openMemory();
 		$xml->startDocument('1.0', 'UTF-8');
@@ -272,13 +279,12 @@ class wpsc_merchant_eway_payment {
 		curl_setopt($curl, CURLOPT_HEADER, FALSE);
 		curl_setopt($curl, CURLOPT_POST, TRUE);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $xml);
-		curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);		// don't validate the certificate
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);			// do verify the hostname
-//		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);			// do not verify the hostname
+		curl_setopt($curl, CURLOPT_TIMEOUT, 60);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $this->sslVerifyPeer);	// whether to validate the certificate
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);						// verify that the SSL common name exists and matches hostname
 
 		// execute the cURL request, and retrieve the response
-		$responseXML = @curl_exec($curl);
+		$responseXML = curl_exec($curl);
 		if (curl_errno($curl)) {
 			$errmsg = "Error posting eWAY payment to $url: " . curl_error($curl);
 			curl_close($curl);

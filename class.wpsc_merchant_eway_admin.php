@@ -159,8 +159,9 @@ EOT;
 	public static function addPluginDetailsLinks($links, $file) {
 		// add settings link
 		if ($file == WPSC_MERCH_EWAY_PLUGIN_NAME) {
-			$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6" title="Please consider making a donation to help support maintenance and further development of this plugin.">'
-				. __('Donate') . '</a>';
+			$links[] = '<a href="http://wordpress.org/support/plugin/eway-payment-gateway">' . __('Support') . '</a>';
+			$links[] = '<a href="http://wordpress.org/extend/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
+			$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=CXNFEP4EAMTG6">' . __('Donate') . '</a>';
 		}
 
 		return $links;
