@@ -6,8 +6,8 @@ Author URI: http://www.webaware.com.au/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
 Tags: wp e-commerce, eway
 Requires at least: 3.0.1
-Tested up to: 3.4.1
-Stable tag: 2.2.0
+Tested up to: 3.4.2
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,9 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 1. wp-e-commerce payments settings
 
 == Changelog ==
+
+= 2.2.1 [2012-10-22] =
+* fixed: address on eWAY invoice was getting "0, " prepended when PHP < 5.3
 
 = 2.2.0 [2012-09-25] =
 * fixed: country name used in eWAY address field, not country code

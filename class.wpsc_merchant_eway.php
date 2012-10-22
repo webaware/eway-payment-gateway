@@ -11,28 +11,52 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	* grab the gateway-specific data from the checkout form post
 	*/
 	public function construct_value_array() {
-		$this->collected_gateway_data = array(
-			'card_number' => stripslashes($_POST['card_number']),
-			'card_name' => stripslashes($_POST['card_name']),
-			'expiry_month' => stripslashes($_POST['expiry_month']),
-			'expiry_year' => stripslashes($_POST['expiry_year']),
-			'c_v_n' => stripslashes($_POST['cvn']),
+		$this->collected_gateway_data = array (
+			'card_number' => self::getPostValue('card_number'),
+			'card_name' => self::getPostValue('card_name'),
+			'expiry_month' => self::getPostValue('expiry_month'),
+			'expiry_year' => self::getPostValue('expiry_year'),
+			'c_v_n' => self::getPostValue('cvn'),
 
 			// additional fields from checkout
-			'first_name' => @stripslashes($_POST['collected_data'][get_option('eway_form_first_name')]),
-			'last_name' => @stripslashes($_POST['collected_data'][get_option('eway_form_last_name')]),
-			'address' => @stripslashes($_POST['collected_data'][get_option('eway_form_address')]),
-			'city' => @stripslashes($_POST['collected_data'][get_option('eway_form_city')]),
-			'state' => @stripslashes($_POST['collected_data'][get_option('eway_form_state')]),
+			'first_name' => self::getCollectedDataValue(get_option('eway_form_first_name')),
+			'last_name' => self::getCollectedDataValue(get_option('eway_form_last_name')),
+			'address' => self::getCollectedDataValue(get_option('eway_form_address')),
+			'city' => self::getCollectedDataValue(get_option('eway_form_city')),
+			'state' => self::getCollectedDataValue(get_option('eway_form_state')),
 			'country' => @stripslashes($_POST['collected_data'][get_option('eway_form_country')][0]),
-			'post_code' => @stripslashes($_POST['collected_data'][get_option('eway_form_post_code')]),
-			'email' => @stripslashes($_POST['collected_data'][get_option('eway_form_email')]),
+			'post_code' => self::getCollectedDataValue(get_option('eway_form_post_code')),
+			'email' => self::getCollectedDataValue(get_option('eway_form_email')),
 		);
 
 		// convert wp-e-commerce country code into country name
 		if ($this->collected_gateway_data['country']) {
 			$this->collected_gateway_data['country'] = wpsc_get_country($this->collected_gateway_data['country']);
 		}
+	}
+
+	/**
+	* Read a field from form post input.
+	*
+	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
+	*
+	* @return string
+	* @param string $fieldname name of the field in the form post
+	*/
+	private static function getPostValue($fieldname) {
+		return isset($_POST[$fieldname]) ? stripslashes(trim($_POST[$fieldname])) : '';
+	}
+
+	/**
+	* Read a field from form post input.
+	*
+	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
+	*
+	* @return string
+	* @param string $fieldname name of the field in the form post
+	*/
+	private static function getCollectedDataValue($fieldname) {
+		return isset($_POST['collected_data'][$fieldname]) ? stripslashes(trim($_POST['collected_data'][$fieldname])) : '';
 	}
 
 	/**
@@ -128,16 +152,13 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		$eway->postcode = $this->collected_gateway_data['post_code'];
 
 		// aggregate street, city, state, country into a single string
-		$eway->address = array_reduce(
-			array (
-				$this->collected_gateway_data['address'],
-				$this->collected_gateway_data['city'],
-				$this->collected_gateway_data['state'],
-				$this->collected_gateway_data['country'],
-			),
-			array(__CLASS__, 'reduceAddress'),
-			''
+		$parts = array (
+			$this->collected_gateway_data['address'],
+			$this->collected_gateway_data['city'],
+			$this->collected_gateway_data['state'],
+			$this->collected_gateway_data['country'],
 		);
+		$eway->address = implode(', ', array_filter($parts, 'strlen'));
 
 		// use cardholder name for last name if no customer name entered
 		if (empty($eway->firstName) && empty($eway->lastName)) {
@@ -207,11 +228,11 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		// try to get the collected data from the form post, if any
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$values = array(
-				'card_number' => @htmlspecialchars(stripslashes($_POST['card_number'])),
-				'card_name' => @htmlspecialchars(stripslashes($_POST['card_name'])),
-				'expiry_month' => @htmlspecialchars(stripslashes($_POST['expiry_month'])),
-				'expiry_year' => @htmlspecialchars(stripslashes($_POST['expiry_year'])),
-				'c_v_n' => @htmlspecialchars(stripslashes($_POST['cvn'])),
+				'card_number'	=> htmlspecialchars(self::getPostValue('card_number')),
+				'card_name'		=> htmlspecialchars(self::getPostValue('card_name')),
+				'expiry_month'	=> self::getPostValue('expiry_month'),
+				'expiry_year'	=> self::getPostValue('expiry_year'),
+				'c_v_n'			=> htmlspecialchars(self::getPostValue('cvn')),
 			);
 		}
 		else {
@@ -275,21 +296,6 @@ class wpsc_merchant_eway extends wpsc_merchant {
 EOT;
 
 		return $checkoutFields;
-	}
-
-	/**
-	* reduce array of address fields to a single string
-	* @param mixed $result
-	* @param mixed $item
-	*/
-	public static function reduceAddress(&$result, $item) {
-		if (!empty($item)) {
-			if ($result !== '')
-				$result .= ', ';
-			$result .= $item;
-		}
-
-		return $result;
 	}
 
 }

@@ -157,7 +157,6 @@ EOT;
 	* action hook for adding plugin details links
 	*/
 	public static function addPluginDetailsLinks($links, $file) {
-		// add settings link
 		if ($file == WPSC_MERCH_EWAY_PLUGIN_NAME) {
 			$links[] = '<a href="http://wordpress.org/support/plugin/eway-payment-gateway">' . __('Support') . '</a>';
 			$links[] = '<a href="http://wordpress.org/extend/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
