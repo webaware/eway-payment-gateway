@@ -138,7 +138,13 @@ class wpsc_merchant_eway extends wpsc_merchant {
 
 		// process the payment
 		$isLiveSite = !get_option('eway_test');
-		$eway = new wpsc_merchant_eway_payment(get_option('ewayCustomerID_id'), $isLiveSite);
+		$useStored = get_option('wpsc_merchant_eway_stored');
+
+		if ($useStored)
+			$eway = new wpsc_merchant_eway_stored_payment(get_option('ewayCustomerID_id'), $isLiveSite);
+		else
+			$eway = new wpsc_merchant_eway_payment(get_option('ewayCustomerID_id'), $isLiveSite);
+
 		$eway->invoiceDescription = get_bloginfo('name');
 		$eway->invoiceReference = $this->purchase_id;
 		$eway->cardHoldersName = $this->collected_gateway_data['card_name'];
@@ -184,20 +190,26 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			$response = $eway->processPayment();
 			if ($response->status) {
 				// transaction was successful, so record transaction number and continue
-				$this->set_transaction_details($response->transactionNumber, 2);	// succeeded
+				if ($useStored)
+					$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::ORDER_RECEIVED : 2;
+				else
+					$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::ACCEPTED_PAYMENT : 3;
+				$this->set_transaction_details($response->transactionNumber, $status);
 				$this->go_to_transaction_results($this->cart_data['session_id']);
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
+				$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::INCOMPLETE_SALE : 1;
 				$this->set_error_message(htmlspecialchars($response->error));
-				$this->set_purchase_processed_by_purchid(1);	// failed
+				$this->set_purchase_processed_by_purchid($status);
 				return;
 			}
 		}
-		catch (Exception $e) {
+		catch (wpsc_merchant_eway_exception $e) {
 			// an exception occured, so record the error
+			$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::INCOMPLETE_SALE : 1;
 			$this->set_error_message(htmlspecialchars($e->getMessage()));
-			$this->set_purchase_processed_by_purchid(1);	// failed
+			$this->set_purchase_processed_by_purchid($status);
 			return;
 		}
 
@@ -222,80 +234,63 @@ class wpsc_merchant_eway extends wpsc_merchant {
 
 	/**
 	* tell wp-e-commerce about fields we require on the checkout form
-	* @return string
 	*/
-	public static function getCheckoutFields() {
-		// try to get the collected data from the form post, if any
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$values = array(
-				'card_number'	=> htmlspecialchars(self::getPostValue('card_number')),
-				'card_name'		=> htmlspecialchars(self::getPostValue('card_name')),
-				'expiry_month'	=> self::getPostValue('expiry_month'),
-				'expiry_year'	=> self::getPostValue('expiry_year'),
-				'c_v_n'			=> htmlspecialchars(self::getPostValue('cvn')),
-			);
+	public static function setCheckoutFields() {
+		global $gateway_checkout_form_fields;
+
+		// check if this gateway is selected for checkout payments
+		if (in_array(WPSC_MERCH_EWAY_GATEWAY_NAME, (array) get_option('custom_gateway_options'))) {
+			// build drop-down items for months
+			$optMonths = '';
+			foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
+				$optMonths .= "<option value='$option'>$option</option>\n";
+			}
+
+			// build drop-down items for years
+			$thisYear = (int) date('Y');
+			$optYears = '';
+			foreach (range($thisYear, $thisYear + 15) as $year) {
+				$optYears .= "<option value='$year'>$year</option>\n";
+			}
+
+			// use TH for field label cells if selected, otherwise use TD (default wp-e-commerce behaviour)
+			$th = get_option('wpsc_merchant_eway_th') ? 'th' : 'td';
+
+			// load template with passed values, capture output and register
+			ob_start();
+			self::loadTemplate('wpsc-eway-fields.php', compact('th', 'optMonths', 'optYears'));
+			$gateway_checkout_form_fields[WPSC_MERCH_EWAY_GATEWAY_NAME] = ob_get_clean();
 		}
-		else {
-			$values = array(
-				'card_number' => '', 'card_name' => '', 'expiry_month' => '', 'expiry_year' => '', 'c_v_n' => '',
-			);
-		}
-
-		$optMonths = '';
-		foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
-			$optMonths .= '<option value="' . htmlentities($option) . '"';
-			if ($option == $values['expiry_month'])
-				$optMonths .= ' selected="selected"';
-			$optMonths .= '>' . htmlentities($option) . "</option>\n";
-		}
-
-		$thisYear = (int) date('Y');
-		$maxYear = $thisYear + 15;
-		$optYears = '';
-		for ($year = $thisYear; $year <= $maxYear; ++$year) {
-			$optYears .= "<option value='$year'";
-			if ($year == $values['expiry_year'])
-				$optYears .= ' selected="selected"';
-			$optYears .= ">$year</option>\n";
-		}
-
-		// use TH for field label cells if selected, otherwise use TD (default wp-e-commerce behaviour)
-		$th = get_option('wpsc_merchant_eway_th') ? 'th' : 'td';
-
-		$checkoutFields = <<<EOT
-<tr class='wpsc-merch-eway-row'>
-	<$th><label>Credit Card Number <span class='asterix'>*</span></label></$th>
-	<td>
-		<input type='text' value='' name='card_number' id='eway_card_number' value="{$values['card_number']}" />
-	</td>
-</tr>
-<tr class='wpsc-merch-eway-row'>
-	<$th><label>Card Holder's Name <span class='asterix'>*</span></label></$th>
-	<td>
-		<input type='text' value='' name='card_name' id='eway_card_name' value="{$values['card_name']}" />
-	</td>
-</tr>
-<tr class='wpsc-merch-eway-row'>
-	<$th><label>Credit Card Expiry <span class='asterix'>*</span></label></$th>
-	<td style='white-space: nowrap'>
-	<select class='wpsc_ccBox' name='expiry_month' style='width: 4em'>
-		$optMonths
-	</select><span>/</span><select class='wpsc_ccBox' name='expiry_year' style='width: 5em'>
-		$optYears
-	</select>
-	</td>
-</tr>
-
-<tr class='wpsc-merch-eway-row'>
-	<$th><label id='eway_cvn'>CVN <span class='asterix'>*</span></label></$th>
-	<td>
-		<input type='text' size='4' maxlength='4' value='' name='cvn' id='eway_cvn' />
-	</td>
-</tr>
-
-EOT;
-
-		return $checkoutFields;
 	}
 
+	/**
+	* load template from theme or plugin
+	* can't use locate_template() because wp-e-commerce is _doing_it_wrong() again!
+	* so have to roll our own...
+	* @param string $template name of template file
+	* @param array $variables an array of variables that should be accessible by the template
+	*/
+	protected static function loadTemplate($template, $variables) {
+		// make variables available to the template
+		extract($variables);
+
+		// check in theme / child theme folder
+		$stylesheetFolder = get_stylesheet_directory();
+		if (file_exists("$stylesheetFolder/$template")) {
+			$template = "$stylesheetFolder/$template";
+		}
+		else {
+			// check in parent theme folder
+			$templateFolder = get_template_directory();
+			if (file_exists("$templateFolder/$template")) {
+				$template = "$templateFolder/$template";
+			}
+			else {
+				// use plugin's template
+				$template = WPSC_MERCH_EWAY_PLUGIN_ROOT . 'templates/' . $template;
+			}
+		}
+
+		include $template;
+	}
 }

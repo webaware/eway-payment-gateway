@@ -19,6 +19,10 @@ class wpsc_merchant_eway_admin {
 	* display additional fields for gateway config form
 	*/
 	public static function configForm() {
+		$eway_stored = get_option('wpsc_merchant_eway_stored');
+		$eway_stored_yes = $eway_stored ? 'checked="checked"' : '';
+		$eway_stored_no  = $eway_stored ? '' : 'checked="checked"';
+
 		$eway_test = get_option('eway_test');
 		$eway_test_yes = $eway_test ? 'checked="checked"' : '';
 		$eway_test_no  = $eway_test ? '' : 'checked="checked"';
@@ -45,6 +49,19 @@ class wpsc_merchant_eway_admin {
 		<td>eWAY Customer ID</td>
 		<td>
 			<input type='text' size='10' value="$ewayCustomerID" name='ewayCustomerID_id' />
+		</td>
+	</tr>
+	<tr>
+		<td>Use Stored Payments</td>
+		<td>
+			<label><input type='radio' value='1' name='eway_stored' $eway_stored_yes /> $yes</label> &nbsp;
+			<label><input type='radio' value='0' name='eway_stored' $eway_stored_no /> $no</label>
+		</td>
+	</tr>
+	<tr id="wpsc-eway-admin-stored-test">
+		<td colspan='2' style='color:#c00'>
+			Stored Payments use the Direct Payments sandbox;
+			<br />there is no Stored Payments sandbox.
 		</td>
 	</tr>
 	<tr>
@@ -127,6 +144,34 @@ class wpsc_merchant_eway_admin {
 		</td>
 	</tr>
 
+<script>
+//<![CDATA[
+jQuery(function($) {
+
+	/**
+	* check whether both the sandbox (test) mode and Stored Payments are selected,
+	* show warning message if they are
+	*/
+	function checkStoredSandbox() {
+		var	useTest = ($("input[name='eway_test']:checked").val() == "1"),
+			useStored = ($("input[name='eway_stored']:checked").val() == "1");
+
+		if (useTest && useStored) {
+			$("#wpsc-eway-admin-stored-test").show(750);
+		}
+		else {
+			$("#wpsc-eway-admin-stored-test").hide();
+		}
+	}
+
+	$("input[name='eway_test'],input[name='eway_stored']").change(checkStoredSandbox);
+
+	checkStoredSandbox();
+
+});
+//]]>
+</script>
+
 EOT;
 	}
 
@@ -134,15 +179,19 @@ EOT;
 	* save config details from payment gateway admin
 	*/
 	public static function saveConfig() {
-		if ($_POST['ewayCustomerID_id'] != null) {
+		if (isset($_POST['ewayCustomerID_id'])) {
 			update_option('ewayCustomerID_id', $_POST['ewayCustomerID_id']);
 		}
 
-		if ($_POST['eway_test'] != null) {
+		if (isset($_POST['eway_stored'])) {
+			update_option('wpsc_merchant_eway_stored', $_POST['eway_stored']);
+		}
+
+		if (isset($_POST['eway_test'])) {
 			update_option('eway_test', $_POST['eway_test']);
 		}
 
-		if ($_POST['eway_th'] != null) {
+		if (isset($_POST['eway_th'])) {
 			update_option('wpsc_merchant_eway_th', $_POST['eway_th']);
 		}
 
@@ -158,7 +207,7 @@ EOT;
 	*/
 	public static function addPluginDetailsLinks($links, $file) {
 		if ($file == WPSC_MERCH_EWAY_PLUGIN_NAME) {
-			$links[] = '<a href="http://wordpress.org/support/plugin/eway-payment-gateway">' . __('Support') . '</a>';
+			$links[] = '<a href="http://wordpress.org/support/plugin/eway-payment-gateway">' . __('Get help') . '</a>';
 			$links[] = '<a href="http://wordpress.org/extend/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
 			$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=CXNFEP4EAMTG6">' . __('Donate') . '</a>';
 		}

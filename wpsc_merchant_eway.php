@@ -3,13 +3,13 @@
 Plugin Name: eWAY Payment Gateway
 Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
 Description: eWAY payment gateway for wp-e-commerce
-Version: 2.2.1
+Version: 2.3.0
 Author: WebAware
 Author URI: http://www.webaware.com.au/
 */
 
 /*
-copyright (c) 2011-2012 WebAware Pty Ltd (email : rmckay@webaware.com.au)
+copyright (c) 2011-2013 WebAware Pty Ltd (email : rmckay@webaware.com.au)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as
@@ -28,6 +28,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 if (!defined('WPSC_MERCH_EWAY_PLUGIN_ROOT')) {
 	define('WPSC_MERCH_EWAY_PLUGIN_ROOT', dirname(__FILE__) . '/');
 	define('WPSC_MERCH_EWAY_PLUGIN_NAME', basename(dirname(__FILE__)) . '/' . basename(__FILE__));
+
+	// wp-e-commerce gateway name
+	define('WPSC_MERCH_EWAY_GATEWAY_NAME', 'wpsc_merchant_eway');
+
+	// name used as cURL user agent
+	define('WPSC_MERCH_EWAY_CURL_USER_AGENT', 'wp-e-commerce eWAY Payment Gateway');
 }
 
 /**
@@ -40,7 +46,7 @@ function wpsc_merchant_eway_autoload($class_name) {
 		'wpsc_merchant_eway'				=> 'class.wpsc_merchant_eway.php',
 		'wpsc_merchant_eway_admin'			=> 'class.wpsc_merchant_eway_admin.php',
 		'wpsc_merchant_eway_payment'		=> 'class.wpsc_merchant_eway_payment.php',
-		'wpsc_merchant_eway_response'		=> 'class.wpsc_merchant_eway_response.php',
+		'wpsc_merchant_eway_stored_payment'	=> 'class.wpsc_merchant_eway_stored_payment.php',
 	);
 
 	if (isset($classMapPlugin[$class_name])) {
@@ -63,13 +69,11 @@ add_filter('plugin_row_meta', array('wpsc_merchant_eway_admin', 'addPluginDetail
 function wpsc_merchant_eway_register($gateways) {
 	global $gateway_checkout_form_fields;
 
-	$gateway_name = 'wpsc_merchant_eway';
-
 	// register the gateway class and additional functions
 	$gateways[] = array(
 			'name' => 'eWAY payment gateway',
 			'api_version' => 2.0,
-			'internalname' => $gateway_name,
+			'internalname' => WPSC_MERCH_EWAY_GATEWAY_NAME,
 			'class_name' => 'wpsc_merchant_eway',
 			'has_recurring_billing' => FALSE,
 			'wp_admin_cannot_cancel' => FALSE,
@@ -83,10 +87,7 @@ function wpsc_merchant_eway_register($gateways) {
 		);
 
 	// register extra fields we require on the checkout form
-	// (but only if this gateway is selected for checkout payments)
-	if (in_array($gateway_name, (array) get_option('custom_gateway_options'))) {
-		$gateway_checkout_form_fields[$gateway_name] = wpsc_merchant_eway::getCheckoutFields();
-	}
+	wpsc_merchant_eway::setCheckoutFields();
 
 	return $gateways;
 }
@@ -99,3 +100,8 @@ add_filter('wpsc_gateway_modules', 'wpsc_merchant_eway_register');
 function wpsc_merchant_eway_admin_configForm() {
 	return wpsc_merchant_eway_admin::configForm();
 }
+
+/**
+* custom exceptons
+*/
+class wpsc_merchant_eway_exception extends Exception {}
