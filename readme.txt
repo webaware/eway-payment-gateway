@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: wp e-commerce, eway, payment, ecommerce, credit cards, australia
 Requires at least: 3.2.1
 Tested up to: 3.5
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,9 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 2. Sales Log showing successful transaction ID
 
 == Changelog ==
+
+= 2.3.1 [2013-01-20] =
+* fixed: close table cell elements in form field template
 
 = 2.3.0 [2013-01-20] =
 * fixed: successful Direct transactions are now marked as Accepted Payment, not Order Received

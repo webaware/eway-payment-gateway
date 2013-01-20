@@ -10,19 +10,21 @@ Take care to keep the field names the same, or your checkout form won't charge c
 */
 ?>
 <tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label>Credit Card Number <span class='asterix'>*</span></label></$th>
+	<<?php echo $th; ?>><label>Credit Card Number <span class='asterix'>*</span></label></<?php echo $th; ?>>
 	<td>
 		<input type='text' value='' name='card_number' id='eway_card_number' />
 	</td>
 </tr>
+
 <tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label>Card Holder's Name <span class='asterix'>*</span></label></$th>
+	<<?php echo $th; ?>><label>Card Holder's Name <span class='asterix'>*</span></label></<?php echo $th; ?>>
 	<td>
 		<input type='text' value='' name='card_name' id='eway_card_name' />
 	</td>
 </tr>
+
 <tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label>Credit Card Expiry <span class='asterix'>*</span></label></$th>
+	<<?php echo $th; ?>><label>Credit Card Expiry <span class='asterix'>*</span></label></<?php echo $th; ?>>
 	<td style='white-space: nowrap'>
 	<select class='wpsc_ccBox' name='expiry_month' style='width: 4em'>
 		<?php echo $optMonths; ?>
@@ -33,7 +35,7 @@ Take care to keep the field names the same, or your checkout form won't charge c
 </tr>
 
 <tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label id='eway_cvn'>CVN <span class='asterix'>*</span></label></$th>
+	<<?php echo $th; ?>><label id='eway_cvn'>CVN <span class='asterix'>*</span></label></<?php echo $th; ?>>
 	<td>
 		<input type='text' size='4' maxlength='4' value='' name='cvn' id='eway_cvn' />
 	</td>
