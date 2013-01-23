@@ -28,11 +28,6 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			'post_code' => self::getCollectedDataValue(get_option('eway_form_post_code')),
 			'email' => self::getCollectedDataValue(get_option('eway_form_email')),
 		);
-
-		// convert wp-e-commerce country code into country name
-		if ($this->collected_gateway_data['country']) {
-			$this->collected_gateway_data['country'] = wpsc_get_country($this->collected_gateway_data['country']);
-		}
 	}
 
 	/**
@@ -146,7 +141,8 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			$eway = new wpsc_merchant_eway_payment(get_option('ewayCustomerID_id'), $isLiveSite);
 
 		$eway->invoiceDescription = get_bloginfo('name');
-		$eway->invoiceReference = $this->purchase_id;
+		$eway->invoiceReference = $this->purchase_id;								// customer invoice reference
+		$eway->transactionNumber = $this->purchase_id;								// transaction reference
 		$eway->cardHoldersName = $this->collected_gateway_data['card_name'];
 		$eway->cardNumber = $this->collected_gateway_data['card_number'];
 		$eway->cardExpiryMonth = $this->collected_gateway_data['expiry_month'];
@@ -157,12 +153,19 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		$eway->emailAddress = $this->collected_gateway_data['email'];
 		$eway->postcode = $this->collected_gateway_data['post_code'];
 
+		// for Beagle (free) security
+		if (get_option('wpsc_merchant_eway_beagle')) {
+			$eway->customerCountryCode = $this->collected_gateway_data['country'];
+		}
+
 		// aggregate street, city, state, country into a single string
+		// convert wp-e-commerce country code into country name
+		$country = $this->collected_gateway_data['country'] ? wpsc_get_country($this->collected_gateway_data['country']) : '';
 		$parts = array (
 			$this->collected_gateway_data['address'],
 			$this->collected_gateway_data['city'],
 			$this->collected_gateway_data['state'],
-			$this->collected_gateway_data['country'],
+			$country,
 		);
 		$eway->address = implode(', ', array_filter($parts, 'strlen'));
 
@@ -182,25 +185,36 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		$total = $purchase_logs['totalprice'];
 		$eway->amount = $isLiveSite ? $total : ceil($total);
 
-//~ $this->set_error_message(htmlspecialchars($eway->getPaymentXML()));
-//~ $this->set_purchase_processed_by_purchid(1);
+//~ error_log(__METHOD__ . "\n" . print_r($eway,1));
+//~ error_log(__METHOD__ . "\n" . $eway->getPaymentXML());
 //~ return;
 
 		try {
 			$response = $eway->processPayment();
 			if ($response->status) {
 				// transaction was successful, so record transaction number and continue
+
+//~ error_log(__METHOD__ . "\n" . print_r($response,1));
+
 				if ($useStored)
 					$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::ORDER_RECEIVED : 2;
 				else
 					$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::ACCEPTED_PAYMENT : 3;
 				$this->set_transaction_details($response->transactionNumber, $status);
+				$this->set_authcode($response->authCode);
+				if (!empty($response->beagleScore)) {
+					$this->setPaymentNotes('Beagle score: ' . $response->beagleScore);
+				}
 				$this->go_to_transaction_results($this->cart_data['session_id']);
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
-				$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::INCOMPLETE_SALE : 1;
-				$this->set_error_message(htmlspecialchars($response->error));
+
+//~ error_log(__METHOD__ . "\n" . print_r($response,1));
+
+				$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::PAYMENT_DECLINED : 6;
+				$this->set_error_message(nl2br(htmlspecialchars($response->error)));
+				$this->setPaymentNotes($response->error);
 				$this->set_purchase_processed_by_purchid($status);
 				return;
 			}
@@ -208,7 +222,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		catch (wpsc_merchant_eway_exception $e) {
 			// an exception occured, so record the error
 			$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::INCOMPLETE_SALE : 1;
-			$this->set_error_message(htmlspecialchars($e->getMessage()));
+			$this->set_error_message(nl2br(htmlspecialchars($e->getMessage())));
 			$this->set_purchase_processed_by_purchid($status);
 			return;
 		}
@@ -230,6 +244,21 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	*/
 	public function process_gateway_notification() {
 		return false;
+	}
+
+	/**
+	* update payment log notes (seems to be missing functionality in wpsc)
+	* @param string $notes
+	*/
+	protected function setPaymentNotes($notes) {
+		global $wpdb;
+
+		$wpdb->update(WPSC_TABLE_PURCHASE_LOGS,
+			array('notes' => $notes),
+			array('id' => $this->purchase_id),
+			array('%s'),
+			array('%d')
+		);
 	}
 
 	/**
@@ -292,5 +321,32 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		}
 
 		include $template;
+	}
+
+	/**
+	* send data via cURL (or similar if cURL is unavailable) and return response
+	* @param string $url
+	* @param string $data
+	* @param bool $sslVerifyPeer whether to validate the SSL certificate
+	* @return string $response
+	* @throws GFDpsPxPayCurlException
+	*/
+	public static function curlSendRequest($url, $data, $sslVerifyPeer = true) {
+		// send data via HTTPS and receive response
+		$response = wp_remote_post($url, array(
+			'user-agent' => WPSC_MERCH_EWAY_CURL_USER_AGENT,
+			'sslverify' => $sslVerifyPeer,
+			'timeout' => 60,
+			'headers' => array('Content-Type' => 'text/xml; charset=utf-8'),
+			'body' => $data,
+		));
+
+//~ error_log(__METHOD__ . "\n" . print_r($response,1));
+
+		if (is_wp_error($response)) {
+			throw new wpsc_merchant_eway_exception($response->get_error_message());
+		}
+
+		return $response['body'];
 	}
 }

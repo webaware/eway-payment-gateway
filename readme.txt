@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: wp e-commerce, eway, payment, ecommerce, credit cards, australia
 Requires at least: 3.2.1
 Tested up to: 3.5
-Stable tag: 2.3.1
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,9 +21,10 @@ The eWAY Payment Gateway adds a credit card payment gateway for [eWAY in Austral
 
 * card holder's name can be different to the purchaser's name
 * basic data validation performed before submitting to eWAY
-* eWAY transaction ID is displayed on purchases log, for successful payments
+* eWAY transaction ID and bank authcode are displayed on purchases log, for successful payments
 * drop-in compatible with eWAY payment gateway from the Gold Cart plugin (except recurring billing -- see FAQ)
 * supports Stored Payments for drop-ship merchants
+* supports Beagle anti-fraud measures for Direct Payments
 * it's free!
 
 = Requirements: =
@@ -73,9 +74,13 @@ No, this plugin only supports the [Direct Payments API](http://www.eway.com.au/d
 
 Like Direct Payments, the purchase information is sent to eWAY for processing, but with [Stored Payments](http://www.eway.com.au/how-it-works/what-products-are-included-#stored-payments) it isn't processed right away. The merchant needs to login to their eWAY Business Centre to complete each transaction. It's useful for shops that do drop-shipping and want to delay billing. Most websites should have this option set to No.
 
+= What is Beagle? =
+
+[Beagle](http://www.eway.com.au/how-it-works/what-products-are-included-#beagle-(free)) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure [Beagle rules](http://www.eway.com.au/developers/resources/beagle-(free)-rules) in your MYeWAY console before enabling Beagle in this plugin.
+
 = Where do I find the eWAY transaction number? =
 
-Successful transaction details including the eWAY transaction number are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
+Successful transaction details including the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
 
 = Can I use this plugin with the Gold Cart? =
 
@@ -98,6 +103,12 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 2. Sales Log showing successful transaction ID
 
 == Changelog ==
+
+= 2.4.0 [2013-01-23] =
+* fixed: declined payments now record status as Payment Declined instead of Incomplete Sale
+* added: record authcode for transactions, and show in Sales Log
+* added: send WP e-Commerce transaction number as both customer reference and invoice reference (customer reference can be filtered)
+* added: support for [Beagle (free)](http://www.eway.com.au/developers/resources/beagle-(free)-rules) anti-fraud using geo-IP (Direct Payments only)
 
 = 2.3.1 [2013-01-20] =
 * fixed: close table cell elements in form field template

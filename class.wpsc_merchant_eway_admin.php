@@ -6,13 +6,15 @@
 class wpsc_merchant_eway_admin {
 
 	/**
-	* hook billing details display on admin, to show eWAY transaction number
+	* hook billing details display on admin, to show eWAY transaction number and authcode
 	*/
 	public static function actionBillingDetailsBottom() {
 		global $purchlogitem;
 
 		if (!empty($purchlogitem->extrainfo->transactid))
 			echo '<p><strong>Transaction ID: ', htmlspecialchars($purchlogitem->extrainfo->transactid), "</strong></p>\n";
+		if (!empty($purchlogitem->extrainfo->authcode))
+			echo '<p><strong>Auth Code: ', htmlspecialchars($purchlogitem->extrainfo->authcode), "</strong></p>\n";
 	}
 
 	/**
@@ -30,6 +32,10 @@ class wpsc_merchant_eway_admin {
 		$eway_th = get_option('wpsc_merchant_eway_th');
 		$eway_th_yes = $eway_th ? 'checked="checked"' : '';
 		$eway_th_no  = $eway_th ? '' : 'checked="checked"';
+
+		$eway_beagle = get_option('wpsc_merchant_eway_beagle');
+		$eway_beagle_yes = $eway_beagle ? 'checked="checked"' : '';
+		$eway_beagle_no  = $eway_beagle ? '' : 'checked="checked"';
 
 		$ewayCustomerID = get_option('ewayCustomerID_id');
 		$yes = TXT_WPSC_YES;
@@ -76,6 +82,18 @@ class wpsc_merchant_eway_admin {
 		<td>
 			<label><input type='radio' value='1' name='eway_th' $eway_th_yes /> $yes</label> &nbsp;
 			<label><input type='radio' value='0' name='eway_th' $eway_th_no /> $no</label>
+		</td>
+	</tr>
+	<tr>
+		<td>Use <a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle</a></td>
+		<td>
+			<label><input type='radio' value='1' name='eway_beagle' $eway_beagle_yes /> $yes</label> &nbsp;
+			<label><input type='radio' value='0' name='eway_beagle' $eway_beagle_no /> $no</label>
+		</td>
+	</tr>
+	<tr id="wpsc-eway-admin-stored-beagle">
+		<td colspan='2' style='color:#c00'>
+			Beagle is not available for Stored Payments
 		</td>
 	</tr>
 
@@ -154,6 +172,7 @@ jQuery(function($) {
 	*/
 	function checkStoredSandbox() {
 		var	useTest = ($("input[name='eway_test']:checked").val() == "1"),
+			useBeagle = ($("input[name='eway_beagle']:checked").val() == "1"),
 			useStored = ($("input[name='eway_stored']:checked").val() == "1");
 
 		if (useTest && useStored) {
@@ -162,9 +181,16 @@ jQuery(function($) {
 		else {
 			$("#wpsc-eway-admin-stored-test").hide();
 		}
+
+		if (useBeagle && useStored) {
+			$("#wpsc-eway-admin-stored-beagle").show(750);
+		}
+		else {
+			$("#wpsc-eway-admin-stored-beagle").hide();
+		}
 	}
 
-	$("input[name='eway_test'],input[name='eway_stored']").change(checkStoredSandbox);
+	$("input[name='eway_test'],input[name='eway_stored'],input[name='eway_beagle']").change(checkStoredSandbox);
 
 	checkStoredSandbox();
 
@@ -193,6 +219,10 @@ EOT;
 
 		if (isset($_POST['eway_th'])) {
 			update_option('wpsc_merchant_eway_th', $_POST['eway_th']);
+		}
+
+		if (isset($_POST['eway_beagle'])) {
+			update_option('wpsc_merchant_eway_beagle', $_POST['eway_beagle']);
 		}
 
 		foreach ((array)$_POST['eway_form'] as $form => $value) {

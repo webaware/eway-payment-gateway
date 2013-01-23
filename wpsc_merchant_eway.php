@@ -3,7 +3,7 @@
 Plugin Name: eWAY Payment Gateway
 Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
 Description: eWAY payment gateway for wp-e-commerce
-Version: 2.3.1
+Version: 2.4.0
 Author: WebAware
 Author URI: http://www.webaware.com.au/
 */
@@ -55,6 +55,11 @@ function wpsc_merchant_eway_autoload($class_name) {
 }
 spl_autoload_register('wpsc_merchant_eway_autoload');
 
+/**
+* custom exceptons
+*/
+class wpsc_merchant_eway_exception extends Exception {}
+
 // hook wp-e-commerce to extend purchase logs display
 add_action('wpsc_billing_details_bottom', array('wpsc_merchant_eway_admin', 'actionBillingDetailsBottom'));
 
@@ -102,6 +107,30 @@ function wpsc_merchant_eway_admin_configForm() {
 }
 
 /**
-* custom exceptons
+* get the customer's IP address dynamically from server variables
+* @link http://www.grantburton.com/2008/11/30/fix-for-incorrect-ip-addresses-in-wordpress-comments/
+* @return string
 */
-class wpsc_merchant_eway_exception extends Exception {}
+function wpsc_merchant_eway_customer_ip() {
+	// if test mode and running on localhost, then kludge to an Aussie IP address
+	if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '127.0.0.1' && get_option('eway_test')) {
+		return '210.1.199.10';
+	}
+
+	// check for remote address, ignore all other headers as they can be spoofed easily
+	if (isset($_SERVER['REMOTE_ADDR']) && inet_pton($_SERVER['REMOTE_ADDR'])) {
+		return $_SERVER['REMOTE_ADDR'];
+	}
+
+	return '';
+}
+
+if (!function_exists('inet_pton')) {
+	/**
+	* handle Windows PHP pre-5.3.0 which doesn't have inet_pton()
+	*/
+	function inet_pton($ip) {
+		// just handle IPv4 addresses; tough!
+		return ip2long($ip);
+	}
+}

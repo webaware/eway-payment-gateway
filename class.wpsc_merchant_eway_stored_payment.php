@@ -3,6 +3,8 @@
 * Classes for dealing with an eWAY stored payment
 *
 * NB: for testing, the only card number seen as valid is '4444333322221111'
+*
+* @link http://www.eway.com.au/developers/api/stored-(xml)
 */
 
 /**
@@ -264,21 +266,13 @@ class wpsc_merchant_eway_stored_payment {
 		// use sandbox if not from live website
 		$url = $this->isLiveSite ? self::REALTIME_API_LIVE : self::REALTIME_API_SANDBOX;
 
-		// send data via HTTPS and receive response
-		$response = wp_remote_post($url, array(
-			'user-agent' => WPSC_MERCH_EWAY_CURL_USER_AGENT,
-			'sslverify' => $this->sslVerifyPeer,
-			'timeout' => 60,
-			'body' => $xml,
-		));
-
-//~ error_log(__METHOD__ . "\n" . print_r($response,1));
-
-		if (is_wp_error($response)) {
-			$errmsg = "Error posting eWAY payment to $url: " . $response->get_error_message();
-			throw new wpsc_merchant_eway_exception($errmsg);
+		// execute the cURL request, and retrieve the response
+		try {
+			$responseXML = wpsc_merchant_eway::curlSendRequest($url, $xml, $this->sslVerifyPeer);
 		}
-		$responseXML = $response['body'];
+		catch (wpsc_merchant_eway_exception $e) {
+			throw new wpsc_merchant_eway_exception("Error posting eWAY payment to $url: " . $e->getMessage());
+		}
 
 		$response = new wpsc_merchant_eway_stored_response();
 		$response->loadResponseXML($responseXML);
@@ -351,10 +345,18 @@ class wpsc_merchant_eway_stored_response {
 	*/
 	public function loadResponseXML($response) {
 		try {
-			// prevent XML injection attacks
+			// prevent XML injection attacks, and handle errors without warnings
 			$oldDisableEntityLoader = libxml_disable_entity_loader(TRUE);
+			$oldUseInternalErrors = libxml_use_internal_errors(TRUE);
 
-			$xml = new SimpleXMLElement($response);
+			$xml = simplexml_load_string($response);
+			if ($xml === false) {
+				$errmsg = '';
+				foreach (libxml_get_errors() as $error) {
+					$errmsg .= $error->message;
+				}
+				throw new Exception($errmsg);
+			}
 
 			$this->status = (strcasecmp((string) $xml->ewayTrxnStatus, 'true') === 0);
 			$this->transactionNumber = (string) $xml->ewayTrxnNumber;
@@ -371,12 +373,14 @@ class wpsc_merchant_eway_stored_response {
 			else
 				$this->amount = NULL;
 
-			// restore default XML inclusion and expansion
+			// restore old libxml settings
 			libxml_disable_entity_loader($oldDisableEntityLoader);
+			libxml_use_internal_errors($oldUseInternalErrors);
 		}
 		catch (Exception $e) {
-			// restore default XML inclusion and expansion
+			// restore old libxml settings
 			libxml_disable_entity_loader($oldDisableEntityLoader);
+			libxml_use_internal_errors($oldUseInternalErrors);
 
 			throw new wpsc_merchant_eway_exception('Error parsing eWAY response: ' . $e->getMessage());
 		}
