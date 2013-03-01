@@ -148,13 +148,10 @@ NB: Beagle isn't available for Another WordPress Classifieds Plugin due to the w
 
 = Where do I find the eWAY transaction number? =
 
-WP e-Commerce: the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
-
-WooCommerce: the eWAY transaction number and the bank authcode are shown in the Custom Fields block when you view the order in the WordPress admin.
-
-Events Manager: from the Payment Gateways menu item or the Bookings menu item, you can view a list of transactions; the eWAY transaction ID is shown in the Transaction ID column, and the authcode in the Notes column.
-
-Another WordPress Classifieds Plugin: not available in v2.x of the plugin.
+* **WP e-Commerce**: the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
+* **WooCommerce**: the eWAY transaction number and the bank authcode are shown in the Custom Fields block when you view the order in the WordPress admin.
+* **Events Manager**: from the Payment Gateways menu item or the Bookings menu item, you can view a list of transactions; the eWAY transaction ID is shown in the Transaction ID column, and the authcode in the Notes column.
+* **Another WordPress Classifieds Plugin**: not available in v2.x of the plugin.
 
 = Can I use this plugin with the WP e-Commerce Gold Cart? =
 
