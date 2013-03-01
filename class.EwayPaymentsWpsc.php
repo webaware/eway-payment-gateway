@@ -1,11 +1,46 @@
 <?php
 
 /**
-* implement bulk of gateway
+* payment gateway integration for WP e-Commerce
+* @ref http://docs.getshopped.org/category/developer-documentation/
 */
-class wpsc_merchant_eway extends wpsc_merchant {
+class EwayPaymentsWpsc extends wpsc_merchant {
 
 	public $name = 'eway';
+
+	/**
+	* register new payment gateway
+	* @param array $gateways array of registered gateways
+	* @return array
+	*/
+	public static function register($gateways) {
+		// register the gateway class and additional functions
+		$gateways[] = array (
+			'name' => 'eWAY payment gateway',
+			'api_version' => 2.0,
+			'internalname' => EWAY_PAYMENTS_WPSC_NAME,
+			'class_name' => __CLASS__,
+			'has_recurring_billing' => false,
+			'wp_admin_cannot_cancel' => true,
+			'display_name' => 'eWAY Credit Card Payment',
+			'form' => 'EwayPaymentsWpsc_configForm',		// called as variable function name, wp-e-commerce is _doing_it_wrong(), again!
+			'submit_function' => array(__CLASS__, 'saveConfig'),
+			'payment_type' => 'credit_card',
+			'requirements' => array(
+				'php_version' => 5.0,
+			),
+		);
+
+		// register extra fields we require on the checkout form
+		self::setCheckoutFields();
+
+		// also register admin hooks if required
+		if (is_admin()) {
+			add_action('wpsc_billing_details_bottom', array(__CLASS__, 'actionBillingDetailsBottom'));
+		}
+
+		return $gateways;
+	}
 
 	/**
 	* grab the gateway-specific data from the checkout form post
@@ -38,7 +73,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	* @return string
 	* @param string $fieldname name of the field in the form post
 	*/
-	private static function getPostValue($fieldname) {
+	protected static function getPostValue($fieldname) {
 		return isset($_POST[$fieldname]) ? stripslashes(trim($_POST[$fieldname])) : '';
 	}
 
@@ -50,7 +85,7 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	* @return string
 	* @param string $fieldname name of the field in the form post
 	*/
-	private static function getCollectedDataValue($fieldname) {
+	protected static function getCollectedDataValue($fieldname) {
 		return isset($_POST['collected_data'][$fieldname]) ? stripslashes(trim($_POST['collected_data'][$fieldname])) : '';
 	}
 
@@ -60,56 +95,11 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	public function submit() {
 		global $wpdb;
 
+//~ error_log(__METHOD__ . "\n" . print_r($this->collected_gateway_data,1));
+//~ error_log(__METHOD__ . "\n" . print_r($this,1));
+
 		// check for missing or invalid values
-		$errors = 0;
-		$expiryError = FALSE;
-
-		if (empty($this->collected_gateway_data['card_number'])) {
-			$this->set_error_message('Please enter credit card number');
-			$errors++;
-		}
-
-		if (empty($this->collected_gateway_data['card_name'])) {
-			$this->set_error_message('Please enter card holder name');
-			$errors++;
-		}
-
-		if (empty($this->collected_gateway_data['expiry_month']) || !preg_match('/^(?:0[0-9]|1[012])$/', $this->collected_gateway_data['expiry_month'])) {
-			$this->set_error_message('Please select credit card expiry month');
-			$errors++;
-			$expiryError = TRUE;
-		}
-
-		// FIXME: if this code makes it into the 2100's, update this regex!
-		if (empty($this->collected_gateway_data['expiry_year']) || !preg_match('/^20\d\d$/', $this->collected_gateway_data['expiry_year'])) {
-			$this->set_error_message('Please select credit card expiry year');
-			$errors++;
-			$expiryError = TRUE;
-		}
-
-		if (!$expiryError) {
-			// make sure hasn't expired!
-			if ($this->collected_gateway_data['expiry_month'] === '12')
-				$expired = mktime(0, 0, 0, 1, 0, 1 + $this->collected_gateway_data['expiry_year']);
-			else
-				$expired = mktime(0, 0, 0, 1 + $this->collected_gateway_data['expiry_month'], 0, $this->collected_gateway_data['expiry_year']);
-			if ($expired == 0) {
-				$this->set_error_message('Credit card expiry month or year is invalid');
-				$errors++;
-			}
-			else {
-				$today = time();
-				if ($expired < $today) {
-					$this->set_error_message('Credit card expiry has passed');
-					$errors++;
-				}
-			}
-		}
-
-		if (empty($this->collected_gateway_data['c_v_n'])) {
-			$this->set_error_message('Please enter CVN (Card Verification Number)');
-			$errors++;
-		}
+		$errors = $this->validateData();
 
 		// if there were errors, fail the transaction so that user can fix things up
 		if ($errors) {
@@ -120,15 +110,18 @@ class wpsc_merchant_eway extends wpsc_merchant {
 
 		// get purchase logs
 		if ($this->purchase_id > 0) {
-			$purchase_logs = $wpdb->get_row(
-				$wpdb->prepare('select totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where id = %d', $this->purchase_id), ARRAY_A);
+			$sql = 'select totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where id = %d';
+			$purchase_logs = $wpdb->get_row($wpdb->prepare($sql, $this->purchase_id), ARRAY_A);
 		}
 		elseif (!empty($this->session_id)) {
-			$purchase_logs = $wpdb->get_row(
-				$wpdb->prepare('select id,totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where sessionid = %s limit 1', $this->session_id),
-				ARRAY_A);
+			$sql = 'select id,totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where sessionid = %s limit 1';
+			$purchase_logs = $wpdb->get_row($wpdb->prepare($sql, $this->session_id), ARRAY_A);
 
 			$this->purchase_id = $purchase_logs['id'];
+		}
+		else {
+			$this->set_error_message('No cart ID and no active session!');
+			return;
 		}
 
 		// process the payment
@@ -136,9 +129,9 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		$useStored = get_option('wpsc_merchant_eway_stored');
 
 		if ($useStored)
-			$eway = new wpsc_merchant_eway_stored_payment(get_option('ewayCustomerID_id'), $isLiveSite);
+			$eway = new EwayPaymentsStoredPayment(get_option('ewayCustomerID_id'), $isLiveSite);
 		else
-			$eway = new wpsc_merchant_eway_payment(get_option('ewayCustomerID_id'), $isLiveSite);
+			$eway = new EwayPaymentsPayment(get_option('ewayCustomerID_id'), $isLiveSite);
 
 		$eway->invoiceDescription = get_bloginfo('name');
 		$eway->invoiceReference = $this->purchase_id;								// customer invoice reference
@@ -158,9 +151,10 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			$eway->customerCountryCode = $this->collected_gateway_data['country'];
 		}
 
-		// aggregate street, city, state, country into a single string
 		// convert wp-e-commerce country code into country name
 		$country = $this->collected_gateway_data['country'] ? wpsc_get_country($this->collected_gateway_data['country']) : '';
+
+		// aggregate street, city, state, country into a single string
 		$parts = array (
 			$this->collected_gateway_data['address'],
 			$this->collected_gateway_data['city'],
@@ -175,11 +169,11 @@ class wpsc_merchant_eway extends wpsc_merchant {
 		}
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription = apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription);
-		$eway->invoiceReference = apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference);
-		$eway->option1 = apply_filters('wpsc_merchant_eway_option1', '');
-		$eway->option2 = apply_filters('wpsc_merchant_eway_option2', '');
-		$eway->option3 = apply_filters('wpsc_merchant_eway_option3', '');
+		$eway->invoiceDescription = apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription, $this->purchase_id);
+		$eway->invoiceReference = apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference, $this->purchase_id);
+		$eway->option1 = apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id);
+		$eway->option2 = apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id);
+		$eway->option3 = apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id);
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$total = $purchase_logs['totalprice'];
@@ -193,13 +187,11 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			$response = $eway->processPayment();
 			if ($response->status) {
 				// transaction was successful, so record transaction number and continue
-
-//~ error_log(__METHOD__ . "\n" . print_r($response,1));
-
 				if ($useStored)
-					$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::ORDER_RECEIVED : 2;
+					$status = 2; // WPSC_Purchase_Log::ORDER_RECEIVED
 				else
-					$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::ACCEPTED_PAYMENT : 3;
+					$status = 3; // WPSC_Purchase_Log::ACCEPTED_PAYMENT
+
 				$this->set_transaction_details($response->transactionNumber, $status);
 				$this->set_authcode($response->authCode);
 				if (!empty($response->beagleScore)) {
@@ -209,19 +201,16 @@ class wpsc_merchant_eway extends wpsc_merchant {
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
-
-//~ error_log(__METHOD__ . "\n" . print_r($response,1));
-
-				$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::PAYMENT_DECLINED : 6;
+				$status = 6; // WPSC_Purchase_Log::PAYMENT_DECLINED
 				$this->set_error_message(nl2br(htmlspecialchars($response->error)));
 				$this->setPaymentNotes($response->error);
 				$this->set_purchase_processed_by_purchid($status);
 				return;
 			}
 		}
-		catch (wpsc_merchant_eway_exception $e) {
+		catch (EwayPaymentsException $e) {
 			// an exception occured, so record the error
-			$status = class_exists('WPSC_Purchase_Log') ? WPSC_Purchase_Log::INCOMPLETE_SALE : 1;
+			$status = 1; // WPSC_Purchase_Log::INCOMPLETE_SALE
 			$this->set_error_message(nl2br(htmlspecialchars($e->getMessage())));
 			$this->set_purchase_processed_by_purchid($status);
 			return;
@@ -247,6 +236,56 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	}
 
 	/**
+	* validate entered data for errors / omissions
+	* @return int number of errors found
+	*/
+	protected function validateData() {
+		// check for missing or invalid values
+		$errors = 0;
+		$expiryError = FALSE;
+
+		if (empty($this->collected_gateway_data['card_number'])) {
+			$this->set_error_message('Please enter credit card number');
+			$errors++;
+		}
+
+		if (empty($this->collected_gateway_data['card_name'])) {
+			$this->set_error_message('Please enter card holder name');
+			$errors++;
+		}
+
+		if (empty($this->collected_gateway_data['expiry_month']) || !preg_match('/^(?:0[1-9]|1[012])$/', $this->collected_gateway_data['expiry_month'])) {
+			$this->set_error_message('Please select credit card expiry month');
+			$errors++;
+			$expiryError = TRUE;
+		}
+
+		// FIXME: if this code makes it into the 2100's, update this regex!
+		if (empty($this->collected_gateway_data['expiry_year']) || !preg_match('/^20\d\d$/', $this->collected_gateway_data['expiry_year'])) {
+			$this->set_error_message('Please select credit card expiry year');
+			$errors++;
+			$expiryError = TRUE;
+		}
+
+		if (!$expiryError) {
+			// check that first day of month after expiry isn't earlier than today
+			$expired = mktime(0, 0, 0, 1 + $this->collected_gateway_data['expiry_month'], 0, $this->collected_gateway_data['expiry_year']);
+			$today = time();
+			if ($expired < $today) {
+				$this->set_error_message('Credit card expiry has passed');
+				$errors++;
+			}
+		}
+
+		if (empty($this->collected_gateway_data['c_v_n'])) {
+			$this->set_error_message('Please enter CVN (Card Verification Number)');
+			$errors++;
+		}
+
+		return $errors;
+	}
+
+	/**
 	* update payment log notes (seems to be missing functionality in wpsc)
 	* @param string $notes
 	*/
@@ -264,11 +303,11 @@ class wpsc_merchant_eway extends wpsc_merchant {
 	/**
 	* tell wp-e-commerce about fields we require on the checkout form
 	*/
-	public static function setCheckoutFields() {
+	protected static function setCheckoutFields() {
 		global $gateway_checkout_form_fields;
 
 		// check if this gateway is selected for checkout payments
-		if (in_array(WPSC_MERCH_EWAY_GATEWAY_NAME, (array) get_option('custom_gateway_options'))) {
+		if (in_array(EWAY_PAYMENTS_WPSC_NAME, (array) get_option('custom_gateway_options'))) {
 			// build drop-down items for months
 			$optMonths = '';
 			foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
@@ -287,66 +326,71 @@ class wpsc_merchant_eway extends wpsc_merchant {
 
 			// load template with passed values, capture output and register
 			ob_start();
-			self::loadTemplate('wpsc-eway-fields.php', compact('th', 'optMonths', 'optYears'));
-			$gateway_checkout_form_fields[WPSC_MERCH_EWAY_GATEWAY_NAME] = ob_get_clean();
+			EwayPaymentsPlugin::loadTemplate('wpsc-eway-fields.php', compact('th', 'optMonths', 'optYears'));
+			$gateway_checkout_form_fields[EWAY_PAYMENTS_WPSC_NAME] = ob_get_clean();
 		}
 	}
 
 	/**
-	* load template from theme or plugin
-	* can't use locate_template() because wp-e-commerce is _doing_it_wrong() again!
-	* so have to roll our own...
-	* @param string $template name of template file
-	* @param array $variables an array of variables that should be accessible by the template
+	* display additional fields for gateway config form
+	* return string
 	*/
-	protected static function loadTemplate($template, $variables) {
-		// make variables available to the template
-		extract($variables);
-
-		// check in theme / child theme folder
-		$stylesheetFolder = get_stylesheet_directory();
-		if (file_exists("$stylesheetFolder/$template")) {
-			$template = "$stylesheetFolder/$template";
-		}
-		else {
-			// check in parent theme folder
-			$templateFolder = get_template_directory();
-			if (file_exists("$templateFolder/$template")) {
-				$template = "$templateFolder/$template";
-			}
-			else {
-				// use plugin's template
-				$template = WPSC_MERCH_EWAY_PLUGIN_ROOT . 'templates/' . $template;
-			}
-		}
-
-		include $template;
+	public static function configForm() {
+		ob_start();
+		include EWAY_PAYMENTS_PLUGIN_ROOT . '/views/admin-wpsc.php';
+		return ob_get_clean();
 	}
 
 	/**
-	* send data via cURL (or similar if cURL is unavailable) and return response
-	* @param string $url
-	* @param string $data
-	* @param bool $sslVerifyPeer whether to validate the SSL certificate
-	* @return string $response
-	* @throws GFDpsPxPayCurlException
+	* save config details from payment gateway admin
 	*/
-	public static function curlSendRequest($url, $data, $sslVerifyPeer = true) {
-		// send data via HTTPS and receive response
-		$response = wp_remote_post($url, array(
-			'user-agent' => WPSC_MERCH_EWAY_CURL_USER_AGENT,
-			'sslverify' => $sslVerifyPeer,
-			'timeout' => 60,
-			'headers' => array('Content-Type' => 'text/xml; charset=utf-8'),
-			'body' => $data,
-		));
-
-//~ error_log(__METHOD__ . "\n" . print_r($response,1));
-
-		if (is_wp_error($response)) {
-			throw new wpsc_merchant_eway_exception($response->get_error_message());
+	public static function saveConfig() {
+		if (isset($_POST['ewayCustomerID_id'])) {
+			update_option('ewayCustomerID_id', $_POST['ewayCustomerID_id']);
 		}
 
-		return $response['body'];
+		if (isset($_POST['eway_stored'])) {
+			update_option('wpsc_merchant_eway_stored', $_POST['eway_stored']);
+		}
+
+		if (isset($_POST['eway_test'])) {
+			update_option('eway_test', $_POST['eway_test']);
+		}
+
+		if (isset($_POST['eway_th'])) {
+			update_option('wpsc_merchant_eway_th', $_POST['eway_th']);
+		}
+
+		if (isset($_POST['eway_beagle'])) {
+			update_option('wpsc_merchant_eway_beagle', $_POST['eway_beagle']);
+		}
+
+		foreach ((array)$_POST['eway_form'] as $form => $value) {
+			update_option(('eway_form_'.$form), $value);
+		}
+
+		return true;
 	}
+
+	/**
+	* hook billing details display on admin, to show eWAY transaction number and authcode
+	*/
+	public static function actionBillingDetailsBottom() {
+		global $purchlogitem;
+
+		if (!empty($purchlogitem->extrainfo->transactid)) {
+			echo '<p><strong>Transaction ID: ', htmlspecialchars($purchlogitem->extrainfo->transactid), "</strong></p>\n";
+		}
+		if (!empty($purchlogitem->extrainfo->authcode)) {
+			echo '<p><strong>Auth Code: ', htmlspecialchars($purchlogitem->extrainfo->authcode), "</strong></p>\n";
+		}
+	}
+}
+
+/**
+* proxy function for calling class method, because wp-e-commerce is _doing_it_wrong(), again!
+* @return string
+*/
+function EwayPaymentsWpsc_configForm() {
+	return EwayPaymentsWpsc::configForm();
 }

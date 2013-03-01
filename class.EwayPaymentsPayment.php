@@ -1,19 +1,23 @@
 <?php
+
 /**
-* Classes for dealing with an eWAY stored payment
+* Classes for dealing with eWAY payments
 *
 * NB: for testing, the only card number seen as valid is '4444333322221111'
 *
-* @link http://www.eway.com.au/developers/api/stored-(xml)
+* @link http://www.eway.com.au/developers/api/direct-payments
+* @link http://www.eway.com.au/developers/api/beagle-(free)
+*
+* copyright (c) 2008-2013 WebAware Pty Ltd, released under GPL v2.1
 */
 
 /**
-* eWAY stored payment request
+* Class for dealing with an eWAY payment
 */
-class wpsc_merchant_eway_stored_payment {
+class EwayPaymentsPayment {
 	// environment / website specific members
 	/**
-	* NB: Stored Payments use the Direct Payments sandbox; there is no Stored Payments sandbox
+	* default FALSE, use eWAY sandbox unless set to TRUE
 	* @var boolean
 	*/
 	public $isLiveSite;
@@ -105,7 +109,6 @@ class wpsc_merchant_eway_stored_payment {
 
 	/**
 	* CVN (Creditcard Verification Number) for verifying physical card is held by buyer
-	* NB: this is ignored for Stored Payments!
 	* @var string max. 3 or 4 characters (depends on type of card)
 	*/
 	public $cardVerificationNumber;
@@ -116,7 +119,7 @@ class wpsc_merchant_eway_stored_payment {
 	* You can pass a unique transaction number from your site. You can update and track the status of a transaction when eWAY
 	* returns to your site.
 	*
-	* NB. This number is returned as 'ewayTrxnReference', member transactionReference of wpsc_merchant_eway_stored_response.
+	* NB. This number is returned as 'ewayTrxnReference', member transactionReference of EwayPaymentsResponse.
 	*
 	* @var string max. 16 characters
 	*/
@@ -140,10 +143,30 @@ class wpsc_merchant_eway_stored_payment {
 	*/
 	public $option3;
 
+	/**
+	* Beagle: country code for billing address
+	* @var string 2 characters
+	*/
+	public $customerCountryCode;
+
+	/**
+	* Beagle: IP address of purchaser (from REMOTE_ADDR)
+	* @var string max. 15 characters
+	*/
+	public $customerIP;
+
 	/** host for the eWAY Real Time API in the developer sandbox environment */
 	const REALTIME_API_SANDBOX = 'https://www.eway.com.au/gateway/xmltest/testpage.asp';
 	/** host for the eWAY Real Time API in the production environment */
-	const REALTIME_API_LIVE = 'https://www.eway.com.au/gateway/xmlstored.asp';
+	const REALTIME_API_LIVE = 'https://www.eway.com.au/gateway/xmlpayment.asp';
+	/** host for the eWAY Real Time API with CVN verification in the developer sandbox environment */
+	const REALTIME_CVN_API_SANDBOX = 'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp';
+	/** host for the eWAY Real Time API with CVN verification in the production environment */
+	const REALTIME_CVN_API_LIVE = 'https://www.eway.com.au/gateway_cvn/xmlpayment.asp';
+	/** host for the eWAY Beagle API in the developer sandbox environment */
+	const REALTIME_BEAGLE_API_SANDBOX = 'https://www.eway.com.au/gateway_cvn/xmltest/BeagleTest.aspx';
+	/** host for the eWAY Beagle API in the production environment */
+	const REALTIME_BEAGLE_API_LIVE = 'https://www.eway.com.au/gateway_cvn/xmlbeagle.asp';
 
 	/**
 	* populate members with defaults, and set account and environment information
@@ -153,7 +176,7 @@ class wpsc_merchant_eway_stored_payment {
 	*/
 	public function __construct($accountID, $isLiveSite = FALSE) {
 		$this->sslVerifyPeer = TRUE;
-		$this->isLiveSite = $isLiveSite;		// NB: this is ignored for Stored Payments!
+		$this->isLiveSite = $isLiveSite;
 		$this->accountID = $accountID;
 	}
 
@@ -219,7 +242,7 @@ class wpsc_merchant_eway_stored_payment {
 		}
 
 		if (strlen($errmsg) > 0)
-			throw new wpsc_merchant_eway_exception($errmsg);
+			throw new EwayPaymentsException($errmsg);
 	}
 
 	/**
@@ -247,10 +270,19 @@ class wpsc_merchant_eway_stored_payment {
 		$xml->writeElement('ewayCardExpiryMonth', sprintf('%02d', $this->cardExpiryMonth));
 		$xml->writeElement('ewayCardExpiryYear', sprintf('%02d', $this->cardExpiryYear % 100));
 		$xml->writeElement('ewayTrxnNumber', $this->transactionNumber);
-		//~ $xml->writeElement('ewayCVN', $this->cardVerificationNumber);	// NB: must not be present for Stored Payments!
 		$xml->writeElement('ewayOption1', $this->option1);
 		$xml->writeElement('ewayOption2', $this->option2);
 		$xml->writeElement('ewayOption3', $this->option3);
+		$xml->writeElement('ewayCVN', $this->cardVerificationNumber);
+
+		// Beagle data
+		if (!empty($this->customerCountryCode)) {
+			if (empty($this->customerIP)) {
+				$this->customerIP = EwayPaymentsPlugin::getCustomerIP($this->isLiveSite);
+			}
+			$xml->writeElement('ewayCustomerIPAddress', $this->customerIP);
+			$xml->writeElement('ewayCustomerBillingCountry', $this->customerCountryCode);
+		}
 
 		$xml->endElement();		// ewaygateway
 
@@ -259,31 +291,45 @@ class wpsc_merchant_eway_stored_payment {
 
 	/**
 	* send the eWAY payment request and retrieve and parse the response
-	* @return wpsc_merchant_eway_stored_response
+	*
+	* @return EwayPaymentsResponse
 	* @param string $xml eWAY payment request as an XML document, per eWAY specifications
 	*/
 	private function sendPayment($xml) {
-		// use sandbox if not from live website
-		$url = $this->isLiveSite ? self::REALTIME_API_LIVE : self::REALTIME_API_SANDBOX;
+		// select endpoint URL, use sandbox if not from live website
+		if (!empty($this->customerCountryCode)) {
+			// use Beagle anti-fraud endpoints
+			$url = $this->isLiveSite ? self::REALTIME_BEAGLE_API_LIVE : self::REALTIME_BEAGLE_API_SANDBOX;
+		}
+		else if (empty($this->cardVerificationNumber)) {
+			// no CVN -- do these endpoints still work?
+			$url = $this->isLiveSite ? self::REALTIME_API_LIVE : self::REALTIME_API_SANDBOX;
+		}
+		else {
+			// normal Direct Payments endpoints with CVN verification
+			$url = $this->isLiveSite ? self::REALTIME_CVN_API_LIVE : self::REALTIME_CVN_API_SANDBOX;
+		}
+
+//~ error_log(__METHOD__ . ": url = $url");
 
 		// execute the cURL request, and retrieve the response
 		try {
-			$responseXML = wpsc_merchant_eway::curlSendRequest($url, $xml, $this->sslVerifyPeer);
+			$responseXML = EwayPaymentsPlugin::curlSendRequest($url, $xml, $this->sslVerifyPeer);
 		}
-		catch (wpsc_merchant_eway_exception $e) {
-			throw new wpsc_merchant_eway_exception("Error posting eWAY payment to $url: " . $e->getMessage());
+		catch (EwayPaymentsException $e) {
+			throw new EwayPaymentsException("Error posting eWAY payment to $url: " . $e->getMessage());
 		}
 
-		$response = new wpsc_merchant_eway_stored_response();
+		$response = new EwayPaymentsResponse();
 		$response->loadResponseXML($responseXML);
 		return $response;
 	}
 }
 
 /**
-* eWAY stored payment response
+* Class for dealing with an eWAY payment response
 */
-class wpsc_merchant_eway_stored_response {
+class EwayPaymentsResponse {
 	/**
 	* For a successful transaction "True" is passed and for a failed transaction "False" is passed.
 	* @var boolean
@@ -349,6 +395,8 @@ class wpsc_merchant_eway_stored_response {
 			$oldDisableEntityLoader = libxml_disable_entity_loader(TRUE);
 			$oldUseInternalErrors = libxml_use_internal_errors(TRUE);
 
+//~ error_log(__METHOD__ . "\n" . $response);
+
 			$xml = simplexml_load_string($response);
 			if ($xml === false) {
 				$errmsg = '';
@@ -367,6 +415,8 @@ class wpsc_merchant_eway_stored_response {
 			$this->authCode = (string) $xml->ewayAuthCode;
 			$this->error = (string) $xml->ewayTrxnError;
 
+			$this->beagleScore = (string) $xml->ewayBeagleScore;
+
 			// if we got an amount, convert it back into dollars.cents from just cents
 			if (!empty($xml->ewayReturnAmount))
 				$this->amount = floatval($xml->ewayReturnAmount) / 100.0;
@@ -382,7 +432,7 @@ class wpsc_merchant_eway_stored_response {
 			libxml_disable_entity_loader($oldDisableEntityLoader);
 			libxml_use_internal_errors($oldUseInternalErrors);
 
-			throw new wpsc_merchant_eway_exception('Error parsing eWAY response: ' . $e->getMessage());
+			throw new EwayPaymentsException('Error parsing eWAY response: ' . $e->getMessage());
 		}
 	}
 }

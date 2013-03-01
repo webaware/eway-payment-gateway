@@ -4,38 +4,54 @@ Plugin Name: eWAY Payment Gateway
 Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
 Author URI: http://www.webaware.com.au/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
-Tags: wp e-commerce, eway, payment, ecommerce, credit cards, australia
+Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.2.1
-Tested up to: 3.5
-Stable tag: 2.4.0
+Tested up to: 3.5.1
+Stable tag: 3.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Add a credit card payment gateway for eWAY to the WP e-Commerce shopping cart plugin
+Add a credit card payment gateway for eWAY (Australia) to some popular WordPress plugins
 
 == Description ==
 
-The eWAY Payment Gateway adds a credit card payment gateway for [eWAY in Australia](http://www.eway.com.au/) [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-(xml)) to the [WP e-Commerce](http://wordpress.org/extend/plugins/wp-e-commerce/) shopping cart plugin, without requiring the Gold Cart option.
+The eWAY Payment Gateway adds a credit card payment gateway integration for [eWAY in Australia](http://www.eway.com.au/) [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-%28xml%29). These plugins are supported:
+
+* [WP e-Commerce](http://wordpress.org/extend/plugins/wp-e-commerce/) shopping cart plugin
+* [WooCommerce](http://wordpress.org/extend/plugins/woocommerce/) shopping cart plugin
+* [Another WordPress Classifieds Plugin](http://wordpress.org/extend/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
+* [Events Manager Pro](http://eventsmanagerpro.com/) event bookings plugin
+
+Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](http://wordpress.org/extend/plugins/gravityforms-eway/).
 
 **Features:**
 
 * card holder's name can be different to the purchaser's name
 * basic data validation performed before submitting to eWAY
-* eWAY transaction ID and bank authcode are displayed on purchases log, for successful payments
-* drop-in compatible with eWAY payment gateway from the Gold Cart plugin (except recurring billing -- see FAQ)
-* supports Stored Payments for drop-ship merchants
-* supports Beagle anti-fraud measures for Direct Payments
+* eWAY transaction ID and bank authcode are recorded for successful payments
+* supports Stored Payments for drop-ship merchants / delayed billing
+* supports Beagle anti-fraud measures for Direct Payments (for supporting plugins)
+* drop-in compatible with eWAY payment gateway from the WP e-Commerce Gold Cart plugin (except recurring billing -- see FAQ)
 * it's free!
 
+= Sponsorships =
+
+* Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+* Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+
+Thanks for sponsoring new features for eWAY Payment Gateway!
+
 = Requirements: =
-* you need to install [WP e-Commerce](http://wordpress.org/extend/plugins/wp-e-commerce/)
+* you need to install a shopping cart plugin listed above
 * you need an SSL certificate for your hosting account
 * you need an account with eWAY Australia
-* this plugin uses eWAY's [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-(xml)), but does not support eWAY's hosted payment form
+* this plugin uses eWAY's [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-%28xml%29), but does not support eWAY's hosted payment form
 
 = Filter hooks =
 
 Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
+
+**WP e-Commerce**
 
 * `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
 * `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
@@ -43,12 +59,60 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `wpsc_merchant_eway_option2` for setting the option2 field
 * `wpsc_merchant_eway_option3` for setting the option3 field
 
+**WooCommerce**
+
+* `woocommerce_eway_invoice_desc` for modifying the invoice description
+* `woocommerce_eway_invoice_ref` for modifying the invoice reference
+* `woocommerce_eway_option1` for setting the option1 field
+* `woocommerce_eway_option2` for setting the option2 field
+* `woocommerce_eway_option3` for setting the option3 field
+
+**Another WordPress Classifieds Plugin**
+
+* `awpcp_eway_invoice_desc` for modifying the invoice description
+* `awpcp_eway_invoice_ref` for modifying the invoice reference
+* `awpcp_eway_option1` for setting the option1 field
+* `awpcp_eway_option2` for setting the option2 field
+* `awpcp_eway_option3` for setting the option3 field
+
+**Events Manager**
+
+* `em_eway_invoice_desc` for modifying the invoice description
+* `em_eway_invoice_ref` for modifying the invoice reference
+* `em_eway_option1` for setting the option1 field
+* `em_eway_option2` for setting the option2 field
+* `em_eway_option3` for setting the option3 field
+
 == Installation ==
 
-1. Upload this plugin to your /wp-content/plugins/ directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Activate the eWAY payment gateway through the 'Settings->Store' menu (WP e-Commerce settings)
-4. Edit the eWAY payment gateway settings by hovering your mouse over the gateway's name and clicking the hidden 'edit' link
+After uploading and activating this plugin, you need to configure it.
+
+**WP e-Commerce**
+
+1. Navigate to 'Settings->Store->Payments' on the menu
+2. Activate the eWAY payment gateway and click the Update button
+3. Edit the eWAY payment gateway settings by hovering your mouse over the gateway's name and clicking the hidden 'edit' link
+4. Edit the eWAY customer ID and select the appropriate settings, including which checkout fields map to eWAY fields
+
+**WooCommerce**
+
+1. Navigate to 'WooCommerce->Settings->Payment Gateways' on the menu
+2. Select eWAY from the Payment Gateways menu
+3. Tick the field 'Enable/Disable' to enable the gateway
+4. Edit the eWAY customer ID and select the appropriate settings
+
+**Another WordPress Classifieds Plugin**
+
+1. Navigate to 'Classified->Settings->Payment' on the menu
+2. Click the Activate eWAY checkbox
+3. Edit the eWAY customer ID and select the appropriate settings
+
+**Events Manager**
+
+1. Navigate to 'Events->Payment Gateways' on the menu
+2. Click the Activate link underneath the eWAY gateway name
+3. Click the Settings link underneath the eWAY gateway name
+4. Edit the eWAY customer ID and select the appropriate settings
 
 NB: you should always test your gateway first by using eWAY's test server. To do this, set your eWAY Customer ID to the special test ID 87654321 and select Use Test Environment. When you go to pay, the only card number that will be accepted by the test server is 4444333322221111. This allows you to make as many test purchases as you like, without billing a real credit card.
 
@@ -60,7 +124,9 @@ eWAY is a leading provider of online payments solutions for Australia, New Zeala
 
 = Is recurring billing supported? =
 
-Not yet. I know it can be done but I haven't had a website that needs it yet, so have not written the code for it. If you need recurring billing, buy the [Gold Cart plugin](http://getshopped.org/premium-upgrades/premium-plugin/gold-cart-plugin/) for WP e-Commerce.
+Not yet. I know it can be done but I haven't had a website that needs it yet, so have not written the code for it. If you need recurring billing for WP e-Commerce, buy the [Gold Cart plugin](http://getshopped.org/premium-upgrades/premium-plugin/gold-cart-plugin/).
+
+If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](http://www.gravityforms.com/) and [Gravity Forms eWAY](http://wordpress.org/extend/plugins/gravityforms-eway/) which does support recurring payments.
 
 = Can I use other eWAY gateways, outside of Australia? =
 
@@ -76,13 +142,21 @@ Like Direct Payments, the purchase information is sent to eWAY for processing, b
 
 = What is Beagle? =
 
-[Beagle](http://www.eway.com.au/how-it-works/what-products-are-included-#beagle-(free)) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure [Beagle rules](http://www.eway.com.au/developers/resources/beagle-(free)-rules) in your MYeWAY console before enabling Beagle in this plugin.
+[Beagle](http://www.eway.com.au/how-it-works/what-products-are-included-#beagle-(free)) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure [Beagle rules](http://www.eway.com.au/developers/resources/beagle-%28free%29-rules) in your MYeWAY console before enabling Beagle in this plugin.
+
+NB: Beagle isn't available for Another WordPress Classifieds Plugin due to the way that plugin collects billing information.
 
 = Where do I find the eWAY transaction number? =
 
-Successful transaction details including the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
+WP e-Commerce: the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
 
-= Can I use this plugin with the Gold Cart? =
+WooCommerce: the eWAY transaction number and the bank authcode are shown in the Custom Fields block when you view the order in the WordPress admin.
+
+Events Manager: from the Payment Gateways menu item or the Bookings menu item, you can view a list of transactions; the eWAY transaction ID is shown in the Transaction ID column, and the authcode in the Notes column.
+
+Another WordPress Classifieds Plugin: not available in v2.x of the plugin.
+
+= Can I use this plugin with the WP e-Commerce Gold Cart? =
 
 Yes, if you deactivate the Gold Cart's eWAY payment gateway and activate this one. The settings from the Gold Cart payment gateway will be picked up by this gateway automatically (they are stored in the same places).
 
@@ -100,15 +174,27 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 == Screenshots ==
 
 1. WP e-Commerce payments settings
-2. Sales Log showing successful transaction ID
+2. WP e-Commerce Sales Log with transaction ID and authcode
+3. WooCommerce payments settings
+4. WooCommerce order details with transaction ID and authcode
+5. Events Manager payments settings
+6. Events Manager transactions with transaction ID and authcode
+7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.0.0 [2013-03-01] =
+* added: WooCommerce integration
+* added: Another WordPress Classifieds Plugin integration (sponsored by [Michael Major Media](http://michaelmajor.com.au/) -- thanks!)
+* added: Events Manager integration (sponsored by [Michael Major Media](http://michaelmajor.com.au/) -- thanks!)
+* changed: use WP e-Commerce 2.8.9+ hooks and functions
+* changed: refactored for greater generalisation
 
 = 2.4.0 [2013-01-23] =
 * fixed: declined payments now record status as Payment Declined instead of Incomplete Sale
 * added: record authcode for transactions, and show in Sales Log
 * added: send WP e-Commerce transaction number as both customer reference and invoice reference (customer reference can be filtered)
-* added: support for [Beagle (free)](http://www.eway.com.au/developers/resources/beagle-(free)-rules) anti-fraud using geo-IP (Direct Payments only)
+* added: support for [Beagle (free)](http://www.eway.com.au/developers/resources/beagle-%28free%29-rules) anti-fraud using geo-IP (Direct Payments only)
 
 = 2.3.1 [2013-01-20] =
 * fixed: close table cell elements in form field template
