@@ -35,9 +35,14 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		$this->eway_stored		= $this->settings['eway_stored'];
 		$this->eway_beagle		= $this->settings['eway_beagle'];
 
-		// hook some actions / filters
-		add_action('woocommerce_update_options_payment_gateways', array($this, 'process_admin_options'));	// save admin options, via WC_Settings_API
-		add_filter('woocommerce_email_order_meta_keys', array($this, 'filterWooEmailOrderMetaKeys'));		// add email fields
+		// add email fields
+		add_filter('woocommerce_email_order_meta_keys', array($this, 'filterWooEmailOrderMetaKeys'));
+
+		// save admin options, via WC_Settings_API
+		// v1.6.6 and under:
+		add_action('woocommerce_update_options_payment_gateways', array($this, 'process_admin_options'));
+		// v2.0+
+		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 	}
 
 	/**

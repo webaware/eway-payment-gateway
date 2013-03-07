@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.2.1
 Tested up to: 3.5.1
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,6 +179,9 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.0.1 [2013-03-07] =
+* changed: update for WooCommerce v2.0.x compatibility
 
 = 3.0.0 [2013-03-01] =
 * added: WooCommerce integration
