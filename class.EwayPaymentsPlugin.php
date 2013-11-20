@@ -4,12 +4,11 @@
 * plugin controller class
 */
 class EwayPaymentsPlugin {
-	//~ public $urlBase;									// string: base URL path to files in plugin
+	public $urlBase;									// string: base URL path to files in plugin
 
 	/**
 	* static method for getting the instance of this singleton object
-	*
-	* @return GFEwayPlugin
+	* @return EwayPaymentsPlugin
 	*/
 	public static function getInstance() {
 		static $instance = NULL;
@@ -25,14 +24,16 @@ class EwayPaymentsPlugin {
 	* initialise plugin
 	*/
 	private function __construct() {
+		$this->urlBase = plugin_dir_url(__FILE__);
+
 		add_action('init', array($this, 'init'));
 		add_filter('plugin_row_meta', array($this, 'addPluginDetailsLinks'), 10, 2);
 
 		// register with WP e-Commerce
-		add_filter('wpsc_merchants_modules', array($this, 'filterWpscRegister'));
+		add_filter('wpsc_merchants_modules', array($this, 'wpscRegister'));
 
 		// register with WooCommerce
-		add_filter('woocommerce_payment_gateways', array($this, 'filterWooRegister'));
+		add_filter('woocommerce_payment_gateways', array($this, 'wooRegister'));
 	}
 
 	/**
@@ -52,11 +53,11 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
-	* register new wp-e-commerce payment gateway
+	* register new WP e-Commerce payment gateway
 	* @param array $gateways array of registered gateways
 	* @return array
 	*/
-	public function filterWpscRegister($gateways) {
+	public function wpscRegister($gateways) {
 		return EwayPaymentsWpsc::register($gateways);
 	}
 
@@ -65,7 +66,7 @@ class EwayPaymentsPlugin {
 	* @param array $gateways array of registered gateways
 	* @return array
 	*/
-	public function filterWooRegister($gateways) {
+	public function wooRegister($gateways) {
 		return EwayPaymentsWoo::register($gateways);
 	}
 
@@ -75,7 +76,7 @@ class EwayPaymentsPlugin {
 	public function addPluginDetailsLinks($links, $file) {
 		if ($file == EWAY_PAYMENTS_PLUGIN_NAME) {
 			$links[] = '<a href="http://wordpress.org/support/plugin/eway-payment-gateway">' . __('Get help') . '</a>';
-			$links[] = '<a href="http://wordpress.org/extend/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
+			$links[] = '<a href="http://wordpress.org/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
 			$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=CXNFEP4EAMTG6">' . __('Donate') . '</a>';
 		}
 
@@ -84,33 +85,39 @@ class EwayPaymentsPlugin {
 
 	/**
 	* load template from theme or plugin
-	* can't use locate_template() because wp-e-commerce is _doing_it_wrong() again!
-	* so have to roll our own...
 	* @param string $template name of template file
 	* @param array $variables an array of variables that should be accessible by the template
 	*/
 	public static function loadTemplate($template, $variables) {
+		global $posts, $post, $wp_did_header, $wp_query, $wp_rewrite, $wpdb, $wp_version, $wp, $id, $comment, $user_ID;
+
 		// make variables available to the template
 		extract($variables);
 
+		// can't use locate_template() because WP e-Commerce is _doing_it_wrong() again!
+		// (STYLESHEETPATH and TEMPLATEPATH are both undefined when this function called for wpsc)
+
 		// check in theme / child theme folder
-		$stylesheetFolder = get_stylesheet_directory();
-		if (file_exists("$stylesheetFolder/$template")) {
-			$template = "$stylesheetFolder/$template";
-		}
-		else {
+		$templatePath = get_stylesheet_directory() . "/$template";
+		if (!file_exists($templatePath)) {
 			// check in parent theme folder
-			$templateFolder = get_template_directory();
-			if (file_exists("$templateFolder/$template")) {
-				$template = "$templateFolder/$template";
-			}
-			else {
-				// use plugin's template
-				$template = EWAY_PAYMENTS_PLUGIN_ROOT . 'templates/' . $template;
+			$templatePath = get_template_directory() . "/$template";
+			if (!file_exists($templatePath)) {
+				// not found in theme, use plugin's template
+				$templatePath = EWAY_PAYMENTS_PLUGIN_ROOT . "templates/$template";
 			}
 		}
 
-		include $template;
+		require $templatePath;
+	}
+
+	/**
+	* get base URL path for plugin files
+	* @return string
+	*/
+	public static function getUrlPath() {
+		$plugin = self::getInstance();
+		return $plugin->urlBase;
 	}
 
 	/**

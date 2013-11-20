@@ -16,7 +16,7 @@ $eway_beagle = get_option('wpsc_merchant_eway_beagle');
 	</tr>
 
 	<tr>
-		<td>Use <a href='http://www.eway.com.au/how-it-works/what-products-are-included-#stored-payments' target="_blank">Stored Payments</a></td>
+		<td>Use <a href='http://www.eway.com.au/how-it-works/payment-products#stored-payments' target="_blank">Stored Payments</a></td>
 		<td>
 			<label><input type='radio' value='1' name='eway_stored' <?php checked($eway_stored, '1'); ?> /> <?php echo TXT_WPSC_YES; ?></label> &nbsp;
 			<label><input type='radio' value='0' name='eway_stored' <?php checked($eway_stored, '0'); ?> /> <?php echo TXT_WPSC_NO; ?></label>

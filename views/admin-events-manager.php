@@ -61,7 +61,7 @@
 				<option value="1" <?php selected($selected, '1'); ?>>Yes</option>
 				<option value="0" <?php selected($selected, '0'); ?>>No</option>
 			</select><br />
-			<em><a href='http://www.eway.com.au/how-it-works/what-products-are-included-#stored-payments' target="_blank">Stored payments</a>
+			<em><a href='http://www.eway.com.au/how-it-works/payment-products#stored-payments' target="_blank">Stored payments</a>
 			 records payment details but doesn't bill immediately.</em>
 			<em id="em-eway-admin-stored-test" style='color:#c00'><br />Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.</em>
 		</td>
