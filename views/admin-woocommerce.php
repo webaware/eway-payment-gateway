@@ -2,6 +2,7 @@
 // WooCommerce admin settings page
 ?>
 
+<img style="float:right" src="<?php echo EwayPaymentsPlugin::getUrlPath(); ?>images/eway-siteseal.png" />
 <h3><?php echo htmlspecialchars($this->admin_page_heading); ?></h3>
 <p><?php echo htmlspecialchars($this->admin_page_description); ?></p>
 <table class="form-table">

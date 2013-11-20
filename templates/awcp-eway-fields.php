@@ -45,7 +45,12 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 	<div class="clear"></div>
 
-	<p><input type="submit" value="Make payment" /></p>
+	<p>
+		<input type="submit" value="Make payment" />
+		<a href="http://www.eway.com.au/" target="_blank">
+			<img src="<?php echo plugins_url('/images/eway-siteseal-tagline.png', EWAY_PAYMENTS_PLUGIN_NAME); ?>" />
+		</a>
+	</p>
 
 </fieldset>
 

@@ -13,6 +13,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		//~ parent::__construct();		// no parent constructor (yet!)
 
 		$this->id						= 'eway_payments';
+		$this->icon						= EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png';
 		$this->method_title				= 'eWAY';
 		$this->admin_page_heading 		= 'eWAY payment gateway';
 		$this->admin_page_description 	= 'Integration with the eWAY Direct API credit card payment gateway.';
@@ -55,14 +56,14 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 			'enabled' => array(
 							'title' 		=> __( 'Enable/Disable', 'woocommerce' ),
 							'type' 			=> 'checkbox',
-							'label' 		=> __( 'Enable this shipping method', 'woocommerce' ),
+							'label' 		=> 'Enable eWAY credit card payment',
 							'default' 		=> 'no',
 						),
 			'title' => array(
 							'title' 		=> __( 'Method Title', 'woocommerce' ),
 							'type' 			=> 'text',
 							'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-							'default'		=> 'Credit card (eWAY)',
+							'default'		=> 'Credit card',
 						),
 			'description' => array(
 							'title' 		=> __( 'Description', 'woocommerce' ),
@@ -93,13 +94,13 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'title' 		=> 'eWAY customer ID',
 							'type' 			=> 'text',
 							'description' 	=> '',
-							'default' 		=> '87654321',
+							'default' 		=> EWAY_PAYMENTS_TEST_CUSTOMER,
 						),
 			'eway_stored' => array(
 							'title' 		=> 'Stored payments',
 							'label' 		=> 'enable stored payments',
 							'type' 			=> 'checkbox',
-							'description' 	=> "<a href='http://www.eway.com.au/how-it-works/what-products-are-included-#stored-payments' target='_blank'>Stored payments</a> records payment details but doesn't bill immediately. Useful for drop-shipping merchants.<em id='woocommerce-eway-admin-stored-test' style='color:#c00'><br />NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.</em>",
+							'description' 	=> "<a href='http://www.eway.com.au/how-it-works/payment-products#stored-payments' target='_blank'>Stored payments</a> records payment details but doesn't bill immediately. Useful for drop-shipping merchants.<em id='woocommerce-eway-admin-stored-test' style='color:#c00'><br />NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.</em>",
 							'default' 		=> 'no',
 						),
 			'eway_sandbox' => array(
@@ -143,7 +144,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 			$optYears .= "<option value='$year'>$year</option>\n";
 		}
 
-		// load template with passed values, capture output and register
+		// load payment fields template with passed values
 		EwayPaymentsPlugin::loadTemplate('woocommerce-eway-fields.php', compact('optMonths', 'optYears'));
 	}
 

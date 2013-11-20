@@ -18,6 +18,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$gateways[] = array (
 			'name' => 'eWAY payment gateway',
 			'api_version' => 2.0,
+			'image' => EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png',
 			'internalname' => EWAY_PAYMENTS_WPSC_NAME,
 			'class_name' => __CLASS__,
 			'has_recurring_billing' => false,
@@ -27,7 +28,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			'submit_function' => array(__CLASS__, 'saveConfig'),
 			'payment_type' => 'credit_card',
 			'requirements' => array(
-				'php_version' => 5.0,
+				'php_version' => 5.2,
 			),
 		);
 
