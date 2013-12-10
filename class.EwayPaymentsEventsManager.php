@@ -20,14 +20,15 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$this->title = 'eWAY';
 		$this->status = 4;
 		$this->status_txt = 'Processing (eWAY)';
-		$this->button_enabled = false; // TODO: we can't use a button here ?
+		$this->button_enabled = false;
+		$this->supports_multiple_bookings = true;
 
 		// ensure options are present, set to defaults if not
 		$defaults = array (
 			'em_' . EM_EWAY_GATEWAY . '_option_name'			=> 'Credit Card',
 			'em_' . EM_EWAY_GATEWAY . '_booking_feedback'		=> 'Booking successful.',
 			'em_' . EM_EWAY_GATEWAY . '_booking_feedback_free'	=> 'Booking successful. You have not been charged for this booking.',
-			'em_' . EM_EWAY_GATEWAY . '_cust_id'				=> '87654321',
+			'em_' . EM_EWAY_GATEWAY . '_cust_id'				=> EWAY_PAYMENTS_TEST_CUSTOMER,
 			'em_' . EM_EWAY_GATEWAY . '_stored'					=> '0',
 			'em_' . EM_EWAY_GATEWAY . '_beagle'					=> '0',
 			'em_' . EM_EWAY_GATEWAY . '_test_force'				=> '1',
@@ -44,12 +45,15 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 		if ($this->is_active()) {
 			// force SSL for booking submissions, since we have card info
-			if (get_option('em_' . EM_EWAY_GATEWAY . '_mode') == 'live') { // no need if in sandbox mode
-				add_filter('em_wp_localize_script', array(__CLASS__, 'filterEmWpLocalizeScript')); // modify booking script, force SSL for all
-				add_filter('em_booking_form_action_url', array(__CLASS__, 'force_ssl')); // modify booking script, force SSL for all
+			// no need if in sandbox mode
+			if (get_option('em_' . EM_EWAY_GATEWAY . '_mode') == 'live') {
+				add_filter('em_wp_localize_script', array(__CLASS__, 'filterEmWpLocalizeScript'));	// booking script
+				add_filter('em_booking_form_action_url', array(__CLASS__, 'force_ssl'));			// booking form action
 			}
 
-			add_filter('em_booking_validate', array(__CLASS__, 'filterEmBookingValidate'), 10, 2);	// perform additional form post validation
+			// perform additional form post validation
+			add_filter('em_booking_validate', array(__CLASS__, 'filterEmBookingValidate'), 10, 2);
+			add_filter('em_multiple_booking_validate', array(__CLASS__, 'filterEmBookingValidate'), 10, 2);
 		}
 	}
 
@@ -163,7 +167,12 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		parent::booking_add($EM_Event, $EM_Booking, $post_validation);
 
 		if ($post_validation && empty($EM_Booking->booking_id)) {
-			add_filter('em_booking_save', array($this, 'em_booking_save'), 2, 2);
+			if (get_option('dbem_multiple_bookings') && get_class($EM_Booking) == 'EM_Multiple_Booking' ) {
+				add_filter('em_multiple_booking_save', array($this, 'em_booking_save'), 2, 2);
+			}
+			else {
+				add_filter('em_booking_save', array($this, 'em_booking_save'), 2, 2);
+			}
 		}
 	}
 
@@ -195,8 +204,14 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 						// (which is when a new user for this booking would be created)
 						$EM_Person = $EM_Booking->get_person();
 						if (strtotime($EM_Person->data->user_registered) >= $this->registered_timer) {
-							include_once(ABSPATH.'/wp-admin/includes/user.php');
-							wp_delete_user($EM_Person->ID);
+							if (is_multisite()) {
+								include_once(ABSPATH.'/wp-admin/includes/ms.php');
+								wpmu_delete_user($EM_Person->ID);
+							}
+							else {
+								include_once(ABSPATH.'/wp-admin/includes/user.php');
+								wp_delete_user($EM_Person->ID);
+							}
 
 							// remove email confirmation
 							global $EM_Notices;
@@ -281,7 +296,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		// process the payment
 		$isLiveSite = !(get_option('em_' . EM_EWAY_GATEWAY . '_mode') == 'sandbox');
 		if (!$isLiveSite && get_option('em_' . EM_EWAY_GATEWAY . '_test_force')) {
-			$customerID = '87654321';
+			$customerID = EWAY_PAYMENTS_TEST_CUSTOMER;
 		}
 		else {
 			$customerID = get_option('em_' . EM_EWAY_GATEWAY . '_cust_id');
@@ -292,11 +307,12 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		else
 			$eway = new EwayPaymentsPayment($customerID, $isLiveSite);
 
-		$eway->invoiceDescription = preg_replace('/[^a-zA-Z0-9\s]/', '', $EM_Booking->get_event()->event_name); //clean event name
+		$eway->invoiceDescription = $EM_Booking->get_event()->event_name;
+		//~ $eway->invoiceDescription = $EM_Booking->output('#_BOOKINGTICKETDESCRIPTION');
 		$eway->invoiceReference = $EM_Booking->booking_id;						// customer invoice reference
 		$eway->transactionNumber = $EM_Booking->booking_id;						// transaction reference
 		$eway->cardHoldersName = self::getPostValue('x_card_name');
-		$eway->cardNumber = self::getPostValue('x_card_num');
+		$eway->cardNumber = strtr(self::getPostValue('x_card_num'), array(' ' => '', '-' => ''));
 		$eway->cardExpiryMonth = self::getPostValue('x_exp_date_month');
 		$eway->cardExpiryYear = self::getPostValue('x_exp_date_year');
 		$eway->cardVerificationNumber = self::getPostValue('x_card_code');

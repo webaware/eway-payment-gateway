@@ -1,10 +1,10 @@
 <?php
 // custom fields for WP e-Commerce admin page
 
-$eway_stored = get_option('wpsc_merchant_eway_stored');
-$eway_test = get_option('eway_test');
-$eway_th = get_option('wpsc_merchant_eway_th');
-$eway_beagle = get_option('wpsc_merchant_eway_beagle');
+$eway_stored = get_option('wpsc_merchant_eway_stored') ? '1' : '0';
+$eway_test = get_option('eway_test') ? '1' : '0';
+$eway_th = get_option('wpsc_merchant_eway_th') ? '1' : '0';
+$eway_beagle = get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 
 ?>
 
@@ -16,7 +16,7 @@ $eway_beagle = get_option('wpsc_merchant_eway_beagle');
 	</tr>
 
 	<tr>
-		<td>Use <a href='http://www.eway.com.au/how-it-works/what-products-are-included-#stored-payments' target="_blank">Stored Payments</a></td>
+		<td>Use <a href='http://www.eway.com.au/how-it-works/payment-products#stored-payments' target="_blank">Stored Payments</a></td>
 		<td>
 			<label><input type='radio' value='1' name='eway_stored' <?php checked($eway_stored, '1'); ?> /> <?php echo TXT_WPSC_YES; ?></label> &nbsp;
 			<label><input type='radio' value='0' name='eway_stored' <?php checked($eway_stored, '0'); ?> /> <?php echo TXT_WPSC_NO; ?></label>
@@ -50,6 +50,10 @@ $eway_beagle = get_option('wpsc_merchant_eway_beagle');
 		<td>
 			<label><input type='radio' value='1' name='eway_beagle' <?php checked($eway_beagle, '1'); ?> /> <?php echo TXT_WPSC_YES; ?></label> &nbsp;
 			<label><input type='radio' value='0' name='eway_beagle' <?php checked($eway_beagle, '0'); ?> /> <?php echo TXT_WPSC_NO; ?></label>
+			<span id="wpsc-eway-admin-beagle-address">
+				<br />You will also need to add a Country field to your checkout form. Beagle works by comparing the country of the address with the
+				country where the purchaser is using the Internet; Beagle won't be used when checking out without a country selected.
+			</span>
 		</td>
 	</tr>
 	<tr id="wpsc-eway-admin-stored-beagle">
@@ -131,38 +135,33 @@ $eway_beagle = get_option('wpsc_merchant_eway_beagle');
 	</tr>
 
 <script>
-//<![CDATA[
-jQuery(function($) {
+(function($) {
 
 	/**
 	* check whether both the sandbox (test) mode and Stored Payments are selected,
 	* show warning message if they are
 	*/
-	function checkStoredSandbox() {
-		var	useTest = ($("input[name='eway_test']:checked").val() == "1"),
-			useBeagle = ($("input[name='eway_beagle']:checked").val() == "1"),
-			useStored = ($("input[name='eway_stored']:checked").val() == "1");
+	function setVisibility() {
+		var	useTest = ($("input[name='eway_test']:checked").val() === "1"),
+			useBeagle = ($("input[name='eway_beagle']:checked").val() === "1"),
+			useStored = ($("input[name='eway_stored']:checked").val() === "1");
 
-		if (useTest && useStored) {
-			$("#wpsc-eway-admin-stored-test").show(750);
-		}
-		else {
-			$("#wpsc-eway-admin-stored-test").hide();
+		function display(element, visible) {
+			if (visible)
+				element.css({display: "none"}).show(750);
+			else
+				element.hide();
 		}
 
-		if (useBeagle && useStored) {
-			$("#wpsc-eway-admin-stored-beagle").show(750);
-		}
-		else {
-			$("#wpsc-eway-admin-stored-beagle").hide();
-		}
+		display($("#wpsc-eway-admin-stored-test"), (useTest && useStored));
+		display($("#wpsc-eway-admin-stored-beagle"), (useBeagle && useStored));
+		display($("#wpsc-eway-admin-beagle-address"), useBeagle);
 	}
 
-	$("input[name='eway_test'],input[name='eway_stored'],input[name='eway_beagle']").change(checkStoredSandbox);
+	$("#gateway_settings_wpsc_merchant_eway_form").on("change", "input[name='eway_test'],input[name='eway_beagle'],input[name='eway_stored']", setVisibility);
 
-	checkStoredSandbox();
+	setVisibility();
 
-});
-//]]>
+})(jQuery);
 </script>
 

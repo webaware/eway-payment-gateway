@@ -6,8 +6,8 @@ Author URI: http://www.webaware.com.au/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.2.1
-Tested up to: 3.5.1
-Stable tag: 3.0.1
+Tested up to: 3.8
+Stable tag: 3.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,16 +15,16 @@ Add a credit card payment gateway for eWAY (Australia) to some popular WordPress
 
 == Description ==
 
-The eWAY Payment Gateway adds a credit card payment gateway integration for [eWAY in Australia](http://www.eway.com.au/) [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-%28xml%29). These plugins are supported:
+The eWAY Payment Gateway adds a credit card payment gateway integration for [eWAY in Australia](http://www.eway.com.au/) [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-%28xml%29). These plugins are supported:
 
-* [WP e-Commerce](http://wordpress.org/extend/plugins/wp-e-commerce/) shopping cart plugin
-* [WooCommerce](http://wordpress.org/extend/plugins/woocommerce/) shopping cart plugin
-* [Another WordPress Classifieds Plugin](http://wordpress.org/extend/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
+* [WP e-Commerce](http://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
+* [WooCommerce](http://wordpress.org/plugins/woocommerce/) shopping cart plugin
+* [Another WordPress Classifieds Plugin](http://wordpress.org/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
 * [Events Manager Pro](http://eventsmanagerpro.com/) event bookings plugin
 
-Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](http://wordpress.org/extend/plugins/gravityforms-eway/).
+Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](http://wordpress.org/plugins/gravityforms-eway/).
 
-**Features:**
+### Features: ###
 
 * card holder's name can be different to the purchaser's name
 * basic data validation performed before submitting to eWAY
@@ -45,43 +45,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 * you need to install a shopping cart plugin listed above
 * you need an SSL certificate for your hosting account
 * you need an account with eWAY Australia
-* this plugin uses eWAY's [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-%28xml%29), but does not support eWAY's hosted payment form
-
-= Filter hooks =
-
-Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
-
-**WP e-Commerce**
-
-* `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
-* `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
-* `wpsc_merchant_eway_option1` for setting the option1 field
-* `wpsc_merchant_eway_option2` for setting the option2 field
-* `wpsc_merchant_eway_option3` for setting the option3 field
-
-**WooCommerce**
-
-* `woocommerce_eway_invoice_desc` for modifying the invoice description
-* `woocommerce_eway_invoice_ref` for modifying the invoice reference
-* `woocommerce_eway_option1` for setting the option1 field
-* `woocommerce_eway_option2` for setting the option2 field
-* `woocommerce_eway_option3` for setting the option3 field
-
-**Another WordPress Classifieds Plugin**
-
-* `awpcp_eway_invoice_desc` for modifying the invoice description
-* `awpcp_eway_invoice_ref` for modifying the invoice reference
-* `awpcp_eway_option1` for setting the option1 field
-* `awpcp_eway_option2` for setting the option2 field
-* `awpcp_eway_option3` for setting the option3 field
-
-**Events Manager**
-
-* `em_eway_invoice_desc` for modifying the invoice description
-* `em_eway_invoice_ref` for modifying the invoice reference
-* `em_eway_option1` for setting the option1 field
-* `em_eway_option2` for setting the option2 field
-* `em_eway_option3` for setting the option3 field
+* this plugin uses eWAY's [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-%28xml%29), but does not support eWAY's hosted payment form
 
 == Installation ==
 
@@ -134,17 +98,19 @@ Not yet. There are plans to integrate eWAY's Rapid Payments API sometime in 2013
 
 = Can I use the eWAY hosted payment form with this plugin? =
 
-No, this plugin only supports the [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments.html).
+No, this plugin only supports the [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments).
 
 = What is Stored Payments? =
 
-Like Direct Payments, the purchase information is sent to eWAY for processing, but with [Stored Payments](http://www.eway.com.au/how-it-works/what-products-are-included-#stored-payments) it isn't processed right away. The merchant needs to login to their eWAY Business Centre to complete each transaction. It's useful for shops that do drop-shipping and want to delay billing. Most websites should have this option set to No.
+Like Direct Payments, the purchase information is sent to eWAY for processing, but with [Stored Payments](http://www.eway.com.au/how-it-works/payment-products#stored-payments) it isn't processed right away. The merchant needs to login to their eWAY Business Centre to complete each transaction. It's useful for shops that do drop-shipping and want to delay billing. Most websites should have this option set to No.
 
 = What is Beagle? =
 
-[Beagle](http://www.eway.com.au/how-it-works/what-products-are-included-#beagle-(free)) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure [Beagle rules](http://www.eway.com.au/developers/resources/beagle-%28free%29-rules) in your MYeWAY console before enabling Beagle in this plugin.
+[Beagle](http://www.eway.com.au/how-it-works/payment-products#beagle-%28free%29) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure [Beagle rules](http://www.eway.com.au/developers/resources/beagle-%28free%29-rules) in your MYeWAY console before enabling Beagle in this plugin.
 
-NB: Beagle isn't available for Another WordPress Classifieds Plugin due to the way that plugin collects billing information.
+**NB**: You will also need to add a Country field to your checkout form. Beagle works by comparing the country of the address with the country where the purchaser is using the Internet; Beagle won't be used when checking out without a country selected.
+
+**NB**: Beagle isn't available for Another WordPress Classifieds Plugin due to the way that plugin collects billing information.
 
 = Where do I find the eWAY transaction number? =
 
@@ -168,6 +134,43 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 * XMLWriter
 * SimpleXML
 
+== Filter hooks ==
+
+Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
+
+**WP e-Commerce**
+
+* `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
+* `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
+* `wpsc_merchant_eway_option1` for setting the option1 field
+* `wpsc_merchant_eway_option2` for setting the option2 field
+* `wpsc_merchant_eway_option3` for setting the option3 field
+
+**WooCommerce**
+
+* `woocommerce_eway_invoice_desc` for modifying the invoice description
+* `woocommerce_eway_invoice_ref` for modifying the invoice reference
+* `woocommerce_eway_option1` for setting the option1 field
+* `woocommerce_eway_option2` for setting the option2 field
+* `woocommerce_eway_option3` for setting the option3 field
+* `woocommerce_eway_icon` for changing the payment gateway icon
+
+**Another WordPress Classifieds Plugin**
+
+* `awpcp_eway_invoice_desc` for modifying the invoice description
+* `awpcp_eway_invoice_ref` for modifying the invoice reference
+* `awpcp_eway_option1` for setting the option1 field
+* `awpcp_eway_option2` for setting the option2 field
+* `awpcp_eway_option3` for setting the option3 field
+
+**Events Manager**
+
+* `em_eway_invoice_desc` for modifying the invoice description
+* `em_eway_invoice_ref` for modifying the invoice reference
+* `em_eway_option1` for setting the option1 field
+* `em_eway_option2` for setting the option2 field
+* `em_eway_option3` for setting the option3 field
+
 == Screenshots ==
 
 1. WP e-Commerce payments settings
@@ -179,6 +182,19 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.1.1 [2013-12-10] =
+* fixed: doco / settings page didn't explain that Beagle requires an Address field
+* changed: permit card numbers with spaces / dashes, but strip before submitting to eWAY
+* changed: move some WooCommerce setting descriptions into tips to reduce screen clutter in admin
+* added: HTML5 text field patterns for credit card number, CVV/CVN
+* added: filter `woocommerce_eway_icon` for changing the payment gateway icon
+
+= 3.1.0 [2013-11-21] =
+* changed: support multiple bookings mode in Events Manager
+* changed: some links to eWAY website
+* added: support for v3 of Another WordPress Classifieds Plugin
+* added: WooCommerce and WP e-Commerce payment method logos
 
 = 3.0.1 [2013-03-07] =
 * changed: update for WooCommerce v2.0.x compatibility
