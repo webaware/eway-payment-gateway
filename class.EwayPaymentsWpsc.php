@@ -48,7 +48,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	*/
 	public function construct_value_array() {
 		$this->collected_gateway_data = array (
-			'card_number' => self::getPostValue('card_number'),
+			'card_number' => strtr(self::getPostValue('card_number'), array(' ' => '', '-' => '')),
 			'card_name' => self::getPostValue('card_name'),
 			'expiry_month' => self::getPostValue('expiry_month'),
 			'expiry_year' => self::getPostValue('expiry_year'),

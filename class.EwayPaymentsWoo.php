@@ -13,7 +13,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		//~ parent::__construct();		// no parent constructor (yet!)
 
 		$this->id						= 'eway_payments';
-		$this->icon						= EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png';
+		$this->icon						= apply_filters('woocommerce_eway_icon', EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png');
 		$this->method_title				= 'eWAY';
 		$this->admin_page_heading 		= 'eWAY payment gateway';
 		$this->admin_page_description 	= 'Integration with the eWAY Direct API credit card payment gateway.';
@@ -63,12 +63,14 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'title' 		=> __( 'Method Title', 'woocommerce' ),
 							'type' 			=> 'text',
 							'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
+							'desc_tip'		=> true,
 							'default'		=> 'Credit card',
 						),
 			'description' => array(
 							'title' 		=> __( 'Description', 'woocommerce' ),
 							'type' 			=> 'textarea',
 							'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
+							'desc_tip'		=> true,
 							'default'		=> 'Pay with your credit card using eWAY secure checkout',
 						),
 			'availability' => array(
@@ -108,13 +110,14 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'label' 		=> 'enable sandbox (testing) mode',
 							'type' 			=> 'checkbox',
 							'description' 	=> 'Use the sandbox testing environment, no live payments are accepted; use test card number 4444333322221111',
+							'desc_tip'		=> true,
 							'default' 		=> 'yes',
 						),
 			'eway_beagle' => array(
 							'title' 		=> 'Beagle (anti-fraud)',
 							'label' 		=> 'enable Beagle (free) anti-fraud',
 							'type' 			=> 'checkbox',
-							'description' 	=> '<a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure <a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle rules</a> in your MYeWAY console before enabling Beagle<em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />Beagle is not available for Stored Payments</em>',
+							'description' 	=> '<a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure <a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle rules</a> in your MYeWAY console before enabling Beagle.<em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />Beagle is not available for Stored Payments</em>',
 							'default' 		=> 'no',
 						),
 			);
@@ -223,7 +226,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		$eway->invoiceReference = $order_id;										// customer invoice reference
 		$eway->transactionNumber = $order_id;										// transaction reference
 		$eway->cardHoldersName = self::getPostValue('eway_card_name');
-		$eway->cardNumber = self::getPostValue('eway_card_number');
+		$eway->cardNumber = strtr(self::getPostValue('eway_card_number'), array(' ' => '', '-' => ''));
 		$eway->cardExpiryMonth = self::getPostValue('eway_expiry_month');
 		$eway->cardExpiryYear = self::getPostValue('eway_expiry_year');
 		$eway->cardVerificationNumber = self::getPostValue('eway_cvn');
@@ -349,6 +352,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	* @param string $fieldname name of the field in the form post
 	*/
 	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? stripslashes(trim($_POST[$fieldname])) : '';
+		return isset($_POST[$fieldname]) ? stripslashes(trim((string) $_POST[$fieldname])) : '';
 	}
 }

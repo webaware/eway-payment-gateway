@@ -9,34 +9,36 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 */
 ?>
-<tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label>Credit Card Number <span class='asterix'>*</span></label></<?php echo $th; ?>>
+<tr class="wpsc-merch-eway-row">
+	<<?php echo $th; ?>><label>Credit Card Number <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>
-		<input type='text' value='' name='card_number' id='eway_card_number' />
+		<input type="text" value="" pattern="[0-9 -]*" name="card_number" id="eway_card_number"
+			title="only digits 0-9 are accepted, with optional spaces" />
 	</td>
 </tr>
 
-<tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label>Card Holder's Name <span class='asterix'>*</span></label></<?php echo $th; ?>>
+<tr class="wpsc-merch-eway-row">
+	<<?php echo $th; ?>><label>Card Holder's Name <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>
-		<input type='text' value='' name='card_name' id='eway_card_name' />
+		<input type="text" value="" name="card_name" id="eway_card_name" />
 	</td>
 </tr>
 
-<tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label>Credit Card Expiry <span class='asterix'>*</span></label></<?php echo $th; ?>>
-	<td style='white-space: nowrap'>
-	<select class='wpsc_ccBox' name='expiry_month' style='width: 4em'>
+<tr class="wpsc-merch-eway-row">
+	<<?php echo $th; ?>><label>Credit Card Expiry <span class="asterix">*</span></label></<?php echo $th; ?>>
+	<td style="white-space: nowrap">
+	<select class="wpsc_ccBox" name="expiry_month" style="width: 4em">
 		<?php echo $optMonths; ?>
-	</select><span>/</span><select class='wpsc_ccBox' name='expiry_year' style='width: 5em'>
+	</select><span>/</span><select class="wpsc_ccBox" name="expiry_year" style="width: 5em">
 		<?php echo $optYears; ?>
 	</select>
 	</td>
 </tr>
 
-<tr class='wpsc-merch-eway-row'>
-	<<?php echo $th; ?>><label id='eway_cvn'>CVN <span class='asterix'>*</span></label></<?php echo $th; ?>>
+<tr class="wpsc-merch-eway-row">
+	<<?php echo $th; ?>><label id="eway_cvn">CVN/CVV <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>
-		<input type='text' size='4' maxlength='4' value='' name='cvn' id='eway_cvn' />
+		<input type="text" size="4" maxlength="4" value="" pattern="[0-9]*" name="cvn" id="eway_cvn"
+			title="only digits 0-9 are accepted" />
 	</td>
 </tr>

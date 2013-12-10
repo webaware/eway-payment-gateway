@@ -312,7 +312,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$eway->invoiceReference = $EM_Booking->booking_id;						// customer invoice reference
 		$eway->transactionNumber = $EM_Booking->booking_id;						// transaction reference
 		$eway->cardHoldersName = self::getPostValue('x_card_name');
-		$eway->cardNumber = self::getPostValue('x_card_num');
+		$eway->cardNumber = strtr(self::getPostValue('x_card_num'), array(' ' => '', '-' => ''));
 		$eway->cardExpiryMonth = self::getPostValue('x_exp_date_month');
 		$eway->cardExpiryYear = self::getPostValue('x_exp_date_year');
 		$eway->cardVerificationNumber = self::getPostValue('x_card_code');

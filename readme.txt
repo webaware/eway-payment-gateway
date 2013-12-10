@@ -6,8 +6,8 @@ Author URI: http://www.webaware.com.au/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.2.1
-Tested up to: 3.7.1
-Stable tag: 3.1.0
+Tested up to: 3.8
+Stable tag: 3.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,7 +108,9 @@ Like Direct Payments, the purchase information is sent to eWAY for processing, b
 
 [Beagle](http://www.eway.com.au/how-it-works/payment-products#beagle-%28free%29) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure [Beagle rules](http://www.eway.com.au/developers/resources/beagle-%28free%29-rules) in your MYeWAY console before enabling Beagle in this plugin.
 
-NB: Beagle isn't available for Another WordPress Classifieds Plugin due to the way that plugin collects billing information.
+**NB**: You will also need to add a Country field to your checkout form. Beagle works by comparing the country of the address with the country where the purchaser is using the Internet; Beagle won't be used when checking out without a country selected.
+
+**NB**: Beagle isn't available for Another WordPress Classifieds Plugin due to the way that plugin collects billing information.
 
 = Where do I find the eWAY transaction number? =
 
@@ -151,6 +153,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `woocommerce_eway_option1` for setting the option1 field
 * `woocommerce_eway_option2` for setting the option2 field
 * `woocommerce_eway_option3` for setting the option3 field
+* `woocommerce_eway_icon` for changing the payment gateway icon
 
 **Another WordPress Classifieds Plugin**
 
@@ -179,6 +182,13 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.1.1 [2013-12-10] =
+* fixed: doco / settings page didn't explain that Beagle requires an Address field
+* changed: permit card numbers with spaces / dashes, but strip before submitting to eWAY
+* changed: move some WooCommerce setting descriptions into tips to reduce screen clutter in admin
+* added: HTML5 text field patterns for credit card number, CVV/CVN
+* added: filter `woocommerce_eway_icon` for changing the payment gateway icon
 
 = 3.1.0 [2013-11-21] =
 * changed: support multiple bookings mode in Events Manager

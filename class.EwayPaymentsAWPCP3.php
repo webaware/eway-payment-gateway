@@ -128,9 +128,3 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
     }
 
 }
-
-
-/*
-process_payment -> show form
-
-*/

@@ -300,7 +300,7 @@ class EwayPaymentsAWPCP {
 		$eway->invoiceReference = $transaction->id;									// customer invoice reference
 		//~ $eway->transactionNumber = $transaction->id;								// transaction reference
 		$eway->cardHoldersName = self::getPostValue('eway_card_name');
-		$eway->cardNumber = self::getPostValue('eway_card_number');
+		$eway->cardNumber = strtr(self::getPostValue('eway_card_number'), array(' ' => '', '-' => ''));
 		$eway->cardExpiryMonth = self::getPostValue('eway_expiry_month');
 		$eway->cardExpiryYear = self::getPostValue('eway_expiry_year');
 		$eway->cardVerificationNumber = self::getPostValue('eway_cvn');
