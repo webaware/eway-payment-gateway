@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.2.1
 Tested up to: 3.8
-Stable tag: 3.1.1
+Stable tag: 3.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,10 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.1.2 [2014-01-03] =
+* changed: credit card field now forces digits only so that number keyboard is used on iPad/iPhone
+* added: filter `em_eway_amount` for changing the booking amount, e.g. adding fees
 
 = 3.1.1 [2013-12-10] =
 * fixed: doco / settings page didn't explain that Beagle requires an Address field

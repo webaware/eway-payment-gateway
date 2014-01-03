@@ -348,6 +348,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$amount = $EM_Booking->get_price(false, false, true);
+		$amount = apply_filters('em_eway_amount', $amount, $EM_Booking);
 		$eway->amount = $isLiveSite ? $amount : ceil($amount);
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields

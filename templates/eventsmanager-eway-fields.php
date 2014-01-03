@@ -14,8 +14,8 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 <p class="em-bookings-form-gateway-cardno">
   <label><?php  _e('Credit Card Number','em-pro'); ?></label>
-  <input type="text" size="15" name="x_card_num" value="<?php echo $card_num; ?>" class="input" pattern="[0-9 -]*"
-	title="only digits 0-9 are accepted, with optional spaces" />
+  <input type="text" size="15" name="x_card_num" value="<?php echo $card_num; ?>" class="input" pattern="[0-9]*"
+	title="only digits 0-9 are accepted" />
 </p>
 
 <p class="em-bookings-form-gateway-cardname">

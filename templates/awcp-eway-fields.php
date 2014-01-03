@@ -16,8 +16,8 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 	<p class="form-row form-row-first">
 		<label>Credit Card Number <span class="required">*</span></label>
-		<input type="text" value="" pattern="[0-9 -]*" name="eway_card_number" id="eway_card_number"
-			title="only digits 0-9 are accepted, with optional spaces" />
+		<input type="text" value="" pattern="[0-9]*" name="eway_card_number" id="eway_card_number"
+			title="only digits 0-9 are accepted" />
 	</p>
 
 	<p class="form-row form-row-last">
