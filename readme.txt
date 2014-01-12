@@ -7,7 +7,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.2.1
 Tested up to: 3.8
-Stable tag: 3.1.2
+Stable tag: 3.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `em_eway_option1` for setting the option1 field
 * `em_eway_option2` for setting the option2 field
 * `em_eway_option3` for setting the option3 field
+* `em_eway_amount` for changing the billed amount (e.g. adding fees)
 
 == Screenshots ==
 
@@ -182,6 +183,10 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.1.3 [2014-01-12] =
+* fixed: no function set_error_message() in EwayPaymentsEventsManager (bad copypasta in exception handler; thanks, [digitalblanket](http://profiles.wordpress.org/digitalblanket)!)
+* fixed: was triggering an exception when Country field removed from Events Manager Pro bookings form
 
 = 3.1.2 [2014-01-03] =
 * changed: credit card field now forces digits only so that number keyboard is used on iPad/iPhone

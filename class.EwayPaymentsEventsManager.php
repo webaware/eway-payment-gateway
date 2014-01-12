@@ -77,7 +77,9 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	protected static function getCountryName($countryCode) {
 		$name = '';
 
-		if ($countryCode) {
+		// check for country code as non-empty string
+		// NB: Events Manager Pro up to at least v2.3.6 returns array when Country field doesn't exist
+		if ($countryCode && is_string($countryCode)) {
 			$countries = em_get_countries();
 			if (isset($countries[$countryCode])) {
 				$name = $countries[$countryCode];
@@ -389,8 +391,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		}
 		catch (Exception $e) {
 			// an exception occured, so record the error
-			$this->set_error_message(htmlspecialchars($e->getMessage()));
-			$this->set_purchase_processed_by_purchid(1);	// failed
+			$EM_Booking->add_error($e->getMessage());
 			return;
 		}
 

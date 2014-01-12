@@ -8,7 +8,7 @@
 * @link http://www.eway.com.au/developers/api/direct-payments
 * @link http://www.eway.com.au/developers/api/beagle-%28free%29
 *
-* copyright (c) 2008-2013 WebAware Pty Ltd, released under GPL v2.1
+* copyright (c) 2008-2014 WebAware Pty Ltd, released under GPL v2.1
 */
 
 /**

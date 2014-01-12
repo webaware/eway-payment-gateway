@@ -131,7 +131,7 @@ class EwayPaymentsPlugin {
 	public static function curlSendRequest($url, $data, $sslVerifyPeer = true) {
 		// send data via HTTPS and receive response
 		$response = wp_remote_post($url, array(
-			'user-agent' => EWAY_PAYMENTS_CURL_USER_AGENT,
+			'user-agent' => 'WordPress/eWAY Payment Gateway',
 			'sslverify' => $sslVerifyPeer,
 			'timeout' => 60,
 			'headers' => array('Content-Type' => 'text/xml; charset=utf-8'),

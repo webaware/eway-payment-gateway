@@ -186,12 +186,17 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		try {
 			$response = $eway->processPayment();
+
+//~ error_log(__METHOD__ . ": response =\n" . print_r($response,1));
+
 			if ($response->status) {
 				// transaction was successful, so record transaction number and continue
-				if ($useStored)
+				if ($useStored) {
 					$status = 2; // WPSC_Purchase_Log::ORDER_RECEIVED
-				else
+				}
+				else {
 					$status = 3; // WPSC_Purchase_Log::ACCEPTED_PAYMENT
+				}
 
 				$this->set_transaction_details($response->transactionNumber, $status);
 				$this->set_authcode($response->authCode);
