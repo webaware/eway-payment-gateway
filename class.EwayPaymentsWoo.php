@@ -302,8 +302,10 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 				}
 				$woocommerce->cart->empty_cart();
 
-				$url = add_query_arg(array('key' => $order->order_key, 'order' => $order->id), get_permalink(woocommerce_get_page_id('thanks')));
-				$result = array('result' => 'success', 'redirect' => $url);
+				$result = array(
+					'result' => 'success',
+					'redirect' => $this->get_return_url($order),
+				);
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error

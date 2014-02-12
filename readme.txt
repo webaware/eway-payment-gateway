@@ -5,9 +5,9 @@ Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gatew
 Author URI: http://www.webaware.com.au/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
-Requires at least: 3.2.1
-Tested up to: 3.8
-Stable tag: 3.1.3
+Requires at least: 3.7.1
+Tested up to: 3.8.1
+Stable tag: 3.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -183,6 +183,9 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.1.4 [2014-02-12] =
+* fixed: WooCommerce 2.1 return page after checkout
 
 = 3.1.3 [2014-01-12] =
 * fixed: no function set_error_message() in EwayPaymentsEventsManager (bad copypasta in exception handler; thanks, [digitalblanket](http://profiles.wordpress.org/digitalblanket)!)
