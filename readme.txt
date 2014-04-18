@@ -5,8 +5,8 @@ Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gatew
 Author URI: http://www.webaware.com.au/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
-Requires at least: 3.7.1
-Tested up to: 3.8.1
+Requires at least: 3.6.1
+Tested up to: 3.9
 Stable tag: 3.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
