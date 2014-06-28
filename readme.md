@@ -1,6 +1,6 @@
 # eWAY Payment Gateway #
 
-Add a credit card payment gateway for eWAY (Australia) to some popular WordPress plugins
+Integrate some popular WordPress plugins with the eWAY credit card payment gateway
 
 * [Home](http://shop.webaware.com.au/downloads/eway-payment-gateway/)
 * [GitHub](https://github.com/webaware/eway-payment-gateway)

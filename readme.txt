@@ -11,7 +11,7 @@ Stable tag: 3.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Add a credit card payment gateway for eWAY (Australia) to some popular WordPress plugins
+Integrate some popular WordPress plugins with the eWAY credit card payment gateway
 
 == Description ==
 
