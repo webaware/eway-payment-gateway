@@ -5,11 +5,16 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 * $optMonths = options for drop-down list of months of the year
 * $optYears = options for drop-down list of current year + 15
+* $settings = settings for eWAY payment gateway
 
 */
 ?>
 
 <fieldset>
+
+	<?php if (!empty($settings['eway_card_msg'])): ?>
+	<p class="eway-credit-card-message"><?php echo $settings['eway_card_msg']; ?></p>
+	<?php endif; ?>
 
 	<p class="form-row form-row-first">
 		<label>Credit Card Number <span class="required">*</span></label>

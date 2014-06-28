@@ -11,7 +11,7 @@ $eway_beagle = get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 	<tr>
 		<td>eWAY Customer ID</td>
 		<td>
-			<input type='text' size='10' value="<?php echo get_option('ewayCustomerID_id'); ?>" name='ewayCustomerID_id' />
+			<input type='text' size='10' value="<?php echo esc_attr(get_option('ewayCustomerID_id')); ?>" name='ewayCustomerID_id' />
 		</td>
 	</tr>
 
@@ -59,6 +59,13 @@ $eway_beagle = get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 	<tr id="wpsc-eway-admin-stored-beagle">
 		<td colspan='2' style='color:#c00'>
 			Beagle is not available for Stored Payments
+		</td>
+	</tr>
+
+	<tr>
+		<td>Credit card message</td>
+		<td>
+			<input type="text" style="width:100%" value="<?php echo esc_attr(get_option('wpsc_merchant_eway_card_msg')); ?>" name="eway_card_msg" />
 		</td>
 	</tr>
 

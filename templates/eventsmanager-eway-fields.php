@@ -3,6 +3,7 @@
 If you want to customise the checkout form, copy this file into your theme folder and edit it there.
 Take care to keep the field names the same, or your checkout form won't charge credit cards!
 
+* $card_msg = credit card message (e.g. what cards are accepted)
 * $card_num = credit card number
 * $card_name = card holder's name
 * $card_code = CVN / CVVN
@@ -11,6 +12,10 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 */
 ?>
+
+<?php if (!empty($card_msg)): ?>
+<p class="em-bookings-form-gateway-cardmessage"><?php echo $card_msg; ?></p>
+<?php endif; ?>
 
 <p class="em-bookings-form-gateway-cardno">
   <label><?php  _e('Credit Card Number','em-pro'); ?></label>

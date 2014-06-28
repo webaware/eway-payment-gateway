@@ -208,7 +208,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
 				$status = 6; // WPSC_Purchase_Log::PAYMENT_DECLINED
-				$this->set_error_message(nl2br(htmlspecialchars($response->error)));
+				$this->set_error_message(nl2br(esc_html($response->error)));
 				$this->setPaymentNotes($response->error);
 				$this->set_purchase_processed_by_purchid($status);
 				return;
@@ -217,7 +217,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		catch (EwayPaymentsException $e) {
 			// an exception occured, so record the error
 			$status = 1; // WPSC_Purchase_Log::INCOMPLETE_SALE
-			$this->set_error_message(nl2br(htmlspecialchars($e->getMessage())));
+			$this->set_error_message(nl2br(esc_html($e->getMessage())));
 			$this->set_purchase_processed_by_purchid($status);
 			return;
 		}
@@ -330,9 +330,12 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			// use TH for field label cells if selected, otherwise use TD (default wp-e-commerce behaviour)
 			$th = get_option('wpsc_merchant_eway_th') ? 'th' : 'td';
 
+			// optional message to show above credit card fields
+			$card_msg = esc_html(get_option('wpsc_merchant_eway_card_msg'));
+
 			// load template with passed values, capture output and register
 			ob_start();
-			EwayPaymentsPlugin::loadTemplate('wpsc-eway-fields.php', compact('th', 'optMonths', 'optYears'));
+			EwayPaymentsPlugin::loadTemplate('wpsc-eway-fields.php', compact('th', 'card_msg', 'optMonths', 'optYears'));
 			$gateway_checkout_form_fields[EWAY_PAYMENTS_WPSC_NAME] = ob_get_clean();
 		}
 	}
@@ -371,6 +374,10 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			update_option('wpsc_merchant_eway_beagle', $_POST['eway_beagle']);
 		}
 
+		if (isset($_POST['eway_card_msg'])) {
+			update_option('wpsc_merchant_eway_card_msg', $_POST['eway_card_msg']);
+		}
+
 		foreach ((array)$_POST['eway_form'] as $form => $value) {
 			update_option(('eway_form_'.$form), $value);
 		}
@@ -385,10 +392,10 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		global $purchlogitem;
 
 		if (!empty($purchlogitem->extrainfo->transactid)) {
-			echo '<p><strong>Transaction ID: ', htmlspecialchars($purchlogitem->extrainfo->transactid), "</strong></p>\n";
+			echo '<p><strong>Transaction ID: ', esc_html($purchlogitem->extrainfo->transactid), "</strong></p>\n";
 		}
 		if (!empty($purchlogitem->extrainfo->authcode)) {
-			echo '<p><strong>Auth Code: ', htmlspecialchars($purchlogitem->extrainfo->authcode), "</strong></p>\n";
+			echo '<p><strong>Auth Code: ', esc_html($purchlogitem->extrainfo->authcode), "</strong></p>\n";
 		}
 	}
 }

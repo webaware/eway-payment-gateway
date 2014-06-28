@@ -32,6 +32,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			'em_' . EM_EWAY_GATEWAY . '_stored'					=> '0',
 			'em_' . EM_EWAY_GATEWAY . '_beagle'					=> '0',
 			'em_' . EM_EWAY_GATEWAY . '_test_force'				=> '1',
+			'em_' . EM_EWAY_GATEWAY . '_ssl_force'				=> '1',
 			'em_' . EM_EWAY_GATEWAY . '_mode'					=> 'sandbox',
 		);
 		foreach ($defaults as $option => $value) {
@@ -45,15 +46,16 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 		if ($this->is_active()) {
 			// force SSL for booking submissions, since we have card info
-			// no need if in sandbox mode
-			if (get_option('em_' . EM_EWAY_GATEWAY . '_mode') == 'live') {
-				add_filter('em_wp_localize_script', array(__CLASS__, 'filterEmWpLocalizeScript'));	// booking script
-				add_filter('em_booking_form_action_url', array(__CLASS__, 'force_ssl'));			// booking form action
+			if (get_option('em_'.EM_EWAY_GATEWAY.'_ssl_force')) {
+				add_action('template_redirect', array(__CLASS__, 'redirect_ssl'));
 			}
 
 			// perform additional form post validation
-			add_filter('em_booking_validate', array(__CLASS__, 'filterEmBookingValidate'), 10, 2);
-			add_filter('em_multiple_booking_validate', array(__CLASS__, 'filterEmBookingValidate'), 10, 2);
+			// but only from front -- payment form won't be there in Bookings admin!
+			if (!is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
+				add_filter('em_booking_validate', array(__CLASS__, 'emBookingValidate'), 10, 2);
+				add_filter('em_multiple_booking_validate', array(__CLASS__, 'emBookingValidate'), 10, 2);
+			}
 		}
 	}
 
@@ -96,22 +98,12 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	*/
 
 	/**
-	* This function intercepts the previous booking form url from the javascript localized array of EM variables and forces it to be an HTTPS url.
-	* @param array $localized_array
-	* @return array
-	*/
-	public static function filterEmWpLocalizeScript($localized_array) {
-		$localized_array['bookingajaxurl'] = self::force_ssl($localized_array['bookingajaxurl']);
-		return $localized_array;
-	}
-
-	/**
 	* perform additional booking form post validation, to check for required credit card fields
 	* @param boolean $result
 	* @param object $EM_Booking
 	* @return boolean
 	*/
-	public static function filterEmBookingValidate($result, $EM_Booking) {
+	public static function emBookingValidate($result, $EM_Booking) {
 		// only perform validation if this payment method has been selected
 		if (isset($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] == EM_EWAY_GATEWAY) {
 			$required = array (
@@ -148,12 +140,26 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	}
 
 	/**
-	* Turns any url into an HTTPS url.
-	* @param string $url
-	* @return string
+	* if page is an event and it has a booking form, make sure it's on SSL
 	*/
-	public static function force_ssl($url) {
-		return str_replace('http://', 'https://', $url);
+	public static function redirect_ssl() {
+		global $post;
+
+		// only if we're on an event page, and not SSL
+		if (!empty($post->post_type) && $post->post_type == EM_POST_TYPE_EVENT && !is_ssl()) {
+			try {
+				// create event object, check that it has bookings
+				$event = new EM_Event($post);
+				if ($event->event_rsvp) {
+					// redirect to SSL
+					$url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+					wp_redirect($url);
+				}
+			}
+			catch (Exception $e) {
+				// NOP
+			}
+		}
 	}
 
 	/**
@@ -220,7 +226,11 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 							$EM_Notices->notices['confirms'] = array();
 						}
 					}
+
+					$EM_Booking->manage_override = true;		// send emails even when admin books
 					$EM_Booking->delete();
+					$EM_Booking->manage_override = false;
+
 					return false;
 				}
 			}
@@ -258,9 +268,11 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	* Outputs custom content and credit card information.
 	*/
 	public function booking_form(){
-		$card_num = htmlspecialchars(self::getPostValue('x_card_num'));
-		$card_name = htmlspecialchars(self::getPostValue('x_card_name'));
-		$card_code = htmlspecialchars(self::getPostValue('x_card_code'));
+		$card_msg = esc_html(get_option('em_' . EM_EWAY_GATEWAY . '_card_msg'));
+
+		$card_num = esc_html(self::getPostValue('x_card_num'));
+		$card_name = esc_html(self::getPostValue('x_card_name'));
+		$card_code = esc_html(self::getPostValue('x_card_code'));
 
 		// build drop-down items for months
 		$optMonths = '';
@@ -280,7 +292,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		}
 
 		// load template with passed values, capture output and register
-		EwayPaymentsPlugin::loadTemplate('eventsmanager-eway-fields.php', compact('card_num', 'card_name', 'card_code', 'optMonths', 'optYears'));
+		EwayPaymentsPlugin::loadTemplate('eventsmanager-eway-fields.php', compact('card_msg', 'card_num', 'card_name', 'card_code', 'optMonths', 'optYears'));
 	}
 
 	/*
@@ -378,8 +390,16 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 					'authcode' => $response->authCode,
 					'amount' => $response->amount,
 				);
-				$note = empty($response->authCode) ? '' : 'Authcode: ' . $response->authCode;
-				if (!empty($response->beagleScore)) $note .= "\nBeagle score: {$response->beagleScore}";
+
+				$notes = array();
+				if (!empty($response->authCode)) {
+					$notes[] = 'Authcode: ' . $response->authCode;
+				}
+				if (!empty($response->beagleScore)) {
+					$notes[] = 'Beagle score: ' . $response->beagleScore;
+				}
+				$note = implode("\n", $notes);
+
 				$status = get_option('em_' . EM_EWAY_GATEWAY . '_stored') ? 'Pending' : 'Completed';
 				$this->record_transaction($EM_Booking, $response->amount, 'AUD', date('Y-m-d H:i:s', current_time('timestamp')), $response->transactionNumber, $status, $note);
 				$result = true;
@@ -425,6 +445,8 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			'em_' . EM_EWAY_GATEWAY . '_stored'					=> self::getPostValue('eway_stored'),
 			'em_' . EM_EWAY_GATEWAY . '_beagle'					=> self::getPostValue('eway_beagle'),
 			'em_' . EM_EWAY_GATEWAY . '_test_force'				=> self::getPostValue('eway_test_force'),
+			'em_' . EM_EWAY_GATEWAY . '_ssl_force'				=> self::getPostValue('eway_ssl_force'),
+			'em_' . EM_EWAY_GATEWAY . '_card_msg'				=> self::getPostValue('eway_card_msg'),
 			'em_' . EM_EWAY_GATEWAY . '_manual_approval'		=> self::getPostValue('manual_approval'),
 			'em_' . EM_EWAY_GATEWAY . '_booking_feedback'		=> wp_kses_data(self::getPostValue('booking_feedback')),
 			'em_' . EM_EWAY_GATEWAY . '_booking_feedback_free'	=> wp_kses_data(self::getPostValue('booking_feedback_free')),

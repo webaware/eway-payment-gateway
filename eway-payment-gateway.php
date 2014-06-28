@@ -1,19 +1,20 @@
 <?php
 /*
 Plugin Name: eWAY Payment Gateway
-Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
+Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Description: Add a credit card payment gateway for eWAY (Australia) to some popular WordPress plugins
-Version: 3.1.4
+Version: 3.2.0
 Author: WebAware
-Author URI: http://www.webaware.com.au/
+Author URI: http://webaware.com.au/
 */
 
 /*
-copyright (c) 2011-2014 WebAware Pty Ltd (email : rmckay@webaware.com.au)
+copyright (c) 2011-2014 WebAware Pty Ltd (email : support@webaware.com.au)
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License, version 2, as
-published by the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +23,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 if (!defined('EWAY_PAYMENTS_PLUGIN_ROOT')) {
 	define('EWAY_PAYMENTS_PLUGIN_ROOT', dirname(__FILE__) . '/');
+	define('EWAY_PAYMENTS_PLUGIN_FILE', __FILE__);
 	define('EWAY_PAYMENTS_PLUGIN_NAME', basename(dirname(__FILE__)) . '/' . basename(__FILE__));
+	define('EWAY_PAYMENTS_VERSION', '3.2.0');
 
 	// special test customer ID for sandbox
 	define('EWAY_PAYMENTS_TEST_CUSTOMER', '87654321');
@@ -43,16 +46,16 @@ if (!defined('EWAY_PAYMENTS_PLUGIN_ROOT')) {
 function eway_payments_autoload($class_name) {
 	static $classMapPlugin = array (
 		// application classes
-		'EwayPaymentsPlugin'				=> 'class.EwayPaymentsPlugin.php',
-		'EwayPaymentsPayment'				=> 'class.EwayPaymentsPayment.php',
-		'EwayPaymentsStoredPayment'			=> 'class.EwayPaymentsStoredPayment.php',
+		'EwayPaymentsPlugin'				=> 'includes/class.EwayPaymentsPlugin.php',
+		'EwayPaymentsPayment'				=> 'includes/class.EwayPaymentsPayment.php',
+		'EwayPaymentsStoredPayment'			=> 'includes/class.EwayPaymentsStoredPayment.php',
 
 		// integrations
-		'EwayPaymentsAWPCP'					=> 'class.EwayPaymentsAWPCP.php',
-		'EwayPaymentsAWPCP3'				=> 'class.EwayPaymentsAWPCP3.php',
-		'EwayPaymentsEventsManager'			=> 'class.EwayPaymentsEventsManager.php',
-		'EwayPaymentsWoo'					=> 'class.EwayPaymentsWoo.php',
-		'EwayPaymentsWpsc'					=> 'class.EwayPaymentsWpsc.php',
+		'EwayPaymentsAWPCP'					=> 'includes/integrations/class.EwayPaymentsAWPCP.php',
+		'EwayPaymentsAWPCP3'				=> 'includes/integrations/class.EwayPaymentsAWPCP3.php',
+		'EwayPaymentsEventsManager'			=> 'includes/integrations/class.EwayPaymentsEventsManager.php',
+		'EwayPaymentsWoo'					=> 'includes/integrations/class.EwayPaymentsWoo.php',
+		'EwayPaymentsWpsc'					=> 'includes/integrations/class.EwayPaymentsWpsc.php',
 	);
 
 	if (isset($classMapPlugin[$class_name])) {

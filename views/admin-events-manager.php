@@ -7,14 +7,14 @@
   <tr valign="top">
 	  <th scope="row"><?php _e('Success Message', 'em-pro') ?></th>
 	  <td>
-		<input type="text" name="booking_feedback" value="<?php esc_attr_e(get_option('em_'. EM_EWAY_GATEWAY . "_booking_feedback")); ?>" style='width: 40em;' /><br />
+		<input type="text" name="booking_feedback" value="<?php echo esc_attr(get_option('em_'. EM_EWAY_GATEWAY . "_booking_feedback")); ?>" style='width: 40em;' /><br />
 		<em><?php _e('The message that is shown to a user when a booking is successful and payment has been taken.','em-pro'); ?></em>
 	  </td>
   </tr>
   <tr valign="top">
 	  <th scope="row"><?php _e('Success Free Message', 'em-pro') ?></th>
 	  <td>
-		<input type="text" name="booking_feedback_free" value="<?php esc_attr_e(get_option('em_'. EM_EWAY_GATEWAY . "_booking_feedback_free" )); ?>" style='width: 40em;' /><br />
+		<input type="text" name="booking_feedback_free" value="<?php echo esc_attr(get_option('em_'. EM_EWAY_GATEWAY . "_booking_feedback_free" )); ?>" style='width: 40em;' /><br />
 		<em><?php _e('If some cases if you allow a free ticket (e.g. pay at gate) as well as paid tickets, this message will be shown and the user will not be charged.','em-pro'); ?></em>
 	  </td>
   </tr>
@@ -39,7 +39,15 @@
 
 	<tr valign="top">
 		<th scope="row">eWAY customer ID</th>
-		<td><input type="text" name="eway_cust_id" value="<?php esc_attr_e(get_option( 'em_'. EM_EWAY_GATEWAY . "_cust_id", "")); ?>" /></td>
+		<td><input type="text" name="eway_cust_id" value="<?php echo esc_attr(get_option( 'em_'. EM_EWAY_GATEWAY . "_cust_id", "")); ?>" /></td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">Credit card message</th>
+		<td>
+			<input type="text" name="eway_card_msg" value="<?php echo esc_attr(get_option( 'em_'. EM_EWAY_GATEWAY . "_card_msg", "")); ?>" style='width: 40em;' />
+			<em><br />Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;</em>
+		</td>
 	</tr>
 
 	<tr valign="top">
@@ -47,6 +55,17 @@
 		<td>
 			<select name="eway_test_force">
 				<?php $selected = get_option('em_'.EM_EWAY_GATEWAY.'_test_force'); ?>
+				<option value="1" <?php selected($selected, '1'); ?>>Yes</option>
+				<option value="0" <?php selected($selected, '0'); ?>>No</option>
+			</select>
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">Force SSL for bookings form</th>
+		<td>
+			<select name="eway_ssl_force">
+				<?php $selected = get_option('em_'.EM_EWAY_GATEWAY.'_ssl_force'); ?>
 				<option value="1" <?php selected($selected, '1'); ?>>Yes</option>
 				<option value="0" <?php selected($selected, '0'); ?>>No</option>
 			</select>

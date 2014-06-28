@@ -24,10 +24,11 @@ class EwayPaymentsPlugin {
 	* initialise plugin
 	*/
 	private function __construct() {
-		$this->urlBase = plugin_dir_url(__FILE__);
+		$this->urlBase = plugin_dir_url(EWAY_PAYMENTS_PLUGIN_FILE);
 
 		add_action('init', array($this, 'init'));
 		add_filter('plugin_row_meta', array($this, 'addPluginDetailsLinks'), 10, 2);
+		add_action('admin_notices', array($this, 'checkPrerequisites'));
 
 		// register with WP e-Commerce
 		add_filter('wpsc_merchants_modules', array($this, 'wpscRegister'));
@@ -53,6 +54,29 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
+	* check for required PHP extensions, tell admin if any are missing
+	*/
+	public function checkPrerequisites() {
+		// need at least PHP 5.2.11 for libxml_disable_entity_loader()
+		$php_min = '5.2.11';
+		if (version_compare(PHP_VERSION, $php_min, '<')) {
+			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-php.php';
+		}
+
+		// need these PHP extensions too
+		$prereqs = array('libxml', 'SimpleXML', 'xmlwriter');
+		$missing = array();
+		foreach ($prereqs as $ext) {
+			if (!extension_loaded($ext)) {
+				$missing[] = $ext;
+			}
+		}
+		if (!empty($missing)) {
+			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-extensions.php';
+		}
+	}
+
+	/**
 	* register new WP e-Commerce payment gateway
 	* @param array $gateways array of registered gateways
 	* @return array
@@ -67,6 +91,11 @@ class EwayPaymentsPlugin {
 	* @return array
 	*/
 	public function wooRegister($gateways) {
+		if (!function_exists('WC')) {
+			// pre-WC2.1 so load compatibility layer
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
+		}
+
 		return EwayPaymentsWoo::register($gateways);
 	}
 
@@ -77,7 +106,7 @@ class EwayPaymentsPlugin {
 		if ($file == EWAY_PAYMENTS_PLUGIN_NAME) {
 			$links[] = '<a href="http://wordpress.org/support/plugin/eway-payment-gateway">' . __('Get help') . '</a>';
 			$links[] = '<a href="http://wordpress.org/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
-			$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=CXNFEP4EAMTG6">' . __('Donate') . '</a>';
+			$links[] = '<a href="http://shop.webaware.com.au/downloads/eway-payment-gateway/">' . __('Donate') . '</a>';
 		}
 
 		return $links;

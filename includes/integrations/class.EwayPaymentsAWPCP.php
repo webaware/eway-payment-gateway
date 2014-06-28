@@ -52,7 +52,7 @@ class EwayPaymentsAWPCP {
 		$method = new stdClass;
 		$method->slug = self::PAYMENT_METHOD;
 		$method->name = 'eWAY Payment Gateway';
-		$method->icon = plugins_url('images/eway-siteseal.png', __FILE__);
+		$method->icon = plugins_url('images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
 		$method->description = 'Credit card payment via eWAY';
 
 		$methods[] = $method;
@@ -84,6 +84,9 @@ class EwayPaymentsAWPCP {
 		// TODO: add Beagle if new version supports taking country info before billing
 		//~ $awpcp->settings->add_setting($section, 'eway_beagle', 'Beagle (anti-fraud)', 'checkbox', 0,
 			//~ "<a href='http://www.eway.com.au/developers/resources/beagle-(free)-rules' target='_blank'>Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure <a href='http://www.eway.com.au/developers/resources/beagle-(free)-rules' target='_blank'>Beagle rules</a> in your MYeWAY console before enabling Beagle");
+
+		$awpcp->settings->add_setting($section, 'eway_card_message', 'Credit card message', 'textfield', '',
+			'<br />Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;');
 	}
 
 	/**
@@ -121,6 +124,8 @@ class EwayPaymentsAWPCP {
 
 //~ error_log(__METHOD__ . ": checkoutURL = $checkoutURL");
 
+			$card_msg = esc_html(get_awpcp_option('eway_card_message'));
+
 			// build drop-down items for months
 			$optMonths = '';
 			foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
@@ -136,7 +141,7 @@ class EwayPaymentsAWPCP {
 
 			// load template with passed values
 			ob_start();
-			EwayPaymentsPlugin::loadTemplate('awcp-eway-fields.php', compact('checkoutURL', 'optMonths', 'optYears'));
+			EwayPaymentsPlugin::loadTemplate('awcp-eway-fields.php', compact('checkoutURL', 'card_msg', 'optMonths', 'optYears'));
 			$form = ob_get_clean();
 		}
 
@@ -238,13 +243,7 @@ class EwayPaymentsAWPCP {
 						//~ $transaction->set('eway_beagle_score', $response->beagleScore);
 					//~ }
 
-					if ($eway_stored) {
-						// payment hasn't happened yet, so record status as 'on-hold' in anticipation
-						$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_PENDING);
-					}
-					else {
-						$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_COMPLETED);
-					}
+					$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_COMPLETED);
 
 					$valid = true;
 				}
@@ -252,14 +251,14 @@ class EwayPaymentsAWPCP {
 					// transaction was unsuccessful, so record transaction number and the error
 					$transaction->set('txn-id', $response->transactionNumber);
 					$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_FAILED);
-					$transaction->errors[] = nl2br(htmlspecialchars($response->error . "\nuse your browser's back button to try again."));
+					$transaction->errors[] = nl2br(esc_html($response->error . "\nuse your browser's back button to try again."));
 					$valid = false;
 				}
 			}
 			catch (EwayPaymentsException $e) {
 				// an exception occured, so record the error
 				$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_FAILED);
-				$transaction->errors[] = nl2br(htmlspecialchars($e->getMessage() . "\nuse your browser's back button to try again."));
+				$transaction->errors[] = nl2br(esc_html($e->getMessage() . "\nuse your browser's back button to try again."));
 				$valid = false;
 			}
 		}
@@ -332,11 +331,11 @@ class EwayPaymentsAWPCP {
 		}
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription = apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $order_id);
-		$eway->invoiceReference = apply_filters('awpcp_eway_invoice_ref', $eway->invoiceReference, $order_id);
-		$eway->option1 = apply_filters('awpcp_eway_option1', '', $order_id);
-		$eway->option2 = apply_filters('awpcp_eway_option2', '', $order_id);
-		$eway->option3 = apply_filters('awpcp_eway_option3', '', $order_id);
+		$eway->invoiceDescription = apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
+		$eway->invoiceReference = apply_filters('awpcp_eway_invoice_ref', $eway->invoiceReference, $transaction);
+		$eway->option1 = apply_filters('awpcp_eway_option1', '', $transaction);
+		$eway->option2 = apply_filters('awpcp_eway_option2', '', $transaction);
+		$eway->option3 = apply_filters('awpcp_eway_option3', '', $transaction);
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		if (method_exists($transaction, 'get_totals')) {

@@ -9,6 +9,13 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 */
 ?>
+
+<?php if (!empty($card_msg)): ?>
+<tr class="wpsc-merch-eway-row">
+	<<?php echo $th; ?> colspan="2" class="wpsc-merch-eway-message"><label><?php echo $card_msg; ?></label></<?php echo $th; ?>>
+</tr>
+<?php endif; ?>
+
 <tr class="wpsc-merch-eway-row">
 	<<?php echo $th; ?>><label>Credit Card Number <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>

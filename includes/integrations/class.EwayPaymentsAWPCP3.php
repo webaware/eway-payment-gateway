@@ -87,13 +87,17 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 						//~ $transaction->set('eway_beagle_score', $response->beagleScore);
 					//~ }
 
+					/* TODO: stored payments in AWPCP, when plugin workflow supports it
 					if ($eway_stored) {
 						// payment hasn't happened yet, so record status as 'on-hold' in anticipation
 						$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_PENDING;
 					}
 					else {
+					*/
 						$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_COMPLETED;
+					/*
 					}
+					*/
 
 					$success = true;
 				}
@@ -101,14 +105,14 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 					// transaction was unsuccessful, so record transaction number and the error
 					$transaction->set('txn-id', $response->transactionNumber);
 					$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
-					$transaction->errors['validation'] = nl2br(htmlspecialchars($response->error . "\nuse your browser's back button to try again."));
+					$transaction->errors['validation'] = nl2br(esc_html($response->error . "\nuse your browser's back button to try again."));
 					$success = false;
 				}
 			}
 			catch (EwayPaymentsException $e) {
 				// an exception occured, so record the error
 				$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
-				$transaction->errors['validation'] = nl2br(htmlspecialchars($e->getMessage()) . "\nuse your browser's back button to try again.");
+				$transaction->errors['validation'] = nl2br(esc_html($e->getMessage()) . "\nuse your browser's back button to try again.");
 				$success = false;
 			}
 		}

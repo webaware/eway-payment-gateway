@@ -1,13 +1,13 @@
 === eWAY Payment Gateway ===
 Contributors: webaware
 Plugin Name: eWAY Payment Gateway
-Plugin URI: http://snippets.webaware.com.au/wordpress-plugins/eway-payment-gateway/
+Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: http://www.webaware.com.au/
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CXNFEP4EAMTG6
+Donate link: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.6.1
-Tested up to: 3.9
-Stable tag: 3.1.4
+Tested up to: 3.9.1
+Stable tag: 3.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,7 @@ This is a common problem in local testing environments. Please [read this post](
 
 The plugin will run in shared hosting environments, but requires PHP 5 with the following modules enabled (talk to your host). Both are typically available because they are enabled by default in PHP 5, but may be disabled on some shared hosts.
 
+* libxml
 * XMLWriter
 * SimpleXML
 
@@ -172,6 +173,10 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `em_eway_option3` for setting the option3 field
 * `em_eway_amount` for changing the billed amount (e.g. adding fees)
 
+== Contributions ==
+
+* [Fork me on GitHub](https://github.com/webaware/eway-payment-gateway/)
+
 == Screenshots ==
 
 1. WP e-Commerce payments settings
@@ -183,6 +188,16 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.2.0 [2014-06-28] =
+* fixed: WooCommerce 2.1 error messages use `wc_add_notice()` (fixes deprecated notice)
+* fixed: Events Manager bookings admin was asking for credit card details when modifying a booking
+* fixed: Another WordPress Classified Plugin hooks now pass `$transaction` as second argument
+* fixed: undefined variable errors with Another WordPress Classified Plugin integration
+* added: Events Manager bookings pages can be forced to SSL (new setting, defaults to Yes, can be turned off)
+* added: optional credit card fields message, e.g. so can advise "Visa and Mastercard only" etc.
+* changed: use standard WooCommerce credit card fields if setting selected (new default); old template is still available for sites that require it
+* changed: some code refactoring
 
 = 3.1.4 [2014-02-12] =
 * fixed: WooCommerce 2.1 return page after checkout
