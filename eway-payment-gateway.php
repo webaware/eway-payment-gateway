@@ -2,7 +2,7 @@
 /*
 Plugin Name: eWAY Payment Gateway
 Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
-Description: Add a credit card payment gateway for eWAY (Australia) to some popular WordPress plugins
+Description: Integrate some popular WordPress plugins with the eWAY credit card payment gateway
 Version: 3.2.0
 Author: WebAware
 Author URI: http://webaware.com.au/
