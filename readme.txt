@@ -24,7 +24,7 @@ The eWAY Payment Gateway adds a credit card payment gateway integration for [eWA
 
 Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](http://wordpress.org/plugins/gravityforms-eway/).
 
-### Features: ###
+= Features =
 
 * card holder's name can be different to the purchaser's name
 * basic data validation performed before submitting to eWAY
@@ -34,15 +34,9 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](http://wordpre
 * drop-in compatible with eWAY payment gateway from the WP e-Commerce Gold Cart plugin (except recurring billing -- see FAQ)
 * it's free!
 
-= Sponsorships =
+= Requirements =
 
-* Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
-* Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
-
-Thanks for sponsoring new features for eWAY Payment Gateway!
-
-= Requirements: =
-* you need to install a shopping cart plugin listed above
+* you need to install an e-commerce plugin listed above
 * you need an SSL certificate for your hosting account
 * you need an account with eWAY Australia
 * this plugin uses eWAY's [Direct Payments API](http://www.eway.com.au/developers/api/direct-payments) and [Stored Payments API](http://www.eway.com.au/developers/api/stored-%28xml%29), but does not support eWAY's hosted payment form
@@ -88,7 +82,7 @@ eWAY is a leading provider of online payments solutions for Australia, New Zeala
 
 = Is recurring billing supported? =
 
-Not yet. I know it can be done but I haven't had a website that needs it yet, so have not written the code for it. If you need recurring billing for WP e-Commerce, buy the [Gold Cart plugin](http://getshopped.org/premium-upgrades/premium-plugin/gold-cart-plugin/).
+Not yet. I know it can be done but I haven't had a website that needs it yet, so have not written the code for it.
 
 If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](http://www.gravityforms.com/) and [Gravity Forms eWAY](http://wordpress.org/extend/plugins/gravityforms-eway/) which does support recurring payments.
 
@@ -135,6 +129,10 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 * XMLWriter
 * SimpleXML
 
+== Contributions ==
+
+* [Fork me on GitHub](https://github.com/webaware/eway-payment-gateway/)
+
 == Filter hooks ==
 
 Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
@@ -173,9 +171,12 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `em_eway_option3` for setting the option3 field
 * `em_eway_amount` for changing the billed amount (e.g. adding fees)
 
-== Contributions ==
+== Sponsorships ==
 
-* [Fork me on GitHub](https://github.com/webaware/eway-payment-gateway/)
+* Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+* Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+
+Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Screenshots ==
 
@@ -188,6 +189,10 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.2.1 [soon...] =
+* fixed: force Events Manager bookings form AJAX url and form action to use HTTPS if forcing SSL for events with bookings
+* changed: updated screenshots
 
 = 3.2.0 [2014-06-28] =
 * fixed: WooCommerce 2.1 error messages use `wc_add_notice()` (fixes deprecated notice)

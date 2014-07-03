@@ -47,6 +47,8 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		if ($this->is_active()) {
 			// force SSL for booking submissions, since we have card info
 			if (get_option('em_'.EM_EWAY_GATEWAY.'_ssl_force')) {
+				add_filter('em_wp_localize_script', array(__CLASS__, 'forceBookingAjaxSSL'));
+				add_filter('em_booking_form_action_url', array(__CLASS__, 'force_ssl'));
 				add_action('template_redirect', array(__CLASS__, 'redirect_ssl'));
 			}
 
@@ -137,6 +139,30 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		}
 
 		return $result;
+	}
+
+	/**
+	* This function intercepts the previous booking form url from the javascript localized array of EM variables and forces it to be an HTTPS url.
+	* @param array $localized_array
+	* @return array
+	*/
+	public static function forceBookingAjaxSSL($localized_array) {
+		$localized_array['bookingajaxurl'] = self::force_ssl($localized_array['bookingajaxurl']);
+		return $localized_array;
+	}
+
+	/**
+	* Turns any url into an HTTPS url.
+	* @param string $url
+	* @return string
+	*/
+	public static function force_ssl($url) {
+		// only fix if source URL starts with http://
+		if (stripos($url, 'http://') === 0) {
+			$url = 'https' . substr($url, 4);
+		}
+
+		return $url;
 	}
 
 	/**
