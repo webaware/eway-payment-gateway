@@ -45,10 +45,14 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		parent::__construct();
 
 		if ($this->is_active()) {
-			// force SSL for booking submissions, since we have card info
-			if (get_option('em_'.EM_EWAY_GATEWAY.'_ssl_force')) {
+			// force SSL for booking submissions on live site, because credit card details need to be encrypted
+			if (get_option('em_'.EM_EWAY_GATEWAY.'_mode') == 'live') {
 				add_filter('em_wp_localize_script', array(__CLASS__, 'forceBookingAjaxSSL'));
 				add_filter('em_booking_form_action_url', array(__CLASS__, 'force_ssl'));
+			}
+
+			// force whole bookings page to SSL if settings require
+			if (get_option('em_'.EM_EWAY_GATEWAY.'_ssl_force')) {
 				add_action('template_redirect', array(__CLASS__, 'redirect_ssl'));
 			}
 
