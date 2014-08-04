@@ -49,4 +49,8 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 	<div class="clear"></div>
 
+	<?php if (!empty($settings['eway_site_seal']) && !empty($settings['eway_site_seal_code']) && $settings['eway_site_seal'] == 'yes'):
+		echo $settings['eway_site_seal_code'];
+	endif; ?>
+
 </fieldset>

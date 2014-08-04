@@ -17,9 +17,9 @@
 	* show warning message if they are
 	*/
 	function setVisibility() {
-		var	useTest = ($("input[name='woocommerce_eway_payments_eway_sandbox']").filter(":checked").val() === "1"),
-			useBeagle = ($("input[name='woocommerce_eway_payments_eway_beagle']").filter(":checked").val() === "1"),
-			useStored = ($("input[name='woocommerce_eway_payments_eway_stored']").filter(":checked").val() === "1");
+		var	useTest = ($("#woocommerce_eway_payments_eway_sandbox").filter(":checked").val() === "1"),
+			useBeagle = ($("#woocommerce_eway_payments_eway_beagle").filter(":checked").val() === "1"),
+			useStored = ($("#woocommerce_eway_payments_eway_stored").filter(":checked").val() === "1");
 
 		function display(element, visible) {
 			if (visible)
@@ -34,7 +34,19 @@
 
 	setVisibility();
 
-	$("#mainform").on("change", "input[name='woocommerce_eway_payments_eway_sandbox'],input[name='woocommerce_eway_payments_eway_beagle'],input[name='woocommerce_eway_payments_eway_stored']", setVisibility);
+	$("#mainform").on("change", "#woocommerce_eway_payments_eway_sandbox,#woocommerce_eway_payments_eway_beagle,#woocommerce_eway_payments_eway_stored", setVisibility);
+
+	/**
+	* enable the eWAY site seal code input
+	*/
+	$("#woocommerce_eway_payments_eway_site_seal").on("change", function() {
+		var codeRow = $("#woocommerce_eway_payments_eway_site_seal_code").closest("tr");
+
+		if (this.checked)
+			codeRow.show(750);
+		else
+			codeRow.hide();
+	}).trigger("change");
 
 })(jQuery);
 </script>

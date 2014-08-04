@@ -26,23 +26,26 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		$this->init_settings();
 
 		// define user set variables
-		$this->enabled			= $this->settings['enabled'];
-		$this->title			= $this->settings['title'];
-		$this->description		= $this->settings['description'];
-		$this->availability		= $this->settings['availability'];
-		$this->countries		= $this->settings['countries'];
-		$this->eway_customerid	= $this->settings['eway_customerid'];
-		$this->eway_sandbox		= $this->settings['eway_sandbox'];
-		$this->eway_stored		= $this->settings['eway_stored'];
-		$this->eway_beagle		= $this->settings['eway_beagle'];
-		$this->eway_card_form	= $this->settings['eway_card_form'];
-		$this->eway_card_msg	= $this->settings['eway_card_msg'];
+		$this->enabled				= $this->settings['enabled'];
+		$this->title				= $this->settings['title'];
+		$this->description			= $this->settings['description'];
+		$this->availability			= $this->settings['availability'];
+		$this->countries			= $this->settings['countries'];
+		$this->eway_customerid		= $this->settings['eway_customerid'];
+		$this->eway_sandbox			= $this->settings['eway_sandbox'];
+		$this->eway_stored			= $this->settings['eway_stored'];
+		$this->eway_beagle			= $this->settings['eway_beagle'];
+		$this->eway_card_form		= $this->settings['eway_card_form'];
+		$this->eway_card_msg		= $this->settings['eway_card_msg'];
+		$this->eway_site_seal		= $this->settings['eway_site_seal'];
+		$this->eway_site_seal_code	= $this->settings['eway_site_seal_code'];
 
 		// handle support for standard WooCommerce credit card form instead of our custom template
 		if ($this->eway_card_form == 'yes') {
 			$this->supports[] = 'default_credit_card_form';
 			add_filter('woocommerce_credit_card_form_fields', array($this, 'wooCcFormFields'), 10, 2);
 			add_action('woocommerce_credit_card_form_start', array($this, 'wooCcFormStart'));
+			add_action('woocommerce_credit_card_form_end', array($this, 'wooCcFormEnd'));
 		}
 
 		// add email fields
@@ -147,6 +150,20 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'desc_tip'		=> true,
 							'default'		=> '',
 						),
+			'eway_site_seal' => array(
+							'title' 		=> 'Show eWAY Site Seal',
+							'label' 		=> 'show the eWAY site seal after the credit card fields',
+							'type' 			=> 'checkbox',
+							'description' 	=> 'Add the verified eWAY Site Seal to your checkout',
+							'desc_tip'		=> true,
+							'default' 		=> 'no',
+						),
+			'eway_site_seal_code' => array(
+							'type' 			=> 'textarea',
+							'description' 	=> '<a href="http://www.eway.com.au/developers/resources/site-seal-generator" target="_blank">generate your site seal on the eWAY website</a> and paste it here',
+							'default'		=> '',
+							'css'			=> 'height:14em',
+						),
 			);
 	}
 
@@ -198,6 +215,18 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		if ($gateway == $this->id) {
 			if (!empty($this->settings['eway_card_msg'])) {
 				printf('<span class="eway-credit-card-message">%s</span>', $this->settings['eway_card_msg']);
+			}
+		}
+	}
+
+	/**
+	* show site seal after fields in standard WooCommerce credit card form, if entered
+	* @param string $gateway
+	*/
+	public function wooCcFormEnd($gateway) {
+		if ($gateway == $this->id) {
+			if (!empty($this->settings['eway_site_seal']) && !empty($this->settings['eway_site_seal_code']) && $this->settings['eway_site_seal'] == 'yes') {
+				echo $this->settings['eway_site_seal_code'];
 			}
 		}
 	}
