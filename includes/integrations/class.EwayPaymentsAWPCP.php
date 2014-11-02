@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for Another WordPress Classifieds Plugin
-* @ref http://www.awpcp.com/
+* @link http://www.awpcp.com/
 */
 class EwayPaymentsAWPCP {
 
@@ -50,10 +50,10 @@ class EwayPaymentsAWPCP {
 	*/
 	public function awpcpPaymentMethods($methods) {
 		$method = new stdClass;
-		$method->slug = self::PAYMENT_METHOD;
-		$method->name = 'eWAY Payment Gateway';
-		$method->icon = plugins_url('images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
-		$method->description = 'Credit card payment via eWAY';
+		$method->slug			= self::PAYMENT_METHOD;
+		$method->name			= 'eWAY Payment Gateway';
+		$method->icon			= plugins_url('images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
+		$method->description	= 'Credit card payment via eWAY';
 
 		$methods[] = $method;
 
@@ -121,8 +121,6 @@ class EwayPaymentsAWPCP {
 			else {
 				list($checkoutURL) = awpcp_payment_urls($transaction);
 			}
-
-//~ error_log(__METHOD__ . ": checkoutURL = $checkoutURL");
 
 			$card_msg = esc_html(get_awpcp_option('eway_card_message'));
 
@@ -223,9 +221,6 @@ class EwayPaymentsAWPCP {
 	* @return bool
 	*/
 	public function awpcpValidateTx($valid, $transaction) {
-
-//~ error_log(__METHOD__ . "\n" . print_r($_POST,1));
-
 		if ($transaction->get('payment-method') == self::PAYMENT_METHOD) {
 
 			try {
@@ -263,9 +258,6 @@ class EwayPaymentsAWPCP {
 			}
 		}
 
-//~ error_log(__METHOD__ . ": valid = $valid");
-//~ error_log(__METHOD__ . "\n" . print_r($transaction,1));
-
 		return $valid;
 	}
 
@@ -290,23 +282,25 @@ class EwayPaymentsAWPCP {
 		$item = $transaction->get_item(0); // no support for multiple items
 		$user = wp_get_current_user();
 
-		if ($eway_stored)
+		if ($eway_stored) {
 			$eway = new EwayPaymentsStoredPayment($eway_customerid, $isLiveSite);
-		else
+		}
+		else {
 			$eway = new EwayPaymentsPayment($eway_customerid, $isLiveSite);
+		}
 
-		$eway->invoiceDescription = $item->name;
-		$eway->invoiceReference = $transaction->id;									// customer invoice reference
-		//~ $eway->transactionNumber = $transaction->id;								// transaction reference
-		$eway->cardHoldersName = self::getPostValue('eway_card_name');
-		$eway->cardNumber = strtr(self::getPostValue('eway_card_number'), array(' ' => '', '-' => ''));
-		$eway->cardExpiryMonth = self::getPostValue('eway_expiry_month');
-		$eway->cardExpiryYear = self::getPostValue('eway_expiry_year');
-		$eway->cardVerificationNumber = self::getPostValue('eway_cvn');
-		$eway->firstName = $user ? $user->first_name : '';
-		$eway->lastName = $user ? $user->last_name : '';
-		$eway->emailAddress = $user ? $user->email : '';
-		//~ $eway->postcode = $order->billing_postcode;
+		$eway->invoiceDescription			= $item->name;
+		$eway->invoiceReference				= $transaction->id;									// customer invoice reference
+		//~ $eway->transactionNumber		= $transaction->id;									// transaction reference
+		$eway->cardHoldersName				= self::getPostValue('eway_card_name');
+		$eway->cardNumber					= strtr(self::getPostValue('eway_card_number'), array(' ' => '', '-' => ''));
+		$eway->cardExpiryMonth				= self::getPostValue('eway_expiry_month');
+		$eway->cardExpiryYear				= self::getPostValue('eway_expiry_year');
+		$eway->cardVerificationNumber		= self::getPostValue('eway_cvn');
+		$eway->firstName					= $user ? $user->first_name : '';
+		$eway->lastName						= $user ? $user->last_name : '';
+		$eway->emailAddress					= $user ? $user->email : '';
+		//~ $eway->postcode					= $order->billing_postcode;
 
 		// TODO: add Beagle if new version supports taking country info before billing
 		// for Beagle (free) security
@@ -349,12 +343,7 @@ class EwayPaymentsAWPCP {
 		}
 		$eway->amount = $isLiveSite ? $total : ceil($total);
 
-//~ error_log(__METHOD__ . "\n" . print_r($eway,1));
-//~ error_log(__METHOD__ . "\n" . $eway->getPaymentXML());
-
 		$response = $eway->processPayment();
-
-//~ error_log(__METHOD__ . "\n" . print_r($response,1));
 
 		return $response;
 	}
@@ -368,6 +357,6 @@ class EwayPaymentsAWPCP {
 	* @param string $fieldname name of the field in the form post
 	*/
 	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? stripslashes(trim($_POST[$fieldname])) : '';
+		return isset($_POST[$fieldname]) ? wp_unslash(trim($_POST[$fieldname])) : '';
 	}
 }

@@ -310,8 +310,6 @@ class EwayPaymentsPayment {
 			$url = $this->isLiveSite ? self::REALTIME_CVN_API_LIVE : self::REALTIME_CVN_API_SANDBOX;
 		}
 
-//~ error_log(__METHOD__ . ": url = $url");
-
 		// execute the cURL request, and retrieve the response
 		try {
 			$responseXML = EwayPaymentsPlugin::curlSendRequest($url, $xml, $this->sslVerifyPeer);
@@ -379,6 +377,12 @@ class EwayPaymentsResponse {
 	public $amount;
 
 	/**
+	* the Beagle fraud detection score for this transaction
+	* @var string
+	*/
+	public $beagleScore;
+
+	/**
 	* the response returned by the bank, and can be related to both successful and failed transactions.
 	* @var string max. 100 characters
 	*/
@@ -390,13 +394,11 @@ class EwayPaymentsResponse {
 	* @param string $response eWAY response as a string (hopefully of XML data)
 	*/
 	public function loadResponseXML($response) {
+		// prevent XML injection attacks, and handle errors without warnings
+		$oldDisableEntityLoader = libxml_disable_entity_loader(TRUE);
+		$oldUseInternalErrors = libxml_use_internal_errors(TRUE);
+
 		try {
-			// prevent XML injection attacks, and handle errors without warnings
-			$oldDisableEntityLoader = libxml_disable_entity_loader(TRUE);
-			$oldUseInternalErrors = libxml_use_internal_errors(TRUE);
-
-//~ error_log(__METHOD__ . "\n" . $response);
-
 			$xml = simplexml_load_string($response);
 			if ($xml === false) {
 				$errmsg = '';

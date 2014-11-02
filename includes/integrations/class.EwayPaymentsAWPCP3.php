@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for Another WordPress Classifieds Plugin since v3.0
-* @ref http://www.awpcp.com/
+* @link http://www.awpcp.com/
 */
 class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 
@@ -35,9 +35,6 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* @return string
 	*/
     public function process_payment($transaction) {
-
-//~ error_log(__METHOD__ . "\n" . print_r($transaction,1));
-
 		$form = "<p>" . $this->integration->awpcpCheckoutStepText('', false, $transaction) . "</p>\n";
         $form .= $this->integration->awpcpCheckoutForm('', $transaction);
         return $form;
@@ -48,9 +45,6 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
     public function process_payment_notification($transaction) {
-
-//~ error_log(__METHOD__);
-
 		return;
     }
 
@@ -59,10 +53,6 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
     public function process_payment_completed($transaction) {
-
-//~ error_log(__METHOD__);
-//~ error_log(__METHOD__ . ": enters as\n" . print_r($transaction,1));
-
 		$errors = $this->integration->verifyForm($transaction);
 		$success = (count($errors) === 0);
 
@@ -125,9 +115,6 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
     public function process_payment_canceled($transaction) {
-
-//~ error_log(__METHOD__);
-
         // TODO: process_payment_canceled
     }
 

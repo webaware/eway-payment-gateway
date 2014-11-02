@@ -150,7 +150,7 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
-	* send data via cURL (or similar if cURL is unavailable) and return response
+	* send data via HTTP and return response
 	* @param string $url
 	* @param string $data
 	* @param bool $sslVerifyPeer whether to validate the SSL certificate
@@ -160,14 +160,12 @@ class EwayPaymentsPlugin {
 	public static function curlSendRequest($url, $data, $sslVerifyPeer = true) {
 		// send data via HTTPS and receive response
 		$response = wp_remote_post($url, array(
-			'user-agent' => 'WordPress/eWAY Payment Gateway',
-			'sslverify' => $sslVerifyPeer,
-			'timeout' => 60,
-			'headers' => array('Content-Type' => 'text/xml; charset=utf-8'),
-			'body' => $data,
+			'user-agent'	=> 'WordPress/eWAY Payment Gateway',
+			'sslverify'		=> $sslVerifyPeer,
+			'timeout'		=> 60,
+			'headers'		=> array('Content-Type' => 'text/xml; charset=utf-8'),
+			'body'			=> $data,
 		));
-
-//~ error_log(__METHOD__ . "\n" . print_r($response,1));
 
 		if (is_wp_error($response)) {
 			throw new EwayPaymentsException($response->get_error_message());

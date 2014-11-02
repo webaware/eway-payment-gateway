@@ -26,6 +26,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 if (!defined('EWAY_PAYMENTS_PLUGIN_ROOT')) {
 	define('EWAY_PAYMENTS_PLUGIN_ROOT', dirname(__FILE__) . '/');
 	define('EWAY_PAYMENTS_PLUGIN_FILE', __FILE__);
@@ -34,9 +38,6 @@ if (!defined('EWAY_PAYMENTS_PLUGIN_ROOT')) {
 
 	// special test customer ID for sandbox
 	define('EWAY_PAYMENTS_TEST_CUSTOMER', '87654321');
-
-	// wp-e-commerce gateway name
-	define('EWAY_PAYMENTS_WPSC_NAME', 'wpsc_merchant_eway');
 }
 
 /**

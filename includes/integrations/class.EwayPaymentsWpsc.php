@@ -2,11 +2,13 @@
 
 /**
 * payment gateway integration for WP e-Commerce
-* @ref http://docs.getshopped.org/category/developer-documentation/
+* @link http://docs.getshopped.org/category/developer-documentation/
 */
 class EwayPaymentsWpsc extends wpsc_merchant {
 
 	public $name = 'eway';
+
+	const WPSC_GATEWAY_NAME = 'wpsc_merchant_eway';
 
 	/**
 	* register new payment gateway
@@ -16,20 +18,20 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	public static function register($gateways) {
 		// register the gateway class and additional functions
 		$gateways[] = array (
-			'name' => 'eWAY payment gateway',
-			'api_version' => 2.0,
-			'image' => EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png',
-			'internalname' => EWAY_PAYMENTS_WPSC_NAME,
-			'class_name' => __CLASS__,
-			'has_recurring_billing' => false,
-			'wp_admin_cannot_cancel' => true,
-			'display_name' => 'eWAY Credit Card Payment',
-			'form' => 'EwayPaymentsWpsc_configForm',		// called as variable function name, wp-e-commerce is _doing_it_wrong(), again!
-			'submit_function' => array(__CLASS__, 'saveConfig'),
-			'payment_type' => 'credit_card',
-			'requirements' => array(
-				'php_version' => 5.2,
-			),
+			'name'						=> 'eWAY payment gateway',
+			'api_version'				=> 2.0,
+			'image'						=> EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png',
+			'internalname'				=> self::WPSC_GATEWAY_NAME,
+			'class_name'				=> __CLASS__,
+			'has_recurring_billing'		=> false,
+			'wp_admin_cannot_cancel'	=> true,
+			'display_name'				=> 'eWAY Credit Card Payment',
+			'form'						=> 'EwayPaymentsWpsc_configForm',		// called as variable function name, wp-e-commerce is _doing_it_wrong(), again!
+			'submit_function'			=> array(__CLASS__, 'saveConfig'),
+			'payment_type'				=> 'credit_card',
+			'requirements'				=> array(
+												'php_version' => 5.2,
+											),
 		);
 
 		// register extra fields we require on the checkout form
@@ -47,22 +49,30 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* grab the gateway-specific data from the checkout form post
 	*/
 	public function construct_value_array() {
+		$country_field = get_option('eway_form_country');
+		if ($country_field && !empty($_POST['collected_data'][$country_field][0])) {
+			$country = wp_unslash($_POST['collected_data'][$country_field][0]);
+		}
+		else {
+			$country = '';
+		}
+
 		$this->collected_gateway_data = array (
-			'card_number' => strtr(self::getPostValue('card_number'), array(' ' => '', '-' => '')),
-			'card_name' => self::getPostValue('card_name'),
-			'expiry_month' => self::getPostValue('expiry_month'),
-			'expiry_year' => self::getPostValue('expiry_year'),
-			'c_v_n' => self::getPostValue('cvn'),
+			'card_number'	=> strtr(self::getPostValue('card_number'), array(' ' => '', '-' => '')),
+			'card_name'		=> self::getPostValue('card_name'),
+			'expiry_month'	=> self::getPostValue('expiry_month'),
+			'expiry_year'	=> self::getPostValue('expiry_year'),
+			'c_v_n'			=> self::getPostValue('cvn'),
 
 			// additional fields from checkout
-			'first_name' => self::getCollectedDataValue(get_option('eway_form_first_name')),
-			'last_name' => self::getCollectedDataValue(get_option('eway_form_last_name')),
-			'address' => self::getCollectedDataValue(get_option('eway_form_address')),
-			'city' => self::getCollectedDataValue(get_option('eway_form_city')),
-			'state' => self::getCollectedDataValue(get_option('eway_form_state')),
-			'country' => @stripslashes($_POST['collected_data'][get_option('eway_form_country')][0]),
-			'post_code' => self::getCollectedDataValue(get_option('eway_form_post_code')),
-			'email' => self::getCollectedDataValue(get_option('eway_form_email')),
+			'first_name'	=> self::getCollectedDataValue(get_option('eway_form_first_name')),
+			'last_name'		=> self::getCollectedDataValue(get_option('eway_form_last_name')),
+			'address'		=> self::getCollectedDataValue(get_option('eway_form_address')),
+			'city'			=> self::getCollectedDataValue(get_option('eway_form_city')),
+			'state'			=> self::getCollectedDataValue(get_option('eway_form_state')),
+			'country'		=> $country,
+			'post_code'		=> self::getCollectedDataValue(get_option('eway_form_post_code')),
+			'email'			=> self::getCollectedDataValue(get_option('eway_form_email')),
 		);
 	}
 
@@ -75,7 +85,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* @param string $fieldname name of the field in the form post
 	*/
 	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? stripslashes(trim($_POST[$fieldname])) : '';
+		return isset($_POST[$fieldname]) ? wp_unslash(trim($_POST[$fieldname])) : '';
 	}
 
 	/**
@@ -87,7 +97,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* @param string $fieldname name of the field in the form post
 	*/
 	protected static function getCollectedDataValue($fieldname) {
-		return isset($_POST['collected_data'][$fieldname]) ? stripslashes(trim($_POST['collected_data'][$fieldname])) : '';
+		return isset($_POST['collected_data'][$fieldname]) ? wp_unslash(trim($_POST['collected_data'][$fieldname])) : '';
 	}
 
 	/**
@@ -95,9 +105,6 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	*/
 	public function submit() {
 		global $wpdb;
-
-//~ error_log(__METHOD__ . "\n" . print_r($this->collected_gateway_data,1));
-//~ error_log(__METHOD__ . "\n" . print_r($this,1));
 
 		// check for missing or invalid values
 		$errors = $this->validateData();
@@ -129,27 +136,29 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$isLiveSite = !get_option('eway_test');
 		$useStored = get_option('wpsc_merchant_eway_stored');
 
-		if ($useStored)
+		if ($useStored) {
 			$eway = new EwayPaymentsStoredPayment(get_option('ewayCustomerID_id'), $isLiveSite);
-		else
+		}
+		else {
 			$eway = new EwayPaymentsPayment(get_option('ewayCustomerID_id'), $isLiveSite);
+		}
 
-		$eway->invoiceDescription = get_bloginfo('name');
-		$eway->invoiceReference = $this->purchase_id;								// customer invoice reference
-		$eway->transactionNumber = $this->purchase_id;								// transaction reference
-		$eway->cardHoldersName = $this->collected_gateway_data['card_name'];
-		$eway->cardNumber = $this->collected_gateway_data['card_number'];
-		$eway->cardExpiryMonth = $this->collected_gateway_data['expiry_month'];
-		$eway->cardExpiryYear = $this->collected_gateway_data['expiry_year'];
-		$eway->cardVerificationNumber = $this->collected_gateway_data['c_v_n'];
-		$eway->firstName = $this->collected_gateway_data['first_name'];
-		$eway->lastName = $this->collected_gateway_data['last_name'];
-		$eway->emailAddress = $this->collected_gateway_data['email'];
-		$eway->postcode = $this->collected_gateway_data['post_code'];
+		$eway->invoiceDescription		= get_bloginfo('name');
+		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
+		$eway->transactionNumber		= $this->purchase_id;								// transaction reference
+		$eway->cardHoldersName			= $this->collected_gateway_data['card_name'];
+		$eway->cardNumber				= $this->collected_gateway_data['card_number'];
+		$eway->cardExpiryMonth			= $this->collected_gateway_data['expiry_month'];
+		$eway->cardExpiryYear			= $this->collected_gateway_data['expiry_year'];
+		$eway->cardVerificationNumber	= $this->collected_gateway_data['c_v_n'];
+		$eway->firstName				= $this->collected_gateway_data['first_name'];
+		$eway->lastName					= $this->collected_gateway_data['last_name'];
+		$eway->emailAddress				= $this->collected_gateway_data['email'];
+		$eway->postcode					= $this->collected_gateway_data['post_code'];
 
 		// for Beagle (free) security
 		if (get_option('wpsc_merchant_eway_beagle')) {
-			$eway->customerCountryCode = $this->collected_gateway_data['country'];
+			$eway->customerCountryCode	= $this->collected_gateway_data['country'];
 		}
 
 		// convert wp-e-commerce country code into country name
@@ -180,14 +189,8 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$total = $purchase_logs['totalprice'];
 		$eway->amount = $isLiveSite ? $total : ceil($total);
 
-//~ error_log(__METHOD__ . "\n" . print_r($eway,1));
-//~ error_log(__METHOD__ . "\n" . $eway->getPaymentXML());
-//~ return;
-
 		try {
 			$response = $eway->processPayment();
-
-//~ error_log(__METHOD__ . ": response =\n" . print_r($response,1));
 
 			if ($response->status) {
 				// transaction was successful, so record transaction number and continue
@@ -313,7 +316,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		global $gateway_checkout_form_fields;
 
 		// check if this gateway is selected for checkout payments
-		if (in_array(EWAY_PAYMENTS_WPSC_NAME, (array) get_option('custom_gateway_options'))) {
+		if (in_array(self::WPSC_GATEWAY_NAME, (array) get_option('custom_gateway_options'))) {
 			// build drop-down items for months
 			$optMonths = '';
 			foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
@@ -336,7 +339,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			// load template with passed values, capture output and register
 			ob_start();
 			EwayPaymentsPlugin::loadTemplate('wpsc-eway-fields.php', compact('th', 'card_msg', 'optMonths', 'optYears'));
-			$gateway_checkout_form_fields[EWAY_PAYMENTS_WPSC_NAME] = ob_get_clean();
+			$gateway_checkout_form_fields[self::WPSC_GATEWAY_NAME] = ob_get_clean();
 		}
 	}
 

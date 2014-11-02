@@ -344,11 +344,11 @@ class EwayPaymentsStoredResponse {
 	* @param string $response eWAY response as a string (hopefully of XML data)
 	*/
 	public function loadResponseXML($response) {
-		try {
-			// prevent XML injection attacks, and handle errors without warnings
-			$oldDisableEntityLoader = libxml_disable_entity_loader(TRUE);
-			$oldUseInternalErrors = libxml_use_internal_errors(TRUE);
+		// prevent XML injection attacks, and handle errors without warnings
+		$oldDisableEntityLoader = libxml_disable_entity_loader(TRUE);
+		$oldUseInternalErrors = libxml_use_internal_errors(TRUE);
 
+		try {
 			$xml = simplexml_load_string($response);
 			if ($xml === false) {
 				$errmsg = '';

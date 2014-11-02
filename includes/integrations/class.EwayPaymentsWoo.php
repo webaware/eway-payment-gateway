@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for WooCommerce
-* @ref http://wcdocs.woothemes.com/codex/extending/payment-gateway-api/
+* @link http://wcdocs.woothemes.com/codex/extending/payment-gateway-api/
 */
 class EwayPaymentsWoo extends WC_Payment_Gateway {
 
@@ -304,8 +304,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	* @return bool
 	*/
 	public function validate_fields() {
-		global $woocommerce;
-
 		// check for missing or invalid values
 		$errors = 0;
 		$expiryError = false;
@@ -370,18 +368,18 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		else
 			$eway = new EwayPaymentsPayment($this->eway_customerid, $isLiveSite);
 
-		$eway->invoiceDescription = get_bloginfo('name');
-		$eway->invoiceReference = $order_id;										// customer invoice reference
-		$eway->transactionNumber = $order_id;										// transaction reference
-		$eway->cardHoldersName = $ccfields['eway_card_name'];
-		$eway->cardNumber = strtr($ccfields['eway_card_number'], array(' ' => '', '-' => ''));
-		$eway->cardExpiryMonth = $ccfields['eway_expiry_month'];
-		$eway->cardExpiryYear = $ccfields['eway_expiry_year'];
-		$eway->cardVerificationNumber = $ccfields['eway_cvn'];
-		$eway->firstName = $order->billing_first_name;
-		$eway->lastName = $order->billing_last_name;
-		$eway->emailAddress = $order->billing_email;
-		$eway->postcode = $order->billing_postcode;
+		$eway->invoiceDescription		= get_bloginfo('name');
+		$eway->invoiceReference			= $order_id;										// customer invoice reference
+		$eway->transactionNumber		= $order_id;										// transaction reference
+		$eway->cardHoldersName			= $ccfields['eway_card_name'];
+		$eway->cardNumber				= strtr($ccfields['eway_card_number'], array(' ' => '', '-' => ''));
+		$eway->cardExpiryMonth			= $ccfields['eway_expiry_month'];
+		$eway->cardExpiryYear			= $ccfields['eway_expiry_year'];
+		$eway->cardVerificationNumber	= $ccfields['eway_cvn'];
+		$eway->firstName				= $order->billing_first_name;
+		$eway->lastName					= $order->billing_last_name;
+		$eway->emailAddress				= $order->billing_email;
+		$eway->postcode					= $order->billing_postcode;
 
 		// for Beagle (free) security
 		if ($this->eway_beagle == 'yes') {
@@ -420,14 +418,8 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		$total = $order->order_total;
 		$eway->amount = $isLiveSite ? $total : ceil($total);
 
-//~ error_log(__METHOD__ . "\n" . print_r($eway,1));
-//~ error_log(__METHOD__ . "\n" . $eway->getPaymentXML());
-//~ return array('result' => 'failure');
-
 		try {
 			$response = $eway->processPayment();
-
-//~ error_log(__METHOD__ . "\n" . print_r($response,1));
 
 			if ($response->status) {
 				// transaction was successful, so record details and complete payment
@@ -495,14 +487,12 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 
 	/**
 	* Read a field from form post input.
-	*
 	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
-	*
-	* @return string
 	* @param string $fieldname name of the field in the form post
+	* @return string
 	*/
 	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? stripslashes(trim((string) $_POST[$fieldname])) : '';
+		return isset($_POST[$fieldname]) ? wp_unslash(trim((string) $_POST[$fieldname])) : '';
 	}
 
 }
