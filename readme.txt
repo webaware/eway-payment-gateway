@@ -192,6 +192,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 = 3.2.1 [soon...] =
 * fixed: force Events Manager bookings form AJAX url and form action to use HTTPS if forcing SSL for events with bookings
+* fixed: WooCommerce 2.0.20 settings backwards compatibility
 * added: eWAY site seal support for WooCommerce
 * changed: updated screenshots
 

@@ -173,7 +173,16 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	public function init_settings() {
 		parent::init_settings();
 
-		if ($form_fields = $this->get_form_fields()) {
+
+		if (is_callable(array($this, 'get_form_fields'))) {
+			$form_fields = $this->get_form_fields();
+		}
+		else {
+			// WooCommerce 2.0.20 or earlier
+			$form_fields = $this->form_fields;
+		}
+
+		if ($form_fields) {
 			foreach ($form_fields as $key => $value) {
 				if (!isset($this->settings[$key])) {
 					$this->settings[$key] = isset($value['default']) ? $value['default'] : '';
