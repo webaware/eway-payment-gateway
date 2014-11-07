@@ -394,11 +394,8 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	public static function actionBillingDetailsBottom() {
 		global $purchlogitem;
 
-		if (!empty($purchlogitem->extrainfo->transactid)) {
-			echo '<p><strong>Transaction ID: ', esc_html($purchlogitem->extrainfo->transactid), "</strong></p>\n";
-		}
-		if (!empty($purchlogitem->extrainfo->authcode)) {
-			echo '<p><strong>Auth Code: ', esc_html($purchlogitem->extrainfo->authcode), "</strong></p>\n";
+		if (!empty($purchlogitem->extrainfo->transactid) || !empty($purchlogitem->extrainfo->authcode)) {
+			include EWAY_PAYMENTS_PLUGIN_ROOT . '/views/admin-wpsc-billing-details.php';
 		}
 	}
 }

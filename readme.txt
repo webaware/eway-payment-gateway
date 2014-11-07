@@ -7,7 +7,7 @@ Donate link: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.6.1
 Tested up to: 4.0
-Stable tag: 3.2.0
+Stable tag: 3.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -190,7 +190,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Changelog ==
 
-= 3.2.1 [soon...] =
+= 3.3.0 [2014-11-07] =
 * fixed: force Events Manager bookings form AJAX url and form action to use HTTPS if forcing SSL for events with bookings
 * fixed: WooCommerce 2.0.20 settings backwards compatibility
 * added: eWAY site seal support for WooCommerce
