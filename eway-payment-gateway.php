@@ -41,34 +41,10 @@ if (!defined('EWAY_PAYMENTS_PLUGIN_ROOT')) {
 }
 
 /**
-* autoload classes as/when needed
-* @param string $class_name name of class to attempt to load
-*/
-function eway_payments_autoload($class_name) {
-	static $classMapPlugin = array (
-		// application classes
-		'EwayPaymentsPlugin'				=> 'includes/class.EwayPaymentsPlugin.php',
-		'EwayPaymentsPayment'				=> 'includes/class.EwayPaymentsPayment.php',
-		'EwayPaymentsStoredPayment'			=> 'includes/class.EwayPaymentsStoredPayment.php',
-
-		// integrations
-		'EwayPaymentsAWPCP'					=> 'includes/integrations/class.EwayPaymentsAWPCP.php',
-		'EwayPaymentsAWPCP3'				=> 'includes/integrations/class.EwayPaymentsAWPCP3.php',
-		'EwayPaymentsEventsManager'			=> 'includes/integrations/class.EwayPaymentsEventsManager.php',
-		'EwayPaymentsWoo'					=> 'includes/integrations/class.EwayPaymentsWoo.php',
-		'EwayPaymentsWpsc'					=> 'includes/integrations/class.EwayPaymentsWpsc.php',
-	);
-
-	if (isset($classMapPlugin[$class_name])) {
-		require EWAY_PAYMENTS_PLUGIN_ROOT . $classMapPlugin[$class_name];
-	}
-}
-spl_autoload_register('eway_payments_autoload');
-
-/**
 * custom exceptons
 */
 class EwayPaymentsException extends Exception {}
 
 // initialise plugin
+require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsPlugin.php';
 EwayPaymentsPlugin::getInstance();

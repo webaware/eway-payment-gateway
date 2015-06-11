@@ -24,6 +24,8 @@ class EwayPaymentsPlugin {
 	* initialise plugin
 	*/
 	private function __construct() {
+		spl_autoload_register(array(__CLASS__, 'autoload'));
+
 		$this->urlBase = plugin_dir_url(EWAY_PAYMENTS_PLUGIN_FILE);
 
 		add_action('init', array($this, 'init'));
@@ -207,4 +209,28 @@ class EwayPaymentsPlugin {
 		// just check for IPv4 addresses
 		return !!ip2long($maybeIP);
 	}
+
+	/**
+	* autoload classes as/when needed
+	* @param string $class_name name of class to attempt to load
+	*/
+	public static function autoload($class_name) {
+		static $classMap = array (
+			// application classes
+			'EwayPaymentsPayment'				=> 'includes/class.EwayPaymentsPayment.php',
+			'EwayPaymentsStoredPayment'			=> 'includes/class.EwayPaymentsStoredPayment.php',
+
+			// integrations
+			'EwayPaymentsAWPCP'					=> 'includes/integrations/class.EwayPaymentsAWPCP.php',
+			'EwayPaymentsAWPCP3'				=> 'includes/integrations/class.EwayPaymentsAWPCP3.php',
+			'EwayPaymentsEventsManager'			=> 'includes/integrations/class.EwayPaymentsEventsManager.php',
+			'EwayPaymentsWoo'					=> 'includes/integrations/class.EwayPaymentsWoo.php',
+			'EwayPaymentsWpsc'					=> 'includes/integrations/class.EwayPaymentsWpsc.php',
+		);
+
+		if (isset($classMap[$class_name])) {
+			require EWAY_PAYMENTS_PLUGIN_ROOT . $classMap[$class_name];
+		}
+	}
+
 }
