@@ -39,6 +39,7 @@ class EwayPaymentsAWPCP {
 		$this->paymentsAPI = $payments;
 
 		if (get_awpcp_option('activateeway')) {
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP3.php';
 			$this->paymentsAPI->register_payment_method(new EwayPaymentsAWPCP3($this));
 		}
 	}

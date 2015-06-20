@@ -45,12 +45,13 @@ class EwayPaymentsPlugin {
 	public function init() {
 		// register with Events Manager
 		if (class_exists('EM_Gateways')) {
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsEventsManager.php';
 			EM_Gateways::register_gateway('eway', 'EwayPaymentsEventsManager');
 		}
 
 		// register with Another WordPress Classifieds Plugin
-		global $awpcp;
-		if (isset($awpcp)) {
+		if (isset($GLOBALS['awpcp'])) {
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP.php';
 			new EwayPaymentsAWPCP();
 		}
 	}
@@ -84,6 +85,8 @@ class EwayPaymentsPlugin {
 	* @return array
 	*/
 	public function wpscRegister($gateways) {
+		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWpsc.php';
+
 		return EwayPaymentsWpsc::register($gateways);
 	}
 
@@ -97,6 +100,7 @@ class EwayPaymentsPlugin {
 			// pre-WC2.1 so load compatibility layer
 			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
 		}
+		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWoo.php';
 
 		return EwayPaymentsWoo::register($gateways);
 	}
@@ -216,16 +220,8 @@ class EwayPaymentsPlugin {
 	*/
 	public static function autoload($class_name) {
 		static $classMap = array (
-			// application classes
 			'EwayPaymentsPayment'				=> 'includes/class.EwayPaymentsPayment.php',
 			'EwayPaymentsStoredPayment'			=> 'includes/class.EwayPaymentsStoredPayment.php',
-
-			// integrations
-			'EwayPaymentsAWPCP'					=> 'includes/integrations/class.EwayPaymentsAWPCP.php',
-			'EwayPaymentsAWPCP3'				=> 'includes/integrations/class.EwayPaymentsAWPCP3.php',
-			'EwayPaymentsEventsManager'			=> 'includes/integrations/class.EwayPaymentsEventsManager.php',
-			'EwayPaymentsWoo'					=> 'includes/integrations/class.EwayPaymentsWoo.php',
-			'EwayPaymentsWpsc'					=> 'includes/integrations/class.EwayPaymentsWpsc.php',
 		);
 
 		if (isset($classMap[$class_name])) {
