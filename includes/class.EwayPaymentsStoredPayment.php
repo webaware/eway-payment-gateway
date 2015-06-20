@@ -3,8 +3,6 @@
 * Classes for dealing with an eWAY stored payment
 *
 * NB: for testing, the only card number seen as valid is '4444333322221111'
-*
-* @link http://www.eway.com.au/developers/api/stored-%28xml%29
 */
 
 /**

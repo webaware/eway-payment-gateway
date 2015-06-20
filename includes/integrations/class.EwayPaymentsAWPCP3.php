@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for Another WordPress Classifieds Plugin since v3.0
-* @link http://www.awpcp.com/
+* @link http://awpcp.com/
 */
 class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 

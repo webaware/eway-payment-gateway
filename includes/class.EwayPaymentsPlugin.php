@@ -106,8 +106,8 @@ class EwayPaymentsPlugin {
 	*/
 	public function addPluginDetailsLinks($links, $file) {
 		if ($file == EWAY_PAYMENTS_PLUGIN_NAME) {
-			$links[] = '<a href="http://wordpress.org/support/plugin/eway-payment-gateway">' . __('Get help') . '</a>';
-			$links[] = '<a href="http://wordpress.org/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
+			$links[] = '<a href="https://wordpress.org/support/plugin/eway-payment-gateway">' . __('Get help') . '</a>';
+			$links[] = '<a href="https://wordpress.org/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
 			$links[] = '<a href="http://shop.webaware.com.au/downloads/eway-payment-gateway/">' . __('Donate') . '</a>';
 		}
 

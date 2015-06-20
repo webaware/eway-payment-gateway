@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for WooCommerce
-* @link http://wcdocs.woothemes.com/codex/extending/payment-gateway-api/
+* @link http://docs.woothemes.com/document/payment-gateway-api/
 */
 class EwayPaymentsWoo extends WC_Payment_Gateway {
 
@@ -117,7 +117,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'title' 		=> 'Stored payments',
 							'label' 		=> 'enable stored payments',
 							'type' 			=> 'checkbox',
-							'description' 	=> "<a href='http://www.eway.com.au/how-it-works/payment-products#stored-payments' target='_blank'>Stored payments</a> records payment details but doesn't bill immediately. Useful for drop-shipping merchants.<em id='woocommerce-eway-admin-stored-test' style='color:#c00'><br />NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.</em>",
+							'description' 	=> "Stored payments records payment details but doesn't bill immediately. Useful for drop-shipping merchants.<em id='woocommerce-eway-admin-stored-test' style='color:#c00'><br />NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.</em>",
 							'default' 		=> 'no',
 						),
 			'eway_sandbox' => array(
@@ -132,7 +132,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'title' 		=> 'Beagle (anti-fraud)',
 							'label' 		=> 'enable Beagle (free) anti-fraud',
 							'type' 			=> 'checkbox',
-							'description' 	=> '<a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure <a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle rules</a> in your MYeWAY console before enabling Beagle.<em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />Beagle is not available for Stored Payments</em>',
+							'description' 	=> '<a href="https://www.eway.com.au/developers/api/beagle-lite" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle.<em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />Beagle is not available for Stored Payments</em>',
 							'default' 		=> 'no',
 						),
 			'eway_card_form' => array(
@@ -160,7 +160,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 						),
 			'eway_site_seal_code' => array(
 							'type' 			=> 'textarea',
-							'description' 	=> '<a href="http://www.eway.com.au/developers/resources/site-seal-generator" target="_blank">generate your site seal on the eWAY website</a> and paste it here',
+							'description' 	=> '<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">generate your site seal on the eWAY website</a> and paste it here',
 							'default'		=> '',
 							'css'			=> 'height:14em',
 						),

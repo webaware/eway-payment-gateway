@@ -80,8 +80,7 @@
 				<option value="1" <?php selected($selected, '1'); ?>>Yes</option>
 				<option value="0" <?php selected($selected, '0'); ?>>No</option>
 			</select><br />
-			<em><a href='http://www.eway.com.au/how-it-works/payment-products#stored-payments' target="_blank">Stored payments</a>
-			 records payment details but doesn't bill immediately.</em>
+			<em>Stored payments records payment details but doesn't bill immediately.</em>
 			<em id="em-eway-admin-stored-test" style='color:#c00'><br />Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.</em>
 		</td>
 	</tr>
@@ -94,11 +93,10 @@
 				<option value="1" <?php selected($selected, '1'); ?>>Yes</option>
 				<option value="0" <?php selected($selected, '0'); ?>>No</option>
 			</select><br />
-			<em><a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle</a>
+			<em><a href="https://www.eway.com.au/developers/api/beagle-lite" target="_blank">Beagle</a>
 			 is a service from eWAY that provides a level of fraud protection for your transactions.
 			 It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud.
-			 You must configure <a href="http://www.eway.com.au/developers/resources/beagle-(free)-rules" target="_blank">Beagle rules</a>
-			 in your MYeWAY console before enabling Beagle.</em>
+			 You must configure Beagle rules in your MYeWAY console before enabling Beagle.</em>
 			<em><br />You will also need to add a Country field to your booking form. Beagle works by comparing the country of the address with
 			the country where the purchaser is using the Internet; Beagle won't be used when booking without a country selected.</em>
 			<em id="em-eway-admin-stored-beagle" style='color:#c00'><br />Beagle is not available for Stored Payments</em>

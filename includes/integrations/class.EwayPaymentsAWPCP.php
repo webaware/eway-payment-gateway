@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for Another WordPress Classifieds Plugin
-* @link http://www.awpcp.com/
+* @link http://awpcp.com/
 */
 class EwayPaymentsAWPCP {
 
@@ -79,11 +79,11 @@ class EwayPaymentsAWPCP {
 			'checkbox', 1, 'Force special test ID 87654321 for sandbox?');
 
 		$awpcp->settings->add_setting($section, 'eway_stored', 'Stored payments', 'checkbox', 0,
-			"<a href='http://www.eway.com.au/how-it-works/payment-products#stored-payments' target='_blank'>Stored payments</a> records payment details but doesn't bill immediately. Useful when ads must be approved by admin, allowing you to reject payments for rejected ads.");
+			"Stored payments records payment details but doesn't bill immediately. Useful when ads must be approved by admin, allowing you to reject payments for rejected ads.");
 
 		// TODO: add Beagle if new version supports taking country info before billing
 		//~ $awpcp->settings->add_setting($section, 'eway_beagle', 'Beagle (anti-fraud)', 'checkbox', 0,
-			//~ "<a href='http://www.eway.com.au/developers/resources/beagle-(free)-rules' target='_blank'>Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure <a href='http://www.eway.com.au/developers/resources/beagle-(free)-rules' target='_blank'>Beagle rules</a> in your MYeWAY console before enabling Beagle");
+			//~ "<a href='https://www.eway.com.au/developers/api/beagle-lite' target='_blank'>Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle");
 
 		$awpcp->settings->add_setting($section, 'eway_card_message', 'Credit card message', 'textfield', '',
 			'<br />Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;');
@@ -94,7 +94,7 @@ class EwayPaymentsAWPCP {
 	*/
 	public function awpcpCheckoutStepText($text, $form_values, $transaction) {
 		if ($transaction->get('payment-method') == self::PAYMENT_METHOD) {
-			$text = "Please enter your credit card details for secure payment via <a target='_blank' href='http://www.eway.com.au/'>eWAY</a>.";
+			$text = "Please enter your credit card details for secure payment via <a target='_blank' href='https://www.eway.com.au/'>eWAY</a>.";
 		}
 
 		return $text;

@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for WP e-Commerce
-* @link http://docs.getshopped.org/category/developer-documentation/
+* @link http://docs.wpecommerce.org/category/payment-gateways/
 */
 class EwayPaymentsWpsc extends wpsc_merchant {
 

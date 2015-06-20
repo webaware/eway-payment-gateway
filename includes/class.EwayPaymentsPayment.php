@@ -5,8 +5,8 @@
 *
 * NB: for testing, the only card number seen as valid is '4444333322221111'
 *
-* @link http://www.eway.com.au/developers/api/direct-payments
-* @link http://www.eway.com.au/developers/api/beagle-%28free%29
+* @link https://www.eway.com.au/developers/api/direct-payments
+* @link https://www.eway.com.au/developers/api/beagle-lite
 *
 * copyright (c) 2008-2014 WebAware Pty Ltd, released under GPL v2.1
 */
