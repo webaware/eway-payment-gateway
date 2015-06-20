@@ -26,23 +26,23 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		$this->init_settings();
 
 		// define user set variables
-		$this->enabled				= $this->settings['enabled'];
-		$this->title				= $this->settings['title'];
-		$this->description			= $this->settings['description'];
-		$this->availability			= $this->settings['availability'];
-		$this->countries			= $this->settings['countries'];
-		$this->eway_customerid		= $this->settings['eway_customerid'];
-		$this->eway_sandbox			= $this->settings['eway_sandbox'];
-		$this->eway_stored			= $this->settings['eway_stored'];
-		$this->eway_beagle			= $this->settings['eway_beagle'];
-		$this->eway_card_form		= $this->settings['eway_card_form'];
-		$this->eway_card_msg		= $this->settings['eway_card_msg'];
-		$this->eway_site_seal		= $this->settings['eway_site_seal'];
-		$this->eway_site_seal_code	= $this->settings['eway_site_seal_code'];
+		$this->enabled					= $this->settings['enabled'];
+		$this->title					= $this->settings['title'];
+		$this->description				= $this->settings['description'];
+		$this->availability				= $this->settings['availability'];
+		$this->countries				= $this->settings['countries'];
+		$this->eway_customerid			= $this->settings['eway_customerid'];
+		$this->eway_sandbox				= $this->settings['eway_sandbox'];
+		$this->eway_stored				= $this->settings['eway_stored'];
+		$this->eway_beagle				= $this->settings['eway_beagle'];
+		$this->eway_card_form			= $this->settings['eway_card_form'];
+		$this->eway_card_msg			= $this->settings['eway_card_msg'];
+		$this->eway_site_seal			= $this->settings['eway_site_seal'];
+		$this->eway_site_seal_code		= $this->settings['eway_site_seal_code'];
 
 		// handle support for standard WooCommerce credit card form instead of our custom template
 		if ($this->eway_card_form == 'yes') {
-			$this->supports[] = 'default_credit_card_form';
+			$this->supports[]			= 'default_credit_card_form';
 			add_filter('woocommerce_credit_card_form_fields', array($this, 'wooCcFormFields'), 10, 2);
 			add_action('woocommerce_credit_card_form_start', array($this, 'wooCcFormStart'));
 			add_action('woocommerce_credit_card_form_end', array($this, 'wooCcFormEnd'));
@@ -413,19 +413,19 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 
 		// use cardholder name for last name if no customer name entered
 		if (empty($eway->firstName) && empty($eway->lastName)) {
-			$eway->lastName = $eway->cardHoldersName;
+			$eway->lastName				= $eway->cardHoldersName;
 		}
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription = apply_filters('woocommerce_eway_invoice_desc', $eway->invoiceDescription, $order_id);
-		$eway->invoiceReference = apply_filters('woocommerce_eway_invoice_ref', $eway->invoiceReference, $order_id);
-		$eway->option1 = apply_filters('woocommerce_eway_option1', '', $order_id);
-		$eway->option2 = apply_filters('woocommerce_eway_option2', '', $order_id);
-		$eway->option3 = apply_filters('woocommerce_eway_option3', '', $order_id);
+		$eway->invoiceDescription		= apply_filters('woocommerce_eway_invoice_desc', $eway->invoiceDescription, $order_id);
+		$eway->invoiceReference			= apply_filters('woocommerce_eway_invoice_ref', $eway->invoiceReference, $order_id);
+		$eway->option1					= apply_filters('woocommerce_eway_option1', '', $order_id);
+		$eway->option2					= apply_filters('woocommerce_eway_option2', '', $order_id);
+		$eway->option3					= apply_filters('woocommerce_eway_option3', '', $order_id);
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$total = $order->order_total;
-		$eway->amount = $isLiveSite ? $total : ceil($total);
+		$eway->amount					= $isLiveSite ? $total : ceil($total);
 
 		try {
 			$response = $eway->processPayment();

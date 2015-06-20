@@ -1,10 +1,10 @@
 <?php
 // custom fields for WP e-Commerce admin page
 
-$eway_stored = get_option('wpsc_merchant_eway_stored') ? '1' : '0';
-$eway_test = get_option('eway_test') ? '1' : '0';
-$eway_th = get_option('wpsc_merchant_eway_th') ? '1' : '0';
-$eway_beagle = get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
+$eway_stored	= get_option('wpsc_merchant_eway_stored') ? '1' : '0';
+$eway_test		= get_option('eway_test')                 ? '1' : '0';
+$eway_th		= get_option('wpsc_merchant_eway_th')     ? '1' : '0';
+$eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 
 ?>
 

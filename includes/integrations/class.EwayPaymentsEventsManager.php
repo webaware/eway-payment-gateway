@@ -129,7 +129,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			}
 
 			$x_exp_date_month = self::getPostValue('x_exp_date_month');
-			$x_exp_date_year = self::getPostValue('x_exp_date_year');
+			$x_exp_date_year  = self::getPostValue('x_exp_date_year');
 			if (!empty($x_exp_date_month) && !empty($x_exp_date_year)) {
 				// check that first day of month after expiry isn't earlier than today
 				$expired = mktime(0, 0, 0, 1 + $x_exp_date_month, 0, $x_exp_date_year);
@@ -298,11 +298,11 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	* Outputs custom content and credit card information.
 	*/
 	public function booking_form(){
-		$card_msg = esc_html(get_option('em_' . EM_EWAY_GATEWAY . '_card_msg'));
+		$card_msg	= esc_html(get_option('em_' . EM_EWAY_GATEWAY . '_card_msg'));
 
-		$card_num = esc_html(self::getPostValue('x_card_num'));
-		$card_name = esc_html(self::getPostValue('x_card_name'));
-		$card_code = esc_html(self::getPostValue('x_card_code'));
+		$card_num	= esc_html(self::getPostValue('x_card_num'));
+		$card_name	= esc_html(self::getPostValue('x_card_name'));
+		$card_code	= esc_html(self::getPostValue('x_card_code'));
 
 		// build drop-down items for months
 		$optMonths = '';
@@ -373,9 +373,9 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		// attempt to split name into parts, and hope to not offend anyone!
 		$names = explode(' ', $EM_Booking->get_person()->get_name());
 		if (!empty($names[0])) {
-			$eway->firstName = array_shift($names);		// remove first name from array
+			$eway->firstName				= array_shift($names);		// remove first name from array
 		}
-		$eway->lastName = trim(implode(' ', $names));
+		$eway->lastName						= trim(implode(' ', $names));
 
 		// use cardholder name for last name if no customer name entered
 		if (empty($eway->firstName) && empty($eway->lastName)) {
@@ -390,19 +390,19 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			EM_Gateways::get_customer_field('state', $EM_Booking),
 			self::getCountryName(EM_Gateways::get_customer_field('country', $EM_Booking)),
 		);
-		$eway->address = implode(', ', array_filter($parts, 'strlen'));
+		$eway->address						= implode(', ', array_filter($parts, 'strlen'));
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$amount = $EM_Booking->get_price(false, false, true);
 		$amount = apply_filters('em_eway_amount', $amount, $EM_Booking);
-		$eway->amount = $isLiveSite ? $amount : ceil($amount);
+		$eway->amount						= $isLiveSite ? $amount : ceil($amount);
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription = apply_filters('em_eway_invoice_desc', $eway->invoiceDescription, $EM_Booking);
-		$eway->invoiceReference = apply_filters('em_eway_invoice_ref', $eway->invoiceReference, $EM_Booking);
-		$eway->option1 = apply_filters('em_eway_option1', '', $EM_Booking);
-		$eway->option2 = apply_filters('em_eway_option2', '', $EM_Booking);
-		$eway->option3 = apply_filters('em_eway_option3', '', $EM_Booking);
+		$eway->invoiceDescription			= apply_filters('em_eway_invoice_desc', $eway->invoiceDescription, $EM_Booking);
+		$eway->invoiceReference				= apply_filters('em_eway_invoice_ref', $eway->invoiceReference, $EM_Booking);
+		$eway->option1						= apply_filters('em_eway_option1', '', $EM_Booking);
+		$eway->option2						= apply_filters('em_eway_option2', '', $EM_Booking);
+		$eway->option3						= apply_filters('em_eway_option3', '', $EM_Booking);
 
 		// Get Payment
 		try {
@@ -412,9 +412,9 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			if ($response->status) {
 				// transaction was successful, so record transaction number and continue
 				$EM_Booking->booking_meta[EM_EWAY_GATEWAY] = array(
-					'txn_id' => $response->transactionNumber,
-					'authcode' => $response->authCode,
-					'amount' => $response->amount,
+					'txn_id'	=> $response->transactionNumber,
+					'authcode'	=> $response->authCode,
+					'amount'	=> $response->amount,
 				);
 
 				$notes = array();
@@ -485,4 +485,5 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		// default action is to return true
 		return true;
 	}
+
 }

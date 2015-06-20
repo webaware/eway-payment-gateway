@@ -171,23 +171,23 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			$this->collected_gateway_data['state'],
 			$country,
 		);
-		$eway->address = implode(', ', array_filter($parts, 'strlen'));
+		$eway->address					= implode(', ', array_filter($parts, 'strlen'));
 
 		// use cardholder name for last name if no customer name entered
 		if (empty($eway->firstName) && empty($eway->lastName)) {
-			$eway->lastName = $eway->cardHoldersName;
+			$eway->lastName				= $eway->cardHoldersName;
 		}
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription = apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription, $this->purchase_id);
-		$eway->invoiceReference = apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference, $this->purchase_id);
-		$eway->option1 = apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id);
-		$eway->option2 = apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id);
-		$eway->option3 = apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id);
+		$eway->invoiceDescription		= apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription, $this->purchase_id);
+		$eway->invoiceReference			= apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference, $this->purchase_id);
+		$eway->option1					= apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id);
+		$eway->option2					= apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id);
+		$eway->option3					= apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id);
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$total = $purchase_logs['totalprice'];
-		$eway->amount = $isLiveSite ? $total : ceil($total);
+		$eway->amount					= $isLiveSite ? $total : ceil($total);
 
 		try {
 			$response = $eway->processPayment();
@@ -398,6 +398,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			include EWAY_PAYMENTS_PLUGIN_ROOT . '/views/admin-wpsc-billing-details.php';
 		}
 	}
+
 }
 
 /**

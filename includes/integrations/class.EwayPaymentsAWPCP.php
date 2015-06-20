@@ -314,8 +314,8 @@ class EwayPaymentsAWPCP {
 			$profile = get_user_meta($user->ID, 'awpcp-profile', true);
 			$parts = array (
 				isset($profile['address']) ? $profile['address'] : '',
-				isset($profile['city']) ? $profile['city'] : '',
-				isset($profile['state']) ? $profile['state'] : '',
+				isset($profile['city'])    ? $profile['city']    : '',
+				isset($profile['state'])   ? $profile['state']   : '',
 			);
 			$eway->address = implode(', ', array_filter($parts, 'strlen'));
 		}
@@ -326,11 +326,11 @@ class EwayPaymentsAWPCP {
 		}
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription = apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
-		$eway->invoiceReference = apply_filters('awpcp_eway_invoice_ref', $eway->invoiceReference, $transaction);
-		$eway->option1 = apply_filters('awpcp_eway_option1', '', $transaction);
-		$eway->option2 = apply_filters('awpcp_eway_option2', '', $transaction);
-		$eway->option3 = apply_filters('awpcp_eway_option3', '', $transaction);
+		$eway->invoiceDescription			= apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
+		$eway->invoiceReference				= apply_filters('awpcp_eway_invoice_ref', $eway->invoiceReference, $transaction);
+		$eway->option1						= apply_filters('awpcp_eway_option1', '', $transaction);
+		$eway->option2						= apply_filters('awpcp_eway_option2', '', $transaction);
+		$eway->option3						= apply_filters('awpcp_eway_option3', '', $transaction);
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		if (method_exists($transaction, 'get_totals')) {
@@ -360,4 +360,5 @@ class EwayPaymentsAWPCP {
 	protected static function getPostValue($fieldname) {
 		return isset($_POST[$fieldname]) ? wp_unslash(trim($_POST[$fieldname])) : '';
 	}
+
 }

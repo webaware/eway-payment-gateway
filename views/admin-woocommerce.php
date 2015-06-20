@@ -17,9 +17,9 @@
 	* show warning message if they are
 	*/
 	function setVisibility() {
-		var	useTest = ($("#woocommerce_eway_payments_eway_sandbox").filter(":checked").val() === "1"),
-			useBeagle = ($("#woocommerce_eway_payments_eway_beagle").filter(":checked").val() === "1"),
-			useStored = ($("#woocommerce_eway_payments_eway_stored").filter(":checked").val() === "1");
+		var	useTest   = ($("#woocommerce_eway_payments_eway_sandbox").filter(":checked").val() === "1"),
+			useBeagle = ($("#woocommerce_eway_payments_eway_beagle").filter(":checked").val()  === "1"),
+			useStored = ($("#woocommerce_eway_payments_eway_stored").filter(":checked").val()  === "1");
 
 		function display(element, visible) {
 			if (visible)
