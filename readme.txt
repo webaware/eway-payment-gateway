@@ -194,6 +194,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 * fixed: WP eCommerce sometimes loses the transaction authcode on sites with an object cache (like memcached)
 * added: some precautionary XSS prevention
+* changed: credit card fields all now have autocomplete disabled, for better card security
 * changed: WooCommerce customer reference now accepts the filtered order number (`$order->get_order_number()`)
 * changed: some code refactoring for easier maintenance
 
