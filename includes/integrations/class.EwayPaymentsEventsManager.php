@@ -455,7 +455,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	* Outputs custom fields in the settings page
 	*/
 	public function mysettings() {
-		include EWAY_PAYMENTS_PLUGIN_ROOT . '/views/admin-events-manager.php';
+		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-events-manager.php';
 	}
 
 	/**
@@ -466,14 +466,14 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		parent::update();
 
 		$options = array (
-			'em_' . EM_EWAY_GATEWAY . '_mode'					=> self::getPostValue('eway_mode'),
-			'em_' . EM_EWAY_GATEWAY . '_cust_id'				=> self::getPostValue('eway_cust_id'),
-			'em_' . EM_EWAY_GATEWAY . '_stored'					=> self::getPostValue('eway_stored'),
-			'em_' . EM_EWAY_GATEWAY . '_beagle'					=> self::getPostValue('eway_beagle'),
-			'em_' . EM_EWAY_GATEWAY . '_test_force'				=> self::getPostValue('eway_test_force'),
-			'em_' . EM_EWAY_GATEWAY . '_ssl_force'				=> self::getPostValue('eway_ssl_force'),
-			'em_' . EM_EWAY_GATEWAY . '_card_msg'				=> self::getPostValue('eway_card_msg'),
-			'em_' . EM_EWAY_GATEWAY . '_manual_approval'		=> self::getPostValue('manual_approval'),
+			'em_' . EM_EWAY_GATEWAY . '_mode'					=> sanitize_text_field(self::getPostValue('eway_mode')),
+			'em_' . EM_EWAY_GATEWAY . '_cust_id'				=> sanitize_text_field(self::getPostValue('eway_cust_id')),
+			'em_' . EM_EWAY_GATEWAY . '_stored'					=> self::getPostValue('eway_stored') ? '1' : '0',
+			'em_' . EM_EWAY_GATEWAY . '_beagle'					=> self::getPostValue('eway_beagle') ? '1' : '0',
+			'em_' . EM_EWAY_GATEWAY . '_test_force'				=> self::getPostValue('eway_test_force') ? '1' : '0',
+			'em_' . EM_EWAY_GATEWAY . '_ssl_force'				=> self::getPostValue('eway_ssl_force') ? '1' : '0',
+			'em_' . EM_EWAY_GATEWAY . '_card_msg'				=> sanitize_text_field(self::getPostValue('eway_card_msg')),
+			'em_' . EM_EWAY_GATEWAY . '_manual_approval'		=> self::getPostValue('manual_approval') ? '1' : '',
 			'em_' . EM_EWAY_GATEWAY . '_booking_feedback'		=> wp_kses_data(self::getPostValue('booking_feedback')),
 			'em_' . EM_EWAY_GATEWAY . '_booking_feedback_free'	=> wp_kses_data(self::getPostValue('booking_feedback_free')),
 		);

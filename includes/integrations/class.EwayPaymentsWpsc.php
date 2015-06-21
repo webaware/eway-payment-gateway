@@ -349,7 +349,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	*/
 	public static function configForm() {
 		ob_start();
-		include EWAY_PAYMENTS_PLUGIN_ROOT . '/views/admin-wpsc.php';
+		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-wpsc.php';
 		return ob_get_clean();
 	}
 
@@ -358,31 +358,31 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	*/
 	public static function saveConfig() {
 		if (isset($_POST['ewayCustomerID_id'])) {
-			update_option('ewayCustomerID_id', $_POST['ewayCustomerID_id']);
+			update_option('ewayCustomerID_id', sanitize_text_field(wp_unslash($_POST['ewayCustomerID_id'])));
 		}
 
 		if (isset($_POST['eway_stored'])) {
-			update_option('wpsc_merchant_eway_stored', $_POST['eway_stored']);
+			update_option('wpsc_merchant_eway_stored', $_POST['eway_stored'] ? '1' : '0');
 		}
 
 		if (isset($_POST['eway_test'])) {
-			update_option('eway_test', $_POST['eway_test']);
+			update_option('eway_test', $_POST['eway_test'] ? '1' : '0');
 		}
 
 		if (isset($_POST['eway_th'])) {
-			update_option('wpsc_merchant_eway_th', $_POST['eway_th']);
+			update_option('wpsc_merchant_eway_th', $_POST['eway_th'] ? '1' : '0');
 		}
 
 		if (isset($_POST['eway_beagle'])) {
-			update_option('wpsc_merchant_eway_beagle', $_POST['eway_beagle']);
+			update_option('wpsc_merchant_eway_beagle', $_POST['eway_beagle'] ? '1' : '0');
 		}
 
 		if (isset($_POST['eway_card_msg'])) {
-			update_option('wpsc_merchant_eway_card_msg', $_POST['eway_card_msg']);
+			update_option('wpsc_merchant_eway_card_msg', sanitize_text_field(wp_unslash($_POST['eway_card_msg'])));
 		}
 
 		foreach ((array)$_POST['eway_form'] as $form => $value) {
-			update_option(('eway_form_'.$form), $value);
+			update_option('eway_form_' . $form, $value ? absint($value) : '');
 		}
 
 		return true;
@@ -395,7 +395,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		global $purchlogitem;
 
 		if (!empty($purchlogitem->extrainfo->transactid) || !empty($purchlogitem->extrainfo->authcode)) {
-			include EWAY_PAYMENTS_PLUGIN_ROOT . '/views/admin-wpsc-billing-details.php';
+			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-wpsc-billing-details.php';
 		}
 	}
 

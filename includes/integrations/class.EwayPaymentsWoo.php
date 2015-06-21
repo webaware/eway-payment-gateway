@@ -173,7 +173,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	public function init_settings() {
 		parent::init_settings();
 
-
 		if (is_callable(array($this, 'get_form_fields'))) {
 			$form_fields = $this->get_form_fields();
 		}
@@ -195,7 +194,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	* show the admin panel for setting plugin options
 	*/
 	public function admin_options() {
-		include EWAY_PAYMENTS_PLUGIN_ROOT . '/views/admin-woocommerce.php';
+		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-woocommerce.php';
 	}
 
 	/**
@@ -206,11 +205,11 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	*/
 	public function wooCcFormFields($fields, $gateway) {
 		if ($gateway == $this->id) {
-			$fields = array_merge(array(
-				'card-name-field' => '<p class="form-row form-row-wide">
-					<label for="' . esc_attr( $this->id ) . '-card-name">Card Holder\'s Name <span class="required">*</span></label>
-					<input id="' . esc_attr( $this->id ) . '-card-name" class="input-text wc-credit-card-form-card-name" type="text" maxlength="50" autocomplete="off" name="' . $this->id . '-card-name" />
-				</p>'), $fields);
+			ob_start();
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/woocommerce-ccfields-card-name.php';
+			$card_name = ob_get_clean();
+
+			$fields = array_merge(array('card-name-field' => $card_name), $fields);
 		}
 
 		return $fields;
@@ -223,7 +222,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	public function wooCcFormStart($gateway) {
 		if ($gateway == $this->id) {
 			if (!empty($this->settings['eway_card_msg'])) {
-				printf('<span class="eway-credit-card-message">%s</span>', $this->settings['eway_card_msg']);
+				printf('<span class="eway-credit-card-message">%s</span>', esc_html($this->settings['eway_card_msg']));
 			}
 		}
 	}

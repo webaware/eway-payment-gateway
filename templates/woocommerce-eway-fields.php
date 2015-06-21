@@ -13,7 +13,7 @@ Take care to keep the field names the same, or your checkout form won't charge c
 <fieldset>
 
 	<?php if (!empty($settings['eway_card_msg'])): ?>
-	<p class="eway-credit-card-message"><?php echo $settings['eway_card_msg']; ?></p>
+	<p class="eway-credit-card-message"><?php echo esc_html($settings['eway_card_msg']); ?></p>
 	<?php endif; ?>
 
 	<p class="form-row form-row-first">
