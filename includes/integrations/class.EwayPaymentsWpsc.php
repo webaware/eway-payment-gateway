@@ -200,20 +200,31 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 				else {
 					$status = 3; // WPSC_Purchase_Log::ACCEPTED_PAYMENT
 				}
+				$log_details = array(
+					'processed'			=> $status,
+					'transactid'		=> $response->transactionNumber,
+					'authcode'			=> $response->authCode,
+				);
 
-				$this->set_transaction_details($response->transactionNumber, $status);
-				$this->set_authcode($response->authCode);
 				if (!empty($response->beagleScore)) {
-					$this->setPaymentNotes('Beagle score: ' . $response->beagleScore);
+					$log_details['notes'] = 'Beagle score: ' . $response->beagleScore;
 				}
+
+				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
+
 				$this->go_to_transaction_results($this->cart_data['session_id']);
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
 				$status = 6; // WPSC_Purchase_Log::PAYMENT_DECLINED
 				$this->set_error_message(nl2br(esc_html($response->error)));
-				$this->setPaymentNotes($response->error);
-				$this->set_purchase_processed_by_purchid($status);
+
+				$log_details = array(
+					'processed'			=> $status,
+					'notes'				=> $response->error,
+				);
+				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
+
 				return;
 			}
 		}
@@ -292,21 +303,6 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		}
 
 		return $errors;
-	}
-
-	/**
-	* update payment log notes (seems to be missing functionality in wpsc)
-	* @param string $notes
-	*/
-	protected function setPaymentNotes($notes) {
-		global $wpdb;
-
-		$wpdb->update(WPSC_TABLE_PURCHASE_LOGS,
-			array('notes' => $notes),
-			array('id' => $this->purchase_id),
-			array('%s'),
-			array('%d')
-		);
 	}
 
 	/**

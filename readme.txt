@@ -192,6 +192,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 = 3.4.0, soon... =
 
+* fixed: WP eCommerce sometimes loses the transaction authcode on sites with an object cache (like memcached)
 * added: some precautionary XSS prevention
 * changed: some code refactoring for easier maintenance
 
