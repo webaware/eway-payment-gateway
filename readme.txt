@@ -6,8 +6,8 @@ Author URI: http://webaware.com.au/
 Donate link: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.6.1
-Tested up to: 4.0
-Stable tag: 3.3.0
+Tested up to: 4.2.2
+Stable tag: 3.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -190,7 +190,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Changelog ==
 
-= 3.4.0, soon... =
+= 3.4.0, 2015-06-21 =
 
 * fixed: WP eCommerce sometimes loses the transaction authcode on sites with an object cache (like memcached)
 * added: some precautionary XSS prevention
