@@ -4,6 +4,7 @@
 * plugin controller class
 */
 class EwayPaymentsPlugin {
+
 	public $urlBase;									// string: base URL path to files in plugin
 
 	/**
@@ -161,7 +162,7 @@ class EwayPaymentsPlugin {
 	* @param string $data
 	* @param bool $sslVerifyPeer whether to validate the SSL certificate
 	* @return string $response
-	* @throws GFDpsPxPayCurlException
+	* @throws EwayPaymentsException
 	*/
 	public static function curlSendRequest($url, $data, $sslVerifyPeer = true) {
 		// send data via HTTPS and receive response
