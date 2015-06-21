@@ -20,14 +20,14 @@ Take care to keep the field names the same, or your checkout form won't charge c
 	<<?php echo $th; ?>><label>Credit Card Number <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>
 		<input type="text" value="" pattern="[0-9]*" name="card_number" id="eway_card_number"
-			title="only digits 0-9 are accepted" />
+			title="only digits 0-9 are accepted" autocomplete="off" />
 	</td>
 </tr>
 
 <tr class="wpsc-merch-eway-row">
 	<<?php echo $th; ?>><label>Card Holder's Name <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>
-		<input type="text" value="" name="card_name" id="eway_card_name" />
+		<input type="text" value="" name="card_name" id="eway_card_name" autocomplete="off" />
 	</td>
 </tr>
 
@@ -46,6 +46,6 @@ Take care to keep the field names the same, or your checkout form won't charge c
 	<<?php echo $th; ?>><label id="eway_cvn">CVN/CVV <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>
 		<input type="text" size="4" maxlength="4" value="" pattern="[0-9]*" name="cvn" id="eway_cvn"
-			title="only digits 0-9 are accepted" />
+			title="only digits 0-9 are accepted" autocomplete="off" />
 	</td>
 </tr>

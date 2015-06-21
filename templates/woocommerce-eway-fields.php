@@ -19,12 +19,12 @@ Take care to keep the field names the same, or your checkout form won't charge c
 	<p class="form-row form-row-first">
 		<label>Credit Card Number <span class="required">*</span></label>
 		<input type="text" value="" pattern="[0-9]*" name="eway_card_number" id="eway_card_number"
-			title="only digits 0-9 are accepted" />
+			title="only digits 0-9 are accepted" autocomplete="off" />
 	</p>
 
 	<p class="form-row form-row-last">
 		<label>Card Holder's Name <span class="required">*</span></label>
-		<input type="text" value="" name="eway_card_name" id="eway_card_name" />
+		<input type="text" value="" name="eway_card_name" id="eway_card_name" autocomplete="off" />
 	</p>
 
 	<div class="clear"></div>
@@ -44,7 +44,7 @@ Take care to keep the field names the same, or your checkout form won't charge c
 	<p class="form-row form-row-last">
 		<label id="eway_cvn">CVN/CVV <span class="required">*</span></label>
 		<input type="text" size="4" maxlength="4" value="" pattern="[0-9]*" name="eway_cvn" id="eway_cvn"
-			title="only digits 0-9 are accepted" />
+			title="only digits 0-9 are accepted" autocomplete="off" />
 	</p>
 
 	<div class="clear"></div>

@@ -20,12 +20,12 @@ Take care to keep the field names the same, or your checkout form won't charge c
 <p class="em-bookings-form-gateway-cardno">
 	<label><?php  _e('Credit Card Number','em-pro'); ?></label>
 	<input type="text" size="15" name="x_card_num" value="<?php echo $card_num; ?>" class="input" pattern="[0-9]*"
-		title="only digits 0-9 are accepted" />
+		title="only digits 0-9 are accepted" autocomplete="off" />
 </p>
 
 <p class="em-bookings-form-gateway-cardname">
 	<label>Name of Card Holder</label>
-	<input type="text" size="15" name="x_card_name" value="<?php echo $card_name; ?>" class="input" />
+	<input type="text" size="15" name="x_card_name" value="<?php echo $card_name; ?>" class="input" autocomplete="off" />
 </p>
 
 <p class="em-bookings-form-gateway-expiry">
@@ -41,5 +41,5 @@ Take care to keep the field names the same, or your checkout form won't charge c
 <p class="em-bookings-form-ccv">
 	<label>CVN/CVV</label>
 	<input type="text" size="4" name="x_card_code" value="<?php echo $card_code; ?>" class="input" maxlength="4" pattern="[0-9]*"
-		title="only digits 0-9 are accepted" />
+		title="only digits 0-9 are accepted" autocomplete="off" />
 </p>
