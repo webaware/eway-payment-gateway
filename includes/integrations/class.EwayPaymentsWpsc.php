@@ -118,14 +118,12 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		// get purchase logs
 		if ($this->purchase_id > 0) {
-			$sql = 'select totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where id = %d';
-			$purchase_logs = $wpdb->get_row($wpdb->prepare($sql, $this->purchase_id), ARRAY_A);
+			$purchase_logs = new WPSC_Purchase_Log($this->purchase_id);
 		}
 		elseif (!empty($this->session_id)) {
-			$sql = 'select id,totalprice from `' . WPSC_TABLE_PURCHASE_LOGS . '` where sessionid = %s limit 1';
-			$purchase_logs = $wpdb->get_row($wpdb->prepare($sql, $this->session_id), ARRAY_A);
+			$purchase_logs = new WPSC_Purchase_Log($this->session_id, 'sessionid');
 
-			$this->purchase_id = $purchase_logs['id'];
+			$this->purchase_id = $purchase_logs->get('id');
 		}
 		else {
 			$this->set_error_message('No cart ID and no active session!');
@@ -186,7 +184,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$eway->option3					= apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id);
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
-		$total = $purchase_logs['totalprice'];
+		$total = $purchase_logs->get('totalprice');
 		$eway->amount					= $isLiveSite ? $total : ceil($total);
 
 		try {
