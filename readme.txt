@@ -194,6 +194,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 * fixed: WP eCommerce sometimes loses the transaction authcode on sites with an object cache (like memcached)
 * added: some precautionary XSS prevention
+* changed: WooCommerce customer reference now accepts the filtered order number (`$order->get_order_number()`)
 * changed: some code refactoring for easier maintenance
 
 = 3.3.0, 2014-11-07 =

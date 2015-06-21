@@ -377,7 +377,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 			$eway = new EwayPaymentsPayment($this->eway_customerid, $isLiveSite);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
-		$eway->invoiceReference			= $order_id;										// customer invoice reference
+		$eway->invoiceReference			= $order->get_order_number();						// customer invoice reference
 		$eway->transactionNumber		= $order_id;										// transaction reference
 		$eway->cardHoldersName			= $ccfields['eway_card_name'];
 		$eway->cardNumber				= strtr($ccfields['eway_card_number'], array(' ' => '', '-' => ''));
