@@ -161,6 +161,8 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `awpcp_eway_option1` for setting the option1 field
 * `awpcp_eway_option2` for setting the option2 field
 * `awpcp_eway_option3` for setting the option3 field
+* `awpcp_eway_icon` for changing the payment gateway icon
+* `awpcp_eway_checkout_message` for changing the message above the checkout form
 
 **Events Manager**
 
@@ -189,6 +191,12 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 7. Another WordPress Classifieds Plugin payments settings
 
 == Changelog ==
+
+= 3.5.0, soon... =
+
+* added: eWAY site seal support for AWPCP
+* added: custom payment method icon setting for AWPCP
+* added: filter `awpcp_eway_checkout_message` for changing the message above the checkout form in AWPCP
 
 = 3.4.0, 2015-06-21 =
 
