@@ -55,6 +55,7 @@ class EwayPaymentsAWPCP {
 		if (empty($icon)) {
 			$icon = plugins_url('images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
 		}
+		$icon = apply_filters('awpcp_eway_icon', $icon);
 
 		$method = new stdClass;
 		$method->slug			= self::PAYMENT_METHOD;
@@ -108,6 +109,7 @@ class EwayPaymentsAWPCP {
 	public function awpcpCheckoutStepText($text, $form_values, $transaction) {
 		if ($transaction->get('payment-method') == self::PAYMENT_METHOD) {
 			$text = "Please enter your credit card details for secure payment via <a target='_blank' href='https://www.eway.com.au/'>eWAY</a>.";
+			$text = apply_filters('awpcp_eway_checkout_message', $text, $form_values, $transaction);
 		}
 
 		return $text;
