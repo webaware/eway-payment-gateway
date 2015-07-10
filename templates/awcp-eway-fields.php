@@ -11,7 +11,7 @@ Take care to keep the field names the same, or your checkout form won't charge c
 */
 ?>
 
-<form action="<?php echo $checkoutURL; ?>" method="post" id="awpcp-eway-checkout">
+<form action="<?php echo esc_url($checkoutURL); ?>" method="post" id="awpcp-eway-checkout">
 
 <fieldset>
 
@@ -54,9 +54,13 @@ Take care to keep the field names the same, or your checkout form won't charge c
 
 	<p>
 		<input type="submit" value="Make payment" />
+		<?php if (get_awpcp_option('eway_site_seal_code')): ?>
+		<?php echo wp_kses_post(get_awpcp_option('eway_site_seal_code')); ?>
+		<?php else: ?>
 		<a href="https://www.eway.com.au/" target="_blank">
-			<img src="<?php echo plugins_url('/images/eway-siteseal-tagline.png', EWAY_PAYMENTS_PLUGIN_FILE); ?>" />
+			<img src="<?php echo esc_url(plugins_url('images/eway-siteseal-tagline.png', EWAY_PAYMENTS_PLUGIN_FILE)); ?>" />
 		</a>
+		<?php endif; ?>
 	</p>
 
 </fieldset>

@@ -50,10 +50,16 @@ class EwayPaymentsAWPCP {
 	* @return array
 	*/
 	public function awpcpPaymentMethods($methods) {
+		// allow custom icon for payment method
+		$icon = get_awpcp_option('eway_icon');
+		if (empty($icon)) {
+			$icon = plugins_url('images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
+		}
+
 		$method = new stdClass;
 		$method->slug			= self::PAYMENT_METHOD;
 		$method->name			= 'eWAY Payment Gateway';
-		$method->icon			= plugins_url('images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
+		$method->icon			= $icon;
 		$method->description	= 'Credit card payment via eWAY';
 
 		$methods[] = $method;
@@ -88,6 +94,12 @@ class EwayPaymentsAWPCP {
 
 		$awpcp->settings->add_setting($section, 'eway_card_message', 'Credit card message', 'textfield', '',
 			'<br />Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;');
+
+		$awpcp->settings->add_setting($section, 'eway_site_seal_code', 'eWAY Site Seal', 'textarea', '',
+			'<br /><a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">generate your site seal on the eWAY website</a> and paste it here');
+
+		$awpcp->settings->add_setting($section, 'eway_icon', 'Payment Method Icon', 'textfield', '',
+			'<br />URL to a custom icon to show for the payment method.');
 	}
 
 	/**
