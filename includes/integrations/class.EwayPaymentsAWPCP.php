@@ -295,6 +295,7 @@ class EwayPaymentsAWPCP {
 		//~ $eway_beagle = get_awpcp_option('eway_beagle');
 
 		$item = $transaction->get_item(0); // no support for multiple items
+		$ad = AWPCP_Ad::find_by_id($transaction->get('ad-id'));
 		$user = wp_get_current_user();
 
 		if ($eway_stored) {
@@ -312,32 +313,17 @@ class EwayPaymentsAWPCP {
 		$eway->cardExpiryMonth				= self::getPostValue('eway_expiry_month');
 		$eway->cardExpiryYear				= self::getPostValue('eway_expiry_year');
 		$eway->cardVerificationNumber		= self::getPostValue('eway_cvn');
-		$eway->firstName					= $user ? $user->first_name : '';
-		$eway->lastName						= $user ? $user->last_name : '';
-		$eway->emailAddress					= $user ? $user->email : '';
-		//~ $eway->postcode					= $order->billing_postcode;
+
+		list($eway->firstName, $eway->lastName) = self::getContactNames($ad, $user, $eway->cardHoldersName);
+
+		$eway->emailAddress					= $ad->ad_contact_email ? $ad->ad_contact_email : ($user ? $user->email : '');
+		$eway->address						= self::getContactAddress($ad, $user);
 
 		// TODO: add Beagle if new version supports taking country info before billing
 		// for Beagle (free) security
 		//~ if ($this->eway_beagle == 'yes') {
 			//~ $eway->customerCountryCode = $order->billing_country;
 		//~ }
-
-		// aggregate street, city, state into a single string
-		if ($user) {
-			$profile = get_user_meta($user->ID, 'awpcp-profile', true);
-			$parts = array (
-				isset($profile['address']) ? $profile['address'] : '',
-				isset($profile['city'])    ? $profile['city']    : '',
-				isset($profile['state'])   ? $profile['state']   : '',
-			);
-			$eway->address = implode(', ', array_filter($parts, 'strlen'));
-		}
-
-		// use cardholder name for last name if no customer name available
-		if (empty($eway->firstName) && empty($eway->lastName)) {
-			$eway->lastName = $eway->cardHoldersName;
-		}
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription			= apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
@@ -361,6 +347,86 @@ class EwayPaymentsAWPCP {
 		$response = $eway->processPayment();
 
 		return $response;
+	}
+
+	/**
+	* get contact name from available data
+	* @param AWPCP_Ad $ad
+	* @param WP_User $user
+	* @param string $cardHoldersName
+	* @return array two elements: first name, last name
+	*/
+	protected static function getContactNames($ad, $user, $cardHoldersName) {
+		$names = array('', '');
+
+		if ($ad->ad_contact_name) {
+			$names = self::splitCompoundName($ad->ad_contact_name);
+		}
+		elseif ($user) {
+			$names = array($user->first_name, $user->last_name);
+		}
+
+		// use cardholder name for customer name if no customer name available
+		if (empty($names[0]) && empty($names[1])) {
+			$names = self::splitCompoundName($cardHoldersName);
+		}
+
+		return $names;
+	}
+
+	/**
+	* attempt to split name into parts, and hope to not offend anyone!
+	* @param string $compoundName
+	* @return array two elements: first name, last name
+	*/
+	protected static function splitCompoundName($compoundName) {
+		$names = explode(' ', $compoundName);
+
+		$firstName = empty($names[0]) ? '' : array_shift($names);		// remove first name from array
+		$lastName = trim(implode(' ', $names));
+
+		return array($firstName, $lastName);
+	}
+
+	/**
+	* attempt to get a meaningful address field from available data
+	* @param AWPCP_Ad $ad
+	* @param WP_User $user
+	* @return string
+	*/
+	protected static function getContactAddress($ad, $user) {
+		$address = '';
+
+		if ($ad->ad_city || $ad->ad_state || $ad->ad_country) {
+			$parts = array (
+				$ad->ad_city,
+				$ad->ad_state,
+				$ad->ad_country,
+			);
+			$address = implode(', ', array_filter($parts, 'strlen'));
+		}
+		elseif (is_callable('AWPCP_Ad::get_ad_regions')) {
+			$regions = AWPCP_Ad::get_ad_regions($ad->ad_id);
+			if (!empty($regions[0])) {
+				$parts = array (
+					$regions[0]['city'],
+					$regions[0]['state'],
+					$regions[0]['country'],
+				);
+				$address = implode(', ', array_filter($parts, 'strlen'));
+			}
+		}
+		elseif ($user) {
+			$profile = get_user_meta($user->ID, 'awpcp-profile', true);
+			$parts = array (
+				isset($profile['address']) ? $profile['address'] : '',
+				isset($profile['city'])    ? $profile['city']    : '',
+				isset($profile['state'])   ? $profile['state']   : '',
+			);
+			$address = implode(', ', array_filter($parts, 'strlen'));
+		}
+
+		return $address;
 	}
 
 	/**

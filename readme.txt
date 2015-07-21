@@ -197,6 +197,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 * added: eWAY site seal support for AWPCP
 * added: custom payment method icon setting for AWPCP
 * added: filter `awpcp_eway_checkout_message` for changing the message above the checkout form in AWPCP
+* changed: try harder to fill eWAY transaction contact details in AWPCP
 
 = 3.4.0, 2015-06-21 =
 
