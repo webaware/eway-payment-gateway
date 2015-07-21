@@ -316,7 +316,7 @@ class EwayPaymentsAWPCP {
 
 		list($eway->firstName, $eway->lastName) = self::getContactNames($ad, $user, $eway->cardHoldersName);
 
-		$eway->emailAddress					= $ad->ad_contact_email ? $ad->ad_contact_email : ($user ? $user->email : '');
+		$eway->emailAddress					= $ad->ad_contact_email ? $ad->ad_contact_email : ($user ? $user->user_email : '');
 		$eway->address						= self::getContactAddress($ad, $user);
 
 		// TODO: add Beagle if new version supports taking country info before billing
