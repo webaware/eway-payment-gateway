@@ -8,4 +8,4 @@ Integrate some popular WordPress plugins with the eWAY credit card payment gatew
 * [Download](https://wordpress.org/plugins/eway-payment-gateway/)
 * [Documentation](https://wordpress.org/plugins/eway-payment-gateway/faq/)
 * [Support](https://wordpress.org/support/plugin/eway-payment-gateway)
-* [Donate](shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway)
+* [Donate](http://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway)
