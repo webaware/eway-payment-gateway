@@ -3,10 +3,10 @@ Contributors: webaware
 Plugin Name: eWAY Payment Gateway
 Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: http://webaware.com.au/
-Donate link: http://shop.webaware.com.au/downloads/eway-payment-gateway/
+Donate link: shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.6.1
-Tested up to: 4.2.2
+Tested up to: 4.3
 Stable tag: 3.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
