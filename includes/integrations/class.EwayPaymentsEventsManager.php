@@ -25,15 +25,15 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 		// ensure options are present, set to defaults if not
 		$defaults = array (
-			'em_' . EM_EWAY_GATEWAY . '_option_name'			=> 'Credit Card',
-			'em_' . EM_EWAY_GATEWAY . '_booking_feedback'		=> 'Booking successful.',
-			'em_' . EM_EWAY_GATEWAY . '_booking_feedback_free'	=> 'Booking successful. You have not been charged for this booking.',
-			'em_' . EM_EWAY_GATEWAY . '_cust_id'				=> EWAY_PAYMENTS_TEST_CUSTOMER,
-			'em_' . EM_EWAY_GATEWAY . '_stored'					=> '0',
-			'em_' . EM_EWAY_GATEWAY . '_beagle'					=> '0',
-			'em_' . EM_EWAY_GATEWAY . '_test_force'				=> '1',
-			'em_' . EM_EWAY_GATEWAY . '_ssl_force'				=> '1',
-			'em_' . EM_EWAY_GATEWAY . '_mode'					=> 'sandbox',
+			"em_{$this->gateway}_option_name"				=> 'Credit Card',
+			"em_{$this->gateway}_booking_feedback"			=> 'Booking successful.',
+			"em_{$this->gateway}_booking_feedback_free"		=> 'Booking successful. You have not been charged for this booking.',
+			"em_{$this->gateway}_cust_id"					=> EWAY_PAYMENTS_TEST_CUSTOMER,
+			"em_{$this->gateway}_stored"					=> '0',
+			"em_{$this->gateway}_beagle"					=> '0',
+			"em_{$this->gateway}_test_force"				=> '1',
+			"em_{$this->gateway}_ssl_force"					=> '1',
+			"em_{$this->gateway}_mode"						=> 'sandbox',
 		);
 		foreach ($defaults as $option => $value) {
 			if (get_option($option) === false) {
@@ -463,27 +463,34 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	* return boolean
 	*/
 	public function update() {
-		parent::update();
-
 		$options = array (
-			'em_' . EM_EWAY_GATEWAY . '_mode'					=> sanitize_text_field(self::getPostValue('eway_mode')),
-			'em_' . EM_EWAY_GATEWAY . '_cust_id'				=> sanitize_text_field(self::getPostValue('eway_cust_id')),
-			'em_' . EM_EWAY_GATEWAY . '_stored'					=> self::getPostValue('eway_stored') ? '1' : '0',
-			'em_' . EM_EWAY_GATEWAY . '_beagle'					=> self::getPostValue('eway_beagle') ? '1' : '0',
-			'em_' . EM_EWAY_GATEWAY . '_test_force'				=> self::getPostValue('eway_test_force') ? '1' : '0',
-			'em_' . EM_EWAY_GATEWAY . '_ssl_force'				=> self::getPostValue('eway_ssl_force') ? '1' : '0',
-			'em_' . EM_EWAY_GATEWAY . '_card_msg'				=> sanitize_text_field(self::getPostValue('eway_card_msg')),
-			'em_' . EM_EWAY_GATEWAY . '_manual_approval'		=> self::getPostValue('manual_approval') ? '1' : '',
-			'em_' . EM_EWAY_GATEWAY . '_booking_feedback'		=> wp_kses_data(self::getPostValue('booking_feedback')),
-			'em_' . EM_EWAY_GATEWAY . '_booking_feedback_free'	=> wp_kses_data(self::getPostValue('booking_feedback_free')),
+			"em_{$this->gateway}_mode",
+			"em_{$this->gateway}_cust_id",
+			"em_{$this->gateway}_stored",
+			"em_{$this->gateway}_beagle",
+			"em_{$this->gateway}_test_force",
+			"em_{$this->gateway}_ssl_force",
+			"em_{$this->gateway}_card_msg",
+			"em_{$this->gateway}_manual_approval",
+			"em_{$this->gateway}_booking_feedback",
+			"em_{$this->gateway}_booking_feedback_free",
 		);
 
-		foreach ($options as $option => $value) {
-			update_option($option, $value);
-		}
+		// filters for specific data
+		add_filter("gateway_update_em_{$this->gateway}_mode", 'sanitize_text_field');
+		add_filter("gateway_update_em_{$this->gateway}_cust_id", 'sanitize_text_field');
+		add_filter("gateway_update_em_{$this->gateway}_card_msg", 'sanitize_text_field');
 
-		// default action is to return true
-		return true;
+		add_filter("gateway_update_em_{$this->gateway}_booking_feedback", 'wp_kses_data');
+		add_filter("gateway_update_em_{$this->gateway}_booking_feedback_free", 'wp_kses_data');
+
+		add_filter("gateway_update_em_{$this->gateway}_stored", 'intval');
+		add_filter("gateway_update_em_{$this->gateway}_beagle", 'intval');
+		add_filter("gateway_update_em_{$this->gateway}_test_force", 'intval');
+		add_filter("gateway_update_em_{$this->gateway}_ssl_force", 'intval');
+		add_filter("gateway_update_em_{$this->gateway}_manual_approval", 'intval');
+
+		return parent::update($options);
 	}
 
 }

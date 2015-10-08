@@ -194,6 +194,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 = 3.5.0, soon... =
 
+* fixed: PHP warning when save Events Manager settings
 * added: eWAY site seal support for AWPCP
 * added: custom payment method icon setting for AWPCP
 * added: filter `awpcp_eway_checkout_message` for changing the message above the checkout form in AWPCP
