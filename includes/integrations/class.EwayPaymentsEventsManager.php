@@ -8,13 +8,11 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 	private $registered_timer = 0;
 
-	const GATEWAY_NAME = 'eway';
-
 	/**
 	* Set up gateaway and add relevant actions/filters
 	*/
 	public function __construct() {
-		$this->gateway						= self::GATEWAY_NAME;
+		$this->gateway						= 'eway';
 		$this->title						= 'eWAY';
 		$this->status						= 4;
 		$this->status_txt					= 'Processing (eWAY)';
@@ -57,8 +55,8 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			// perform additional form post validation
 			// but only from front -- payment form won't be there in Bookings admin!
 			if (!is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
-				add_filter('em_booking_validate', array(__CLASS__, 'emBookingValidate'), 10, 2);
-				add_filter('em_multiple_booking_validate', array(__CLASS__, 'emBookingValidate'), 10, 2);
+				add_filter('em_booking_validate', array($this, 'emBookingValidate'), 10, 2);
+				add_filter('em_multiple_booking_validate', array($this, 'emBookingValidate'), 10, 2);
 			}
 		}
 	}
@@ -107,9 +105,9 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	* @param object $EM_Booking
 	* @return boolean
 	*/
-	public static function emBookingValidate($result, $EM_Booking) {
+	public function emBookingValidate($result, $EM_Booking) {
 		// only perform validation if this payment method has been selected
-		if (isset($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] == self::GATEWAY_NAME) {
+		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] == $this->gateway) {
 			$required = array (
 				'x_card_name'		=> 'You must enter credit card holder name.',
 				'x_card_num'		=> 'You must enter credit card number.',
@@ -275,7 +273,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	public function booking_form_feedback( $return, $EM_Booking = false ){
 		// Double check $EM_Booking is an EM_Booking object and that we have a booking awaiting payment.
 		if (!empty($return['result'])) {
-			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] == self::GATEWAY_NAME && $EM_Booking->get_price() > 0) {
+			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] == $this->gateway && $EM_Booking->get_price() > 0) {
 				$return['message'] = get_option("em_{$this->gateway}_booking_feedback");
 			}
 			else {
@@ -409,7 +407,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 			if ($response->status) {
 				// transaction was successful, so record transaction number and continue
-				$EM_Booking->booking_meta[self::GATEWAY_NAME] = array(
+				$EM_Booking->booking_meta[$this->gateway] = array(
 					'txn_id'	=> $response->transactionNumber,
 					'authcode'	=> $response->authCode,
 					'amount'	=> $response->amount,
@@ -430,12 +428,12 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			}
 			else {
 				// transaction was unsuccessful, so record the error
-				$EM_Booking->add_error($response->error);
+				$EM_Booking->add_error(nl2br($response->error));
 			}
 		}
 		catch (Exception $e) {
 			// an exception occured, so record the error
-			$EM_Booking->add_error($e->getMessage());
+			$EM_Booking->add_error(nl2br($e->getMessage()));
 			return;
 		}
 
