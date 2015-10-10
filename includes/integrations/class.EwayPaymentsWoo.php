@@ -2,7 +2,7 @@
 
 /**
 * payment gateway integration for WooCommerce
-* @link http://docs.woothemes.com/document/payment-gateway-api/
+* @link https://docs.woothemes.com/document/payment-gateway-api/
 */
 class EwayPaymentsWoo extends WC_Payment_Gateway {
 

@@ -6,8 +6,8 @@ Author URI: http://webaware.com.au/
 Donate link: http://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 3.6.1
-Tested up to: 4.3
-Stable tag: 3.4.0
+Tested up to: 4.3.1
+Stable tag: 3.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,27 +45,27 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://wordpr
 
 After uploading and activating this plugin, you need to configure it.
 
-**WP e-Commerce**
+### WP e-Commerce
 
 1. Navigate to 'Settings->Store->Payments' on the menu
 2. Activate the eWAY payment gateway and click the Update button
 3. Edit the eWAY payment gateway settings by hovering your mouse over the gateway's name and clicking the hidden 'edit' link
 4. Edit the eWAY customer ID and select the appropriate settings, including which checkout fields map to eWAY fields
 
-**WooCommerce**
+### WooCommerce
 
 1. Navigate to 'WooCommerce->Settings->Payment Gateways' on the menu
 2. Select eWAY from the Payment Gateways menu
 3. Tick the field 'Enable/Disable' to enable the gateway
 4. Edit the eWAY customer ID and select the appropriate settings
 
-**Another WordPress Classifieds Plugin**
+### Another WordPress Classifieds Plugin
 
 1. Navigate to 'Classified->Settings->Payment' on the menu
 2. Click the Activate eWAY checkbox
 3. Edit the eWAY customer ID and select the appropriate settings
 
-**Events Manager**
+### Events Manager
 
 1. Navigate to 'Events->Payment Gateways' on the menu
 2. Click the Activate link underneath the eWAY gateway name
@@ -84,7 +84,7 @@ eWAY is a leading provider of online payments solutions for Australia, New Zeala
 
 Not yet. I know it can be done but I haven't had a website that needs it yet, so have not written the code for it.
 
-If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](http://webaware.com.au/get-gravity-forms) and [Gravity Forms eWAY](https://wordpress.org/extend/plugins/gravityforms-eway/) which does support recurring payments.
+If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](http://webaware.com.au/get-gravity-forms) and [Gravity Forms eWAY](https://wordpress.org/plugins/gravityforms-eway/) which does support recurring payments.
 
 = Can I use other eWAY gateways, outside of Australia? =
 
@@ -137,7 +137,7 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 
 Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
 
-**WP e-Commerce**
+### WP e-Commerce
 
 * `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
 * `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
@@ -146,7 +146,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `wpsc_merchant_eway_option3` for setting the option3 field
 * `wpsc_merchant_eway_customer_id` for modifying the eWAY customer ID used in transaction
 
-**WooCommerce**
+### WooCommerce
 
 * `woocommerce_eway_invoice_desc` for modifying the invoice description
 * `woocommerce_eway_invoice_ref` for modifying the invoice reference
@@ -156,7 +156,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `woocommerce_eway_icon` for changing the payment gateway icon
 * `woocommerce_eway_customer_id` for modifying the eWAY customer ID used in transaction
 
-**Another WordPress Classifieds Plugin**
+### Another WordPress Classifieds Plugin
 
 * `awpcp_eway_invoice_desc` for modifying the invoice description
 * `awpcp_eway_invoice_ref` for modifying the invoice reference
@@ -167,7 +167,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `awpcp_eway_checkout_message` for changing the message above the checkout form
 * `awpcp_eway_customer_id` for modifying the eWAY customer ID used in transaction
 
-**Events Manager**
+### Events Manager
 
 * `em_eway_invoice_desc` for modifying the invoice description
 * `em_eway_invoice_ref` for modifying the invoice reference
@@ -194,9 +194,17 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 6. Events Manager transactions with transaction ID and authcode
 7. Another WordPress Classifieds Plugin payments settings
 
+== Upgrade Notice ==
+
+= 3.5.0 =
+
+Events Manager card validation fixes; AWPCP enhancements
+
 == Changelog ==
 
-= 3.5.0, soon... =
+The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
+
+### 3.5.0, 2015-10-10
 
 * fixed: PHP warning when save Events Manager settings
 * fixed: pre-transaction validation for Events Manager was being skipped
@@ -206,7 +214,7 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 * added: filters for modifying the eWAY customer ID used in transaction
 * changed: try harder to fill eWAY transaction contact details in AWPCP
 
-= 3.4.0, 2015-06-21 =
+### 3.4.0, 2015-06-21
 
 * fixed: WP eCommerce sometimes loses the transaction authcode on sites with an object cache (like memcached)
 * added: some precautionary XSS prevention
@@ -214,126 +222,9 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 * changed: WooCommerce customer reference now accepts the filtered order number (`$order->get_order_number()`)
 * changed: some code refactoring for easier maintenance
 
-= 3.3.0, 2014-11-07 =
+### 3.3.0, 2014-11-07
 
 * fixed: force Events Manager bookings form AJAX url and form action to use HTTPS if forcing SSL for events with bookings
 * fixed: WooCommerce 2.0.20 settings backwards compatibility
 * added: eWAY site seal support for WooCommerce
 * changed: updated screenshots
-
-= 3.2.0, 2014-06-28 =
-
-* fixed: WooCommerce 2.1 error messages use `wc_add_notice()` (fixes deprecated notice)
-* fixed: Events Manager bookings admin was asking for credit card details when modifying a booking
-* fixed: Another WordPress Classified Plugin hooks now pass `$transaction` as second argument
-* fixed: undefined variable errors with Another WordPress Classified Plugin integration
-* added: Events Manager bookings pages can be forced to SSL (new setting, defaults to Yes, can be turned off)
-* added: optional credit card fields message, e.g. so can advise "Visa and Mastercard only" etc.
-* changed: use standard WooCommerce credit card fields if setting selected (new default); old template is still available for sites that require it
-* changed: some code refactoring
-
-= 3.1.4, 2014-02-12 =
-
-* fixed: WooCommerce 2.1 return page after checkout
-
-= 3.1.3, 2014-01-12 =
-
-* fixed: no function set_error_message() in EwayPaymentsEventsManager (bad copypasta in exception handler; thanks, [digitalblanket](https://profiles.wordpress.org/digitalblanket)!)
-* fixed: was triggering an exception when Country field removed from Events Manager Pro bookings form
-
-= 3.1.2, 2014-01-03 =
-
-* changed: credit card field now forces digits only so that number keyboard is used on iPad/iPhone
-* added: filter `em_eway_amount` for changing the booking amount, e.g. adding fees
-
-= 3.1.1, 2013-12-10 =
-
-* fixed: doco / settings page didn't explain that Beagle requires an Address field
-* changed: permit card numbers with spaces / dashes, but strip before submitting to eWAY
-* changed: move some WooCommerce setting descriptions into tips to reduce screen clutter in admin
-* added: HTML5 text field patterns for credit card number, CVV/CVN
-* added: filter `woocommerce_eway_icon` for changing the payment gateway icon
-
-= 3.1.0, 2013-11-21 =
-
-* changed: support multiple bookings mode in Events Manager
-* changed: some links to eWAY website
-* added: support for v3 of Another WordPress Classifieds Plugin
-* added: WooCommerce and WP e-Commerce payment method logos
-
-= 3.0.1, 2013-03-07 =
-
-* changed: update for WooCommerce v2.0.x compatibility
-
-= 3.0.0, 2013-03-01 =
-
-* added: WooCommerce integration
-* added: Another WordPress Classifieds Plugin integration (sponsored by [Michael Major Media](http://michaelmajor.com.au/) -- thanks!)
-* added: Events Manager integration (sponsored by [Michael Major Media](http://michaelmajor.com.au/) -- thanks!)
-* changed: use WP e-Commerce 2.8.9+ hooks and functions
-* changed: refactored for greater generalisation
-
-= 2.4.0, 2013-01-23 =
-
-* fixed: declined payments now record status as Payment Declined instead of Incomplete Sale
-* added: record authcode for transactions, and show in Sales Log
-* added: send WP e-Commerce transaction number as both customer reference and invoice reference (customer reference can be filtered)
-* added: support for [Beagle (free)](https://www.eway.com.au/developers/api/beagle-lite) anti-fraud using geo-IP (Direct Payments only)
-
-= 2.3.1, 2013-01-20 =
-
-* fixed: close table cell elements in form field template
-
-= 2.3.0, 2013-01-20 =
-
-* fixed: successful Direct transactions are now marked as Accepted Payment, not Order Received
-* added: eWAY credit card form fields now in template, can be customised by theme
-* added: can now use eWAY Stored Payments, e.g. for merchants who do drop-shipping
-* changed: use WordPress function wp_remote_post() instead of directly calling curl functions
-
-= 2.2.1, 2012-10-22 =
-
-* fixed: address on eWAY invoice was getting "0, " prepended when PHP < 5.3
-
-= 2.2.0, 2012-09-25 =
-
-* fixed: country name used in eWAY address field, not country code
-* changed: remote SSL certificate is verified (i.e. eWAY's certificate)
-* added: prevent XML injection attacks when loading eWAY response (security hardening)
-* added: filter hooks for invoice description and reference
-* added: if customer name isn't mandatory and not given, will use cardholder's name
-
-= 2.1.0, 2012-07-03 =
-
-* changed: CVN is now a required field, no option to omit; Australian banks are all moving to require CVN and some already do
-* added: customer name is now supported, if configured in WP e-Commerce payment admin; card holder name is not seen in eWAY notification emails, so customer name is required for showing who made the purchase
-
-= 2.0.4, 2012-05-13 =
-
-* fixed: invoice number recorded in eWAY invoice reference field
-
-= 2.0.3, 2012-05-05 =
-
-* fixed: optional fields for address, email are no longer required for eWAY payment
-
-= 2.0.2, 2012-04-16 =
-
-* fixed: undeclared array index errors
-
-= 2.0.1, 2012-04-12 =
-
-* fixed: admin transposed Use Testing Environment and Use CVN Security
-
-= 2.0.0, 2012-04-08 =
-
-* final cleanup and refactor for public release
-
-= 1.0.0, 2011-09-15 =
-
-* private version, not released to public
-
-== Upgrade Notice ==
-
-= 3.4.0 =
-
-security update: some precautionary XSS (cross-site scripting) prevention
