@@ -371,10 +371,13 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 
 		$isLiveSite = ($this->eway_sandbox != 'yes');
 
+		$customerID = $this->eway_customerid;
+		$customerID = apply_filters('woocommerce_eway_customer_id', $customerID, $isLiveSite, $order_id);
+
 		if ($this->eway_stored == 'yes')
-			$eway = new EwayPaymentsStoredPayment($this->eway_customerid, $isLiveSite);
+			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
 		else
-			$eway = new EwayPaymentsPayment($this->eway_customerid, $isLiveSite);
+			$eway = new EwayPaymentsPayment($customerID, $isLiveSite);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $order->get_order_number();						// customer invoice reference

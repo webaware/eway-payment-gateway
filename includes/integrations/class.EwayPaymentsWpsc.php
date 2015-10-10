@@ -134,11 +134,14 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$isLiveSite = !get_option('eway_test');
 		$useStored = get_option('wpsc_merchant_eway_stored');
 
+		$customerID = get_option('ewayCustomerID_id');
+		$customerID = apply_filters('wpsc_merchant_eway_customer_id', $customerID, $isLiveSite, $this->purchase_id);
+
 		if ($useStored) {
-			$eway = new EwayPaymentsStoredPayment(get_option('ewayCustomerID_id'), $isLiveSite);
+			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
 		}
 		else {
-			$eway = new EwayPaymentsPayment(get_option('ewayCustomerID_id'), $isLiveSite);
+			$eway = new EwayPaymentsPayment($customerID, $isLiveSite);
 		}
 
 		$eway->invoiceDescription		= get_bloginfo('name');

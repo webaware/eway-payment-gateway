@@ -144,6 +144,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `wpsc_merchant_eway_option1` for setting the option1 field
 * `wpsc_merchant_eway_option2` for setting the option2 field
 * `wpsc_merchant_eway_option3` for setting the option3 field
+* `wpsc_merchant_eway_customer_id` for modifying the eWAY customer ID used in transaction
 
 **WooCommerce**
 
@@ -153,6 +154,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `woocommerce_eway_option2` for setting the option2 field
 * `woocommerce_eway_option3` for setting the option3 field
 * `woocommerce_eway_icon` for changing the payment gateway icon
+* `woocommerce_eway_customer_id` for modifying the eWAY customer ID used in transaction
 
 **Another WordPress Classifieds Plugin**
 
@@ -163,6 +165,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `awpcp_eway_option3` for setting the option3 field
 * `awpcp_eway_icon` for changing the payment gateway icon
 * `awpcp_eway_checkout_message` for changing the message above the checkout form
+* `awpcp_eway_customer_id` for modifying the eWAY customer ID used in transaction
 
 **Events Manager**
 
@@ -172,6 +175,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `em_eway_option2` for setting the option2 field
 * `em_eway_option3` for setting the option3 field
 * `em_eway_amount` for changing the billed amount (e.g. adding fees)
+* `em_eway_customer_id` for modifying the eWAY customer ID used in transaction
 
 == Sponsorships ==
 
@@ -195,9 +199,11 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 = 3.5.0, soon... =
 
 * fixed: PHP warning when save Events Manager settings
+* fixed: pre-transaction validation for Events Manager was being skipped
 * added: eWAY site seal support for AWPCP
 * added: custom payment method icon setting for AWPCP
 * added: filter `awpcp_eway_checkout_message` for changing the message above the checkout form in AWPCP
+* added: filters for modifying the eWAY customer ID used in transaction
 * changed: try harder to fill eWAY transaction contact details in AWPCP
 
 = 3.4.0, 2015-06-21 =

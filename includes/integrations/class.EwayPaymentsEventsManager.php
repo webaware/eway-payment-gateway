@@ -341,6 +341,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		else {
 			$customerID = get_option("em_{$this->gateway}_cust_id");
 		}
+		$customerID = apply_filters('em_eway_customer_id', $customerID, $isLiveSite, $EM_Booking);
 
 		if (get_option("em_{$this->gateway}_stored")) {
 			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);

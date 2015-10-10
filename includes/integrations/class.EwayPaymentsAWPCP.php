@@ -290,6 +290,7 @@ class EwayPaymentsAWPCP {
 		else {
 			$eway_customerid = get_awpcp_option('eway_customerid');
 		}
+		$eway_customerid = apply_filters('awpcp_eway_customer_id', $eway_customerid, $isLiveSite, $transaction);
 
 		// TODO: add Beagle if new version supports taking country info before billing
 		//~ $eway_beagle = get_awpcp_option('eway_beagle');
