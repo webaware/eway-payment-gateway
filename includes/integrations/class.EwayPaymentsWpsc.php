@@ -1,7 +1,7 @@
 <?php
 
 /**
-* payment gateway integration for WP e-Commerce
+* payment gateway integration for WP eCommerce
 * @link http://docs.wpecommerce.org/category/payment-gateways/
 */
 class EwayPaymentsWpsc extends wpsc_merchant {

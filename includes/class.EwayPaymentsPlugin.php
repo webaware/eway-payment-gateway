@@ -33,7 +33,7 @@ class EwayPaymentsPlugin {
 		add_filter('plugin_row_meta', array($this, 'addPluginDetailsLinks'), 10, 2);
 		add_action('admin_notices', array($this, 'checkPrerequisites'));
 
-		// register with WP e-Commerce
+		// register with WP eCommerce
 		add_filter('wpsc_merchants_modules', array($this, 'wpscRegister'));
 
 		// register with WooCommerce
@@ -81,7 +81,7 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
-	* register new WP e-Commerce payment gateway
+	* register new WP eCommerce payment gateway
 	* @param array $gateways array of registered gateways
 	* @return array
 	*/
@@ -130,7 +130,7 @@ class EwayPaymentsPlugin {
 		// make variables available to the template
 		extract($variables);
 
-		// can't use locate_template() because WP e-Commerce is _doing_it_wrong() again!
+		// can't use locate_template() because WP eCommerce is _doing_it_wrong() again!
 		// (STYLESHEETPATH and TEMPLATEPATH are both undefined when this function called for wpsc)
 
 		// check in theme / child theme folder

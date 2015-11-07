@@ -1,5 +1,5 @@
 <?php
-// custom fields for WP e-Commerce admin page
+// custom fields for WP eCommerce admin page
 
 $eway_stored	= get_option('wpsc_merchant_eway_stored') ? '1' : '0';
 $eway_test		= get_option('eway_test')                 ? '1' : '0';

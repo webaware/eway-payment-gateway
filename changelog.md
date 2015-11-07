@@ -69,7 +69,7 @@
 * changed: support multiple bookings mode in Events Manager
 * changed: some links to eWAY website
 * added: support for v3 of Another WordPress Classifieds Plugin
-* added: WooCommerce and WP e-Commerce payment method logos
+* added: WooCommerce and WP eCommerce payment method logos
 
 ### 3.0.1, 2013-03-07
 
@@ -80,14 +80,14 @@
 * added: WooCommerce integration
 * added: Another WordPress Classifieds Plugin integration (sponsored by [Michael Major Media](http://michaelmajor.com.au/) -- thanks!)
 * added: Events Manager integration (sponsored by [Michael Major Media](http://michaelmajor.com.au/) -- thanks!)
-* changed: use WP e-Commerce 2.8.9+ hooks and functions
+* changed: use WP eCommerce 2.8.9+ hooks and functions
 * changed: refactored for greater generalisation
 
 ### 2.4.0, 2013-01-23
 
 * fixed: declined payments now record status as Payment Declined instead of Incomplete Sale
 * added: record authcode for transactions, and show in Sales Log
-* added: send WP e-Commerce transaction number as both customer reference and invoice reference (customer reference can be filtered)
+* added: send WP eCommerce transaction number as both customer reference and invoice reference (customer reference can be filtered)
 * added: support for [Beagle (free)](https://www.eway.com.au/developers/api/beagle-lite) anti-fraud using geo-IP (Direct Payments only)
 
 ### 2.3.1, 2013-01-20
@@ -116,7 +116,7 @@
 ### 2.1.0, 2012-07-03
 
 * changed: CVN is now a required field, no option to omit; Australian banks are all moving to require CVN and some already do
-* added: customer name is now supported, if configured in WP e-Commerce payment admin; card holder name is not seen in eWAY notification emails, so customer name is required for showing who made the purchase
+* added: customer name is now supported, if configured in WP eCommerce payment admin; card holder name is not seen in eWAY notification emails, so customer name is required for showing who made the purchase
 
 ### 2.0.4, 2012-05-13
 

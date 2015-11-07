@@ -17,7 +17,7 @@ Integrate some popular WordPress plugins with the eWAY credit card payment gatew
 
 The eWAY Payment Gateway adds a credit card payment gateway integration for [eWAY in Australia](https://www.eway.com.au/) [Direct Payments API](https://www.eway.com.au/developers/api/direct-payments) and Stored Payments API. These plugins are supported:
 
-* [WP e-Commerce](https://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
+* [WP eCommerce](https://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
 * [WooCommerce](https://wordpress.org/plugins/woocommerce/) shopping cart plugin
 * [Another WordPress Classifieds Plugin](https://wordpress.org/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
 * [Events Manager Pro](https://eventsmanagerpro.com/) event bookings plugin
@@ -31,7 +31,7 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://wordpr
 * eWAY transaction ID and bank authcode are recorded for successful payments
 * supports Stored Payments for drop-ship merchants / delayed billing
 * supports Beagle anti-fraud measures for Direct Payments (for supporting plugins)
-* drop-in compatible with eWAY payment gateway from the WP e-Commerce Gold Cart plugin (except recurring billing -- see FAQ)
+* drop-in compatible with eWAY payment gateway from the WP eCommerce Gold Cart plugin (except recurring billing -- see FAQ)
 * it's free!
 
 = Requirements =
@@ -45,7 +45,7 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://wordpr
 
 After uploading and activating this plugin, you need to configure it.
 
-### WP e-Commerce
+### WP eCommerce
 
 1. Navigate to 'Settings->Store->Payments' on the menu
 2. Activate the eWAY payment gateway and click the Update button
@@ -108,12 +108,12 @@ Like Direct Payments, the purchase information is sent to eWAY for processing, b
 
 = Where do I find the eWAY transaction number? =
 
-* **WP e-Commerce**: the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
+* **WP eCommerce**: the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
 * **WooCommerce**: the eWAY transaction number and the bank authcode are shown in the Custom Fields block when you view the order in the WordPress admin.
 * **Events Manager**: from the Payment Gateways menu item or the Bookings menu item, you can view a list of transactions; the eWAY transaction ID is shown in the Transaction ID column, and the authcode in the Notes column.
 * **Another WordPress Classifieds Plugin**: not available in v2.x of the plugin.
 
-= Can I use this plugin with the WP e-Commerce Gold Cart? =
+= Can I use this plugin with the WP eCommerce Gold Cart? =
 
 Yes, if you deactivate the Gold Cart's eWAY payment gateway and activate this one. The settings from the Gold Cart payment gateway will be picked up by this gateway automatically (they are stored in the same places).
 
@@ -137,7 +137,7 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 
 Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
 
-### WP e-Commerce
+### WP eCommerce
 
 * `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
 * `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
@@ -186,8 +186,8 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Screenshots ==
 
-1. WP e-Commerce payments settings
-2. WP e-Commerce Sales Log with transaction ID and authcode
+1. WP eCommerce payments settings
+2. WP eCommerce Sales Log with transaction ID and authcode
 3. WooCommerce payments settings
 4. WooCommerce order details with transaction ID and authcode
 5. Events Manager payments settings
