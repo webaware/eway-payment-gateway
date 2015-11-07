@@ -405,12 +405,12 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		if ($fields === false) {
 			global $wpdb;
-			$fields = $wpdb->get_results(sprintf("select id,name from `%s` where active = '1'", WPSC_TABLE_CHECKOUT_FORMS));
+			$fields = $wpdb->get_results(sprintf("select id,name,unique_name from `%s` where active = '1'", WPSC_TABLE_CHECKOUT_FORMS));
 		}
 
 		echo '<option value="">Please choose</option>';
 		foreach ($fields as $field) {
-			printf('<option value="%s"%s>%s</option>', esc_attr($field->id), selected($field->id, $selected, false), esc_html($field->name));
+			printf('<option value="%s"%s>%s (%s)</option>', esc_attr($field->id), selected($field->id, $selected, false), esc_html($field->name), esc_html($field->unique_name));
 		}
 	}
 
