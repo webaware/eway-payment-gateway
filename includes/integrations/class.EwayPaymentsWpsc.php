@@ -396,6 +396,24 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		}
 	}
 
+	/**
+	* show select list options for checkout form fields
+	* @param int $selected
+	*/
+	public static function showCheckoutFormFields($selected) {
+		static $fields = false;
+
+		if ($fields === false) {
+			global $wpdb;
+			$fields = $wpdb->get_results(sprintf("select id,name from `%s` where active = '1'", WPSC_TABLE_CHECKOUT_FORMS));
+		}
+
+		echo '<option value="">Please choose</option>';
+		foreach ($fields as $field) {
+			printf('<option value="%s"%s>%s</option>', esc_attr($field->id), selected($field->id, $selected, false), esc_html($field->name));
+		}
+	}
+
 }
 
 /**

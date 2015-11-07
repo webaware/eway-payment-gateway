@@ -73,7 +73,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>First Name</td>
 		<td>
 			<select name='eway_form[first_name]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_first_name')); ?>
+				<?php EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_first_name')); ?>
 			</select>
 		</td>
 	</tr>
@@ -82,7 +82,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>Last Name</td>
 		<td>
 			<select name='eway_form[last_name]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_last_name')); ?>
+				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_last_name')); ?>
 			</select>
 		</td>
 	</tr>
@@ -91,7 +91,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>Address Field</td>
 		<td>
 			<select name='eway_form[address]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_address')); ?>
+				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_address')); ?>
 			</select>
 		</td>
 	</tr>
@@ -100,7 +100,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>City Field</td>
 		<td>
 			<select name='eway_form[city]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_city')); ?>
+				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_city')); ?>
 			</select>
 		</td>
 	</tr>
@@ -109,7 +109,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>State Field</td>
 		<td>
 			<select name='eway_form[state]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_state')); ?>
+				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_state')); ?>
 			</select>
 		</td>
 	</tr>
@@ -118,7 +118,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>Postal code/Zip code Field</td>
 		<td>
 			<select name='eway_form[post_code]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_post_code')); ?>
+				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_post_code')); ?>
 			</select>
 		</td>
 	</tr>
@@ -127,7 +127,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>Country Field</td>
 		<td>
 			<select name='eway_form[country]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_country')); ?>
+				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_country')); ?>
 			</select>
 		</td>
 	</tr>
@@ -136,7 +136,7 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>Email Field</td>
 		<td>
 			<select name='eway_form[email]'>
-				<?php echo nzshpcrt_form_field_list(get_option('eway_form_email')); ?>
+				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_email')); ?>
 			</select>
 		</td>
 	</tr>

@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 3.5.1, soon...
+
+* changed: remove dependency on WP eCommerce deprecated function for checkout field list
+
 ### 3.5.0, 2015-10-10
 
 * fixed: PHP warning when save Events Manager settings
