@@ -5,6 +5,7 @@ $eway_stored	= get_option('wpsc_merchant_eway_stored') ? '1' : '0';
 $eway_test		= get_option('eway_test')                 ? '1' : '0';
 $eway_th		= get_option('wpsc_merchant_eway_th')     ? '1' : '0';
 $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
+$eway_logging	= get_option('eway_logging', 'off');
 
 ?>
 
@@ -34,6 +35,17 @@ $eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
 		<td>
 			<label><input type='radio' value='1' name='eway_test' <?php checked($eway_test, '1'); ?> /> <?php echo TXT_WPSC_YES; ?></label> &nbsp;
 			<label><input type='radio' value='0' name='eway_test' <?php checked($eway_test, '0'); ?> /> <?php echo TXT_WPSC_NO; ?></label>
+		</td>
+	</tr>
+
+	<tr>
+		<td>Logging</td>
+		<td>
+			<label><input type='radio' value='off' name='eway_logging' <?php checked($eway_logging, 'off'); ?> /> Off</label> &nbsp;
+			<label><input type='radio' value='error' name='eway_logging' <?php checked($eway_logging, 'error'); ?> /> Errors</label> &nbsp;
+			<label><input type='radio' value='info' name='eway_logging' <?php checked($eway_logging, 'info'); ?> /> All messages</label>
+			<p class="description">enable logging to assist trouble shooting;
+			<br />the log file can be found in <?php echo esc_html(substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH))); ?></p>
 		</td>
 	</tr>
 

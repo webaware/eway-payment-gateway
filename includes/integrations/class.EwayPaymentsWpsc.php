@@ -8,6 +8,8 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 	public $name = 'eway';
 
+	protected $logger;
+
 	const WPSC_GATEWAY_NAME = 'wpsc_merchant_eway';
 
 	/**
@@ -43,6 +45,18 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		}
 
 		return $gateways;
+	}
+
+	/**
+	* initialise class
+	* @param int $purchase_id
+	* @param bool $is_receiving
+	*/
+	public function __construct($purchase_id = null, $is_receiving = false) {
+		// create logger
+		$this->logger = new EwayPaymentsLogging('wp-ecommerce', get_option('eway_logging', 'off'));
+
+		parent::__construct($purchase_id, $is_receiving);
 	}
 
 	/**
@@ -189,6 +203,13 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$total = $purchase_logs->get('totalprice');
 		$eway->amount					= $isLiveSite ? $total : ceil($total);
+		if ($eway->amount != $total) {
+			$this->logger->log('info', sprintf('amount rounded up from %1$s to %2$s, to pass test gateway',
+				number_format($total, 2), number_format($eway->amount, 2)));
+		}
+
+		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
+			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		try {
 			$response = $eway->processPayment();
@@ -213,6 +234,10 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
+				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
+					$eway->invoiceReference, $response->transactionNumber, $useStored == 'yes' ? 'order received' : 'accepted payment',
+					$response->amount, $response->authCode, $response->beagleScore));
+
 				$this->go_to_transaction_results($this->cart_data['session_id']);
 			}
 			else {
@@ -226,11 +251,14 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 				);
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->error));
+
 				return;
 			}
 		}
 		catch (EwayPaymentsException $e) {
 			// an exception occured, so record the error
+			$this->logger->log('error', $e->getMessage());
 			$status = 1; // WPSC_Purchase_Log::INCOMPLETE_SALE
 			$this->set_error_message(nl2br(esc_html($e->getMessage())));
 			$this->set_purchase_processed_by_purchid($status);
@@ -364,6 +392,10 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		if (isset($_POST['eway_test'])) {
 			update_option('eway_test', $_POST['eway_test'] ? '1' : '0');
+		}
+
+		if (isset($_POST['eway_logging'])) {
+			update_option('eway_logging', sanitize_text_field(wp_unslash($_POST['eway_logging'])));
 		}
 
 		if (isset($_POST['eway_th'])) {
