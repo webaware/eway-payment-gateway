@@ -12,7 +12,7 @@ class EwayPaymentsPlugin {
 	* @return EwayPaymentsPlugin
 	*/
 	public static function getInstance() {
-		static $instance = NULL;
+		static $instance = null;
 
 		if (is_null($instance)) {
 			$instance = new self();
@@ -38,6 +38,8 @@ class EwayPaymentsPlugin {
 
 		// register with WooCommerce
 		add_filter('woocommerce_payment_gateways', array($this, 'wooRegister'));
+
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsLogging.php';
 	}
 
 	/**

@@ -6,6 +6,8 @@
 */
 class EwayPaymentsWoo extends WC_Payment_Gateway {
 
+	protected $logger;
+
 	/**
 	* initialise gateway with custom settings
 	*/
@@ -50,6 +52,9 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 
 		// add email fields
 		add_filter('woocommerce_email_order_meta_keys', array($this, 'wooEmailOrderMetaKeys'));
+
+		// create a logger
+		$this->logger = new EwayPaymentsLogging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
 
 		// save admin options, via WC_Settings_API
 		// v1.6.6 and under:
@@ -134,6 +139,18 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'type' 			=> 'checkbox',
 							'description' 	=> '<a href="https://www.eway.com.au/developers/api/beagle-lite" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle.<em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />Beagle is not available for Stored Payments</em>',
 							'default' 		=> 'no',
+						),
+			'eway_logging' => array(
+							'title' 		=> 'Logging',
+							'label' 		=> 'enable logging to assist trouble shooting',
+							'type' 			=> 'select',
+							'description'	=> 'the log file can be found in ' . substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH)),
+							'default' 		=> 'off',
+							'options'		=> array(
+								'off' 		=> 'Off',
+								'error' 	=> 'Errors',
+								'info'	 	=> 'All messages',
+							),
 						),
 			'eway_card_form' => array(
 							'title' 		=> 'Credit card fields',
@@ -428,6 +445,13 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		$total = $order->order_total;
 		$eway->amount					= $isLiveSite ? $total : ceil($total);
+		if ($eway->amount != $total) {
+			$this->logger->log('info', sprintf('amount rounded up from %1$s to %2$s, to pass test gateway',
+				number_format($total, 2), number_format($eway->amount, 2)));
+		}
+
+		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
+			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		try {
 			$response = $eway->processPayment();
@@ -457,12 +481,18 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 					'result' => 'success',
 					'redirect' => $this->get_return_url($order),
 				);
+
+				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
+					$eway->invoiceReference, $response->transactionNumber, $this->eway_stored == 'yes' ? 'on-hold' : 'completed',
+					$response->amount, $response->authCode, $response->beagleScore));
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
 				$order->update_status('failed', nl2br(esc_html($response->error)));
 				wc_add_notice(nl2br(esc_html($response->error)), 'error');
 				$result = array('result' => 'failure');
+
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->error));
 			}
 		}
 		catch (EwayPaymentsException $e) {
@@ -470,6 +500,8 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 			$order->update_status('failed', nl2br(esc_html($e->getMessage())));
 			wc_add_notice(nl2br(esc_html($e->getMessage())), 'error');
 			$result = array('result' => 'failure');
+
+			$this->logger->log('error', $e->getMessage());
 		}
 
 		return $result;
