@@ -23,24 +23,26 @@ class EwayPaymentsLogging {
 
 		// attempt to locate or create log folder
 		$logFolder = self::getLogFolder();
-		if (is_dir($logFolder)) {
-			// log folder already exists
-			$this->logFolder = $logFolder;
-		}
-		else {
-			$base = dirname($logFolder);
-			if (!is_dir($base)) {
-				// need to create parent folder
-				if (mkdir($base, 0755)) {
-					// prevent web access to index of folder
-					@file_put_contents($base . '/.htaccess', "Options -Indexes\n");
-					@touch($base . '/index.html');
-				}
-			}
-			// create log folder if parent folder was created OK
-			if (is_dir($base) && mkdir($logFolder, 0755)) {
-				@touch($logFolder . '/index.html');
+		if ($logFolder) {
+			if (is_dir($logFolder)) {
+				// log folder already exists
 				$this->logFolder = $logFolder;
+			}
+			else {
+				$base = dirname($logFolder);
+				if (!is_dir($base)) {
+					// need to create parent folder
+					if (mkdir($base, 0755)) {
+						// prevent web access to index of folder
+						@file_put_contents($base . '/.htaccess', "Options -Indexes\n");
+						@touch($base . '/index.html');
+					}
+				}
+				// create log folder if parent folder was created OK
+				if (is_dir($base) && mkdir($logFolder, 0755)) {
+					@touch($logFolder . '/index.html');
+					$this->logFolder = $logFolder;
+				}
 			}
 		}
 	}
@@ -60,6 +62,11 @@ class EwayPaymentsLogging {
 	* @param string $msg
 	*/
 	public function log($level, $msg) {
+		if (empty($this->logFolder)) {
+			// no log folder (e.g. error creating folder)
+			return;
+		}
+
 		if ($this->min_level === 'off') {
 			// no logging
 			return;
@@ -106,11 +113,17 @@ class EwayPaymentsLogging {
 	* @return string
 	*/
 	public static function getLogFolder() {
-		static $logFolder = false;
+		static $logFolder = null;
 
-		if ($logFolder === false) {
+		if (is_null($logFolder)) {
 			$upload_dir = wp_upload_dir();
-			$logFolder = sprintf('%s/eway-payment-gateway/%s', $upload_dir['basedir'], wp_hash('eway-payment-gateway'));
+
+			if (empty($upload_dir['error'])) {
+				$logFolder = sprintf('%s/eway-payment-gateway/%s', $upload_dir['basedir'], wp_hash('eway-payment-gateway'));
+			}
+			else {
+				$logFolder = false;
+			}
 		}
 
 		return $logFolder;
