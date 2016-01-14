@@ -73,6 +73,20 @@
 	</tr>
 
 	<tr valign="top">
+		<th scope="row">Logging</th>
+		<td>
+			<select name="em_eway_logging">
+				<?php $selected = get_option('em_eway_logging'); ?>
+				<option value="off" <?php selected($selected, 'off'); ?>>Off</option>
+				<option value="info" <?php selected($selected, 'info'); ?>>All messages</option>
+				<option value="error" <?php selected($selected, 'error'); ?>>Errors only</option>
+			</select><br />
+			<em>Enable logging to assist trouble shooting. The log file can be found in:</em><br />
+			<em><?php echo esc_html(substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH))); ?></em>
+		</td>
+	</tr>
+
+	<tr valign="top">
 		<th scope="row">Stored payments</th>
 		<td>
 			<select name="em_eway_stored">

@@ -30,12 +30,16 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			"em_{$this->gateway}_test_force"				=> '1',
 			"em_{$this->gateway}_ssl_force"					=> '1',
 			"em_{$this->gateway}_mode"						=> 'sandbox',
+			"em_{$this->gateway}_logging"					=> 'off',
 		);
 		foreach ($defaults as $option => $value) {
 			if (get_option($option) === false) {
 				add_option($option, $value);
 			}
 		}
+
+		// create a logger
+		$this->logger = new EwayPaymentsLogging('events-manager', get_option("em_{$this->gateway}_logging"));
 
 		// initialise parent class
 		parent::__construct();
@@ -393,6 +397,10 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$amount = $EM_Booking->get_price(false, false, true);
 		$amount = apply_filters('em_eway_amount', $amount, $EM_Booking);
 		$eway->amount						= $isLiveSite ? $amount : ceil($amount);
+		if ($eway->amount != $amount) {
+			$this->logger->log('info', sprintf('amount rounded up from %1$s to %2$s, to pass test gateway',
+				number_format($amount, 2), number_format($eway->amount, 2)));
+		}
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription			= apply_filters('em_eway_invoice_desc', $eway->invoiceDescription, $EM_Booking);
@@ -400,6 +408,9 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$eway->option1						= apply_filters('em_eway_option1', '', $EM_Booking);
 		$eway->option2						= apply_filters('em_eway_option2', '', $EM_Booking);
 		$eway->option3						= apply_filters('em_eway_option3', '', $EM_Booking);
+
+		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
+			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		// Get Payment
 		try {
@@ -426,15 +437,22 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 				$status = get_option("em_{$this->gateway}_stored") ? 'Pending' : 'Completed';
 				$this->record_transaction($EM_Booking, $response->amount, 'AUD', date('Y-m-d H:i:s', current_time('timestamp')), $response->transactionNumber, $status, $note);
 				$result = true;
+
+				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
+					$eway->invoiceReference, $response->transactionNumber, get_option("em_{$this->gateway}_stored") ? 'on-hold' : 'completed',
+					$response->amount, $response->authCode, $response->beagleScore));
 			}
 			else {
 				// transaction was unsuccessful, so record the error
 				$EM_Booking->add_error(nl2br($response->error));
+
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->error));
 			}
 		}
 		catch (Exception $e) {
 			// an exception occured, so record the error
 			$EM_Booking->add_error(nl2br($e->getMessage()));
+			$this->logger->log('error', $e->getMessage());
 			return;
 		}
 
@@ -467,6 +485,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			"em_{$this->gateway}_beagle",
 			"em_{$this->gateway}_test_force",
 			"em_{$this->gateway}_ssl_force",
+			"em_{$this->gateway}_logging",
 			"em_{$this->gateway}_card_msg",
 			"em_{$this->gateway}_manual_approval",
 			"em_{$this->gateway}_booking_feedback",
@@ -477,6 +496,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		add_filter("gateway_update_em_{$this->gateway}_mode", 'sanitize_text_field');
 		add_filter("gateway_update_em_{$this->gateway}_cust_id", 'sanitize_text_field');
 		add_filter("gateway_update_em_{$this->gateway}_card_msg", 'sanitize_text_field');
+		add_filter("gateway_update_em_{$this->gateway}_logging", 'sanitize_text_field');
 
 		add_filter("gateway_update_em_{$this->gateway}_booking_feedback", 'wp_kses_data');
 		add_filter("gateway_update_em_{$this->gateway}_booking_feedback_free", 'wp_kses_data');
