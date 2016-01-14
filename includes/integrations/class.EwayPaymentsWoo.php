@@ -148,8 +148,8 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 							'default' 		=> 'off',
 							'options'		=> array(
 								'off' 		=> 'Off',
-								'error' 	=> 'Errors',
 								'info'	 	=> 'All messages',
+								'error' 	=> 'Errors only',
 							),
 						),
 			'eway_card_form' => array(
