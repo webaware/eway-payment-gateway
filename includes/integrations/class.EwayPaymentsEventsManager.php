@@ -6,6 +6,8 @@
 */
 class EwayPaymentsEventsManager extends EM_Gateway {
 
+	protected $logger;
+
 	private $registered_timer = 0;
 
 	/**

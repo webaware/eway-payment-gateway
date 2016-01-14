@@ -42,8 +42,8 @@ $eway_logging	= get_option('eway_logging', 'off');
 		<td>Logging</td>
 		<td>
 			<label><input type='radio' value='off' name='eway_logging' <?php checked($eway_logging, 'off'); ?> /> Off</label> &nbsp;
-			<label><input type='radio' value='error' name='eway_logging' <?php checked($eway_logging, 'error'); ?> /> Errors</label> &nbsp;
 			<label><input type='radio' value='info' name='eway_logging' <?php checked($eway_logging, 'info'); ?> /> All messages</label>
+			<label><input type='radio' value='error' name='eway_logging' <?php checked($eway_logging, 'error'); ?> /> Errors only</label> &nbsp;
 			<p class="description">enable logging to assist trouble shooting;
 			<br />the log file can be found in <?php echo esc_html(substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH))); ?></p>
 		</td>
