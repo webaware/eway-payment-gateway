@@ -406,7 +406,7 @@ class EwayPaymentsAWPCP {
 			);
 			$address = implode(', ', array_filter($parts, 'strlen'));
 		}
-		elseif (is_callable('AWPCP_Ad::get_ad_regions')) {
+		elseif (method_exists('AWPCP_Ad', 'get_ad_regions')) {
 			$regions = AWPCP_Ad::get_ad_regions($ad->ad_id);
 			if (!empty($regions[0])) {
 				$parts = array (

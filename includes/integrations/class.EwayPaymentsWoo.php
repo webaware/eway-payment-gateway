@@ -190,7 +190,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	public function init_settings() {
 		parent::init_settings();
 
-		if (is_callable(array($this, 'get_form_fields'))) {
+		if (method_exists($this, 'get_form_fields')) {
 			$form_fields = $this->get_form_fields();
 		}
 		else {
