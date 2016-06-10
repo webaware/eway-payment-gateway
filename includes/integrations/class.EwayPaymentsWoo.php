@@ -4,7 +4,7 @@
 * payment gateway integration for WooCommerce
 * @link https://docs.woothemes.com/document/payment-gateway-api/
 */
-class EwayPaymentsWoo extends WC_Payment_Gateway {
+class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 	protected $logger;
 
@@ -262,7 +262,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway {
 	public function payment_fields() {
 		if ($this->eway_card_form == 'yes') {
 			// use standard WooCommerce credit card form
-			$this->credit_card_form();
+			$this->form();
 		}
 		else {
 			// build drop-down items for months

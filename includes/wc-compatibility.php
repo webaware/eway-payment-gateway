@@ -23,3 +23,22 @@ if (!function_exists('wc_add_notice')) {
 
 }
 
+
+if (!class_exists('WC_Payment_Gateway_CC', false)) {
+
+	/**
+	* shim for WC_Payment_Gateway_CC for WooCommerce < 2.6
+	*/
+	class WC_Payment_Gateway_CC extends WC_Payment_Gateway {
+
+		/**
+		 * Outputs fields for entering credit card information.
+		 * @since 2.6.0
+		 */
+		public function form() {
+			$this->credit_card_form();
+		}
+
+	}
+
+}

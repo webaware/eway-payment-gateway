@@ -4,6 +4,7 @@
 
 ### 3.5.1, soon...
 
+* fixed: WooCommerce 2.6 compatibility (deprecated notice on credit card form)
 * added: basic logging for eWAY transactions (WooCommerce, WP eCommerce, Events Manager)
 * changed: remove dependency on WP eCommerce deprecated function for checkout field list
 

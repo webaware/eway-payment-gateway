@@ -99,10 +99,7 @@ class EwayPaymentsPlugin {
 	* @return array
 	*/
 	public function wooRegister($gateways) {
-		if (!function_exists('WC')) {
-			// pre-WC2.1 so load compatibility layer
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
-		}
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
 		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWoo.php';
 
 		return EwayPaymentsWoo::register($gateways);
