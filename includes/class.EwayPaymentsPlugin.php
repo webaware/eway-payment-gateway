@@ -181,7 +181,7 @@ class EwayPaymentsPlugin {
 			throw new EwayPaymentsException($response->get_error_message());
 		}
 
-		return $response['body'];
+		return wp_remote_retrieve_body($response);
 	}
 
 	/**
