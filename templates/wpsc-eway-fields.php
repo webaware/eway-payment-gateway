@@ -8,6 +8,10 @@ Take care to keep the field names the same, or your checkout form won't charge c
 * $optYears = options for drop-down list of current year + 15
 
 */
+
+if (!defined('ABSPATH')) {
+	exit;
+}
 ?>
 
 <?php if (!empty($card_msg)): ?>

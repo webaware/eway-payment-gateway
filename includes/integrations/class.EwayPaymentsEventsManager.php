@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 /**
 * payment gateway integration for Events Manager
 * with thanks to EM_Gateway_Authorize_AIM for showing the way...

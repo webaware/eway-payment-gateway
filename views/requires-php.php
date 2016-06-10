@@ -1,3 +1,8 @@
+<?php
+if (!defined('ABSPATH')) {
+	exit;
+}
+?>
 
 <div class="error">
 	<p>eWAY Payment Gateway requires PHP <?php echo esc_html($php_min); ?> or higher; your website has PHP <?php echo esc_html(PHP_VERSION); ?>

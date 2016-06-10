@@ -1,5 +1,9 @@
 <?php
 // WooCommerce admin settings page
+
+if (!defined('ABSPATH')) {
+	exit;
+}
 ?>
 
 <img style="float:right" src="<?php echo esc_url(EwayPaymentsPlugin::getUrlPath()); ?>images/eway-siteseal.png" />

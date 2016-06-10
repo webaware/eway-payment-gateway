@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 /**
 * payment gateway integration for WooCommerce
 * @link https://docs.woothemes.com/document/payment-gateway-api/

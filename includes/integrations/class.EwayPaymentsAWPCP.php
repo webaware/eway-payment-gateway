@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 /**
 * payment gateway integration for Another WordPress Classifieds Plugin
 * @link http://awpcp.com/

@@ -9,6 +9,10 @@ Take care to keep the field names the same, or your checkout form won't charge c
 * $optYears = options for drop-down list of current year + 15
 
 */
+
+if (!defined('ABSPATH')) {
+	exit;
+}
 ?>
 
 <form action="<?php echo esc_url($checkoutURL); ?>" method="post" id="awpcp-eway-checkout">

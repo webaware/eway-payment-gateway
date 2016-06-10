@@ -1,6 +1,10 @@
 <?php
 // compatibility layer for WooCommerce versions
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 if (!function_exists('wc_add_notice')) {
 
 	/**

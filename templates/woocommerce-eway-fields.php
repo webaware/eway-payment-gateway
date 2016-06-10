@@ -8,6 +8,10 @@ Take care to keep the field names the same, or your checkout form won't charge c
 * $settings = settings for eWAY payment gateway
 
 */
+
+if (!defined('ABSPATH')) {
+	exit;
+}
 ?>
 
 <fieldset>

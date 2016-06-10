@@ -5,6 +5,10 @@
 * NB: for testing, the only card number seen as valid is '4444333322221111'
 */
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 /**
 * eWAY stored payment request
 */

@@ -1,5 +1,9 @@
 <?php
 // custom fields for Events Manager admin page
+
+if (!defined('ABSPATH')) {
+	exit;
+}
 ?>
 
 <table class="form-table">

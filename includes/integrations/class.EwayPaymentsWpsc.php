@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 /**
 * payment gateway integration for WP eCommerce
 * @link http://docs.wpecommerce.org/category/payment-gateways/
