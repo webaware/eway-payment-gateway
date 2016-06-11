@@ -15,6 +15,8 @@ class EwayPaymentsAWPCP {
 	// payments API -- v3.0+
 	protected $paymentsAPI = false;
 
+	protected $logger;
+
 	/**
 	* initialise gateway with custom settings
 	*/
@@ -33,6 +35,9 @@ class EwayPaymentsAWPCP {
 
 		// make sure we have jQuery so that checkout form script works
 		wp_enqueue_script('jquery');
+
+		// create a logger
+		$this->logger = new EwayPaymentsLogging('awpcp', get_awpcp_option('eway_logging', 'off'));
 	}
 
 	/**
@@ -44,7 +49,7 @@ class EwayPaymentsAWPCP {
 
 		if (get_awpcp_option('activateeway')) {
 			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP3.php';
-			$this->paymentsAPI->register_payment_method(new EwayPaymentsAWPCP3($this));
+			$this->paymentsAPI->register_payment_method(new EwayPaymentsAWPCP3($this, $this->logger));
 		}
 	}
 
@@ -96,6 +101,17 @@ class EwayPaymentsAWPCP {
 		// TODO: add Beagle if new version supports taking country info before billing
 		//~ $awpcp->settings->add_setting($section, 'eway_beagle', 'Beagle (anti-fraud)', 'checkbox', 0,
 			//~ "<a href='https://www.eway.com.au/developers/api/beagle-lite' target='_blank'>Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle");
+
+		$log_options = array(
+			'off' 		=> 'Off',
+			'info'	 	=> 'All messages',
+			'error' 	=> 'Errors only',
+		);
+		$log_descripton = sprintf('<br />%s<br />%s<br />%s',
+			'enable logging to assist trouble shooting',
+			'the log file can be found in:',
+			substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH)));
+		$awpcp->settings->add_setting($section, 'eway_logging', 'Logging', 'select', 'off', $log_descripton, array('options' => $log_options));
 
 		$awpcp->settings->add_setting($section, 'eway_card_message', 'Credit card message', 'textfield', '',
 			'<br />Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;');
@@ -260,6 +276,9 @@ class EwayPaymentsAWPCP {
 					$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_COMPLETED);
 
 					$valid = true;
+
+					$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s',
+						$transaction->id, $response->transactionNumber, 'completed', $response->amount, $response->authCode));
 				}
 				else {
 					// transaction was unsuccessful, so record transaction number and the error
@@ -267,6 +286,8 @@ class EwayPaymentsAWPCP {
 					$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_FAILED);
 					$transaction->errors[] = nl2br(esc_html($response->error . "\nuse your browser's back button to try again."));
 					$valid = false;
+
+					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->error));
 				}
 			}
 			catch (EwayPaymentsException $e) {
@@ -274,6 +295,8 @@ class EwayPaymentsAWPCP {
 				$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_FAILED);
 				$transaction->errors[] = nl2br(esc_html($e->getMessage() . "\nuse your browser's back button to try again."));
 				$valid = false;
+
+				$this->logger->log('error', $e->getMessage());
 			}
 		}
 
@@ -348,6 +371,13 @@ class EwayPaymentsAWPCP {
 			$total = $transaction->get('amount');
 		}
 		$eway->amount = $isLiveSite ? $total : ceil($total);
+		if ($eway->amount != $total) {
+			$this->logger->log('info', sprintf('amount rounded up from %1$s to %2$s, to pass test gateway',
+				number_format($total, 2), number_format($eway->amount, 2)));
+		}
+
+		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
+			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		$response = $eway->processPayment();
 

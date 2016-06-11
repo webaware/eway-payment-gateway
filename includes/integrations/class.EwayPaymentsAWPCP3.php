@@ -11,13 +11,16 @@ if (!defined('ABSPATH')) {
 class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 
 	protected $integration;
+	protected $logger;
 
 	/**
 	* initialise payment gateway
 	* @param EwayPaymentsAWPCP $integration the integration code for AWPCP v < 3.0
+	* @param EwayPaymentsLogging $logger
 	*/
-    public function __construct($integration) {
+    public function __construct($integration, $logger) {
 		$this->integration = $integration;
+		$this->logger      = $logger;
 
 		$methods = $this->integration->awpcpPaymentMethods(array());
 		$method = $methods[0];
@@ -94,6 +97,9 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 					*/
 
 					$success = true;
+
+					$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s',
+						$transaction->id, $response->transactionNumber, 'completed', $response->amount, $response->authCode));
 				}
 				else {
 					// transaction was unsuccessful, so record transaction number and the error
@@ -101,6 +107,8 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 					$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
 					$transaction->errors['validation'] = nl2br(esc_html($response->error . "\nuse your browser's back button to try again."));
 					$success = false;
+
+					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->error));
 				}
 			}
 			catch (EwayPaymentsException $e) {
@@ -108,6 +116,8 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 				$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
 				$transaction->errors['validation'] = nl2br(esc_html($e->getMessage()) . "\nuse your browser's back button to try again.");
 				$success = false;
+
+				$this->logger->log('error', $e->getMessage());
 			}
 		}
 
