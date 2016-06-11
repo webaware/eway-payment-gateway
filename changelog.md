@@ -8,6 +8,7 @@
 * added: basic logging for eWAY transactions (WooCommerce, WP eCommerce, Events Manager)
 * changed: remove dependency on WP eCommerce deprecated function for checkout field list
 * changed: use `wp_remote_retrieve_body()` instead of array access to get eWAY response (WP4.6 compatibility)
+* changed: improved accessibility for credit card forms, admin settings forms
 
 ### 3.5.0, 2015-10-10
 
