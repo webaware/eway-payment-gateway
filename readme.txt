@@ -15,14 +15,14 @@ Integrate some popular WordPress plugins with the eWAY credit card payment gatew
 
 == Description ==
 
-The eWAY Payment Gateway adds a credit card payment gateway integration for [eWAY in Australia](https://www.eway.com.au/) [Direct Payments API](https://www.eway.com.au/developers/api/direct-payments) and Stored Payments API. These plugins are supported:
+The eWAY Payment Gateway adds a credit card payment gateway integration for [eWAY in Australia](https://www.eway.com.au/) legacy Direct Payments XML API and Stored Payments API. These plugins are supported:
 
 * [WP eCommerce](https://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
 * [WooCommerce](https://wordpress.org/plugins/woocommerce/) shopping cart plugin
 * [Another WordPress Classifieds Plugin](https://wordpress.org/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
 * [Events Manager Pro](https://eventsmanagerpro.com/) event bookings plugin
 
-Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://wordpress.org/plugins/gravityforms-eway/).
+Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://gfeway.webaware.net.au/).
 
 = Features =
 
@@ -39,7 +39,7 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://wordpr
 * you need to install an e-commerce plugin listed above
 * you need an SSL certificate for your hosting account
 * you need an account with eWAY Australia
-* this plugin uses eWAY's [Direct Payments API](https://www.eway.com.au/developers/api/direct-payments) and Stored Payments API, but does not support eWAY's hosted payment form
+* this plugin uses eWAY's legacy Direct Payments XML API and Stored Payments API, but does not support eWAY's hosted payment form
 
 == Installation ==
 
@@ -84,7 +84,7 @@ eWAY is a leading provider of online payments solutions for Australia, New Zeala
 
 Not yet. I know it can be done but I haven't had a website that needs it yet, so have not written the code for it.
 
-If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](http://webaware.com.au/get-gravity-forms) and [Gravity Forms eWAY](https://wordpress.org/plugins/gravityforms-eway/) which does support recurring payments.
+If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](http://webaware.com.au/get-gravity-forms) and [Gravity Forms eWAY](https://gfeway.webaware.net.au/) which does support recurring payments.
 
 = Can I use other eWAY gateways, outside of Australia? =
 
@@ -92,7 +92,7 @@ Not yet. There are plans to integrate eWAY's Rapid Payments API sometime in 2013
 
 = Can I use the eWAY hosted payment form with this plugin? =
 
-No, this plugin only supports the [Direct Payments API](https://www.eway.com.au/developers/api/direct-payments).
+No, this plugin only supports the legacy Direct Payments XML API.
 
 = What is Stored Payments? =
 
@@ -100,7 +100,7 @@ Like Direct Payments, the purchase information is sent to eWAY for processing, b
 
 = What is Beagle? =
 
-[Beagle](https://www.eway.com.au/developers/api/beagle-lite) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle in this plugin.
+[Beagle Lite](https://eway.io/features/antifraud-beagle-lite) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle in this plugin.
 
 **NB**: You will also need to add a Country field to your checkout form. Beagle works by comparing the country of the address with the country where the purchaser is using the Internet; Beagle won't be used when checking out without a country selected.
 
