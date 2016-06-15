@@ -2,13 +2,14 @@
 
 ## Changelog
 
-### 3.5.1, soon...
+### 3.6.0, 2016-06-15
 
 * fixed: WooCommerce 2.6 compatibility (deprecated notice on credit card form)
 * added: basic logging for eWAY transactions
 * changed: remove dependency on WP eCommerce deprecated function for checkout field list
 * changed: use `wp_remote_retrieve_body()` instead of array access to get eWAY response (WP4.6 compatibility)
 * changed: improved accessibility for credit card forms, admin settings forms
+* changed: minimum required WordPress version is now 4.2
 
 ### 3.5.0, 2015-10-10
 

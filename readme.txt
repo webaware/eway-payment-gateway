@@ -5,9 +5,9 @@ Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: http://webaware.com.au/
 Donate link: http://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
-Requires at least: 3.6.1
-Tested up to: 4.4.1
-Stable tag: 3.5.0
+Requires at least: 4.2
+Tested up to: 4.5.2
+Stable tag: 3.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -196,35 +196,19 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Upgrade Notice ==
 
-= 3.5.0 =
+= 3.6.0 =
 
-Events Manager card validation fixes; AWPCP enhancements
+added basic logging for eWAY transactions; WordPress 4.6 and WooCommerce 2.6 compatibility
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 3.5.0, 2015-10-10
+### 3.6.0, 2016-06-15
 
-* fixed: PHP warning when save Events Manager settings
-* fixed: pre-transaction validation for Events Manager was being skipped
-* added: eWAY site seal support for AWPCP
-* added: custom payment method icon setting for AWPCP
-* added: filter `awpcp_eway_checkout_message` for changing the message above the checkout form in AWPCP
-* added: filters for modifying the eWAY customer ID used in transaction
-* changed: try harder to fill eWAY transaction contact details in AWPCP
-
-### 3.4.0, 2015-06-21
-
-* fixed: WP eCommerce sometimes loses the transaction authcode on sites with an object cache (like memcached)
-* added: some precautionary XSS prevention
-* changed: credit card fields all now have autocomplete disabled, for better card security
-* changed: WooCommerce customer reference now accepts the filtered order number (`$order->get_order_number()`)
-* changed: some code refactoring for easier maintenance
-
-### 3.3.0, 2014-11-07
-
-* fixed: force Events Manager bookings form AJAX url and form action to use HTTPS if forcing SSL for events with bookings
-* fixed: WooCommerce 2.0.20 settings backwards compatibility
-* added: eWAY site seal support for WooCommerce
-* changed: updated screenshots
+* fixed: WooCommerce 2.6 compatibility (deprecated notice on credit card form)
+* added: basic logging for eWAY transactions
+* changed: remove dependency on WP eCommerce deprecated function for checkout field list
+* changed: use `wp_remote_retrieve_body()` instead of array access to get eWAY response (WP4.6 compatibility)
+* changed: improved accessibility for credit card forms, admin settings forms
+* changed: minimum required WordPress version is now 4.2

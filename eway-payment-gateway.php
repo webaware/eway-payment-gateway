@@ -3,13 +3,13 @@
 Plugin Name: eWAY Payment Gateway
 Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
 Description: Integrate some popular WordPress plugins with the eWAY credit card payment gateway
-Version: 3.5.1-alpha1
+Version: 3.6.0
 Author: WebAware
 Author URI: http://webaware.com.au/
 */
 
 /*
-copyright (c) 2011-2015 WebAware Pty Ltd (email : support@webaware.com.au)
+copyright (c) 2011-2016 WebAware Pty Ltd (email : support@webaware.com.au)
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
 define('EWAY_PAYMENTS_PLUGIN_FILE', __FILE__);
 define('EWAY_PAYMENTS_PLUGIN_ROOT', dirname(__FILE__) . '/');
 define('EWAY_PAYMENTS_PLUGIN_NAME', basename(dirname(__FILE__)) . '/' . basename(__FILE__));
-define('EWAY_PAYMENTS_VERSION', '3.5.1-alpha1');
+define('EWAY_PAYMENTS_VERSION', '3.6.0');
 
 // special test customer ID for sandbox
 define('EWAY_PAYMENTS_TEST_CUSTOMER', '87654321');
