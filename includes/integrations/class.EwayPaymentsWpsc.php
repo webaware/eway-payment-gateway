@@ -427,6 +427,10 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	public static function actionBillingDetailsBottom() {
 		global $purchlogitem;
 
+		if (empty($purchlogitem->extrainfo->gateway) || $purchlogitem->extrainfo->gateway !== self::WPSC_GATEWAY_NAME) {
+			return;
+		}
+
 		if (!empty($purchlogitem->extrainfo->transactid) || !empty($purchlogitem->extrainfo->authcode)) {
 			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-wpsc-billing-details.php';
 		}
