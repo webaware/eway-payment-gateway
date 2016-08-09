@@ -445,7 +445,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		if ($fields === false) {
 			global $wpdb;
-			$fields = $wpdb->get_results(sprintf("select id,name,unique_name from `%s` where active = '1'", WPSC_TABLE_CHECKOUT_FORMS));
+			$fields = $wpdb->get_results(sprintf("select id,name,unique_name from `%s` where active = '1' and type != 'heading'", WPSC_TABLE_CHECKOUT_FORMS));
 		}
 
 		echo '<option value="">Please choose</option>';
