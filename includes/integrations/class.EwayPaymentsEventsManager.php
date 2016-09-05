@@ -353,6 +353,9 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		}
 		$customerID = apply_filters('em_eway_customer_id', $customerID, $isLiveSite, $EM_Booking);
 
+		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+		$transactionID = apply_filters('em_eway_trans_number', $EM_Booking->booking_id);
+
 		if (get_option("em_{$this->gateway}_stored")) {
 			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
 		}
@@ -363,7 +366,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$eway->invoiceDescription			= $EM_Booking->get_event()->event_name;
 		//~ $eway->invoiceDescription		= $EM_Booking->output('#_BOOKINGTICKETDESCRIPTION');
 		$eway->invoiceReference				= $EM_Booking->booking_id;						// customer invoice reference
-		$eway->transactionNumber			= $EM_Booking->booking_id;						// transaction reference
+		$eway->transactionNumber			= $transactionID;
 		$eway->cardHoldersName				= self::getPostValue('x_card_name');
 		$eway->cardNumber					= strtr(self::getPostValue('x_card_num'), array(' ' => '', '-' => ''));
 		$eway->cardExpiryMonth				= self::getPostValue('x_exp_date_month');

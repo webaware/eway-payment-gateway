@@ -395,6 +395,9 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$customerID = $this->eway_customerid;
 		$customerID = apply_filters('woocommerce_eway_customer_id', $customerID, $isLiveSite, $order_id);
 
+		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+		$transactionID = apply_filters('woocommerce_eway_trans_number', $order_id);
+
 		if ($this->eway_stored == 'yes')
 			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
 		else
@@ -402,7 +405,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $order->get_order_number();						// customer invoice reference
-		$eway->transactionNumber		= $order_id;										// transaction reference
+		$eway->transactionNumber		= $transactionID;
 		$eway->cardHoldersName			= $ccfields['eway_card_name'];
 		$eway->cardNumber				= strtr($ccfields['eway_card_number'], array(' ' => '', '-' => ''));
 		$eway->cardExpiryMonth			= $ccfields['eway_expiry_month'];

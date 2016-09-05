@@ -155,6 +155,9 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$customerID = get_option('ewayCustomerID_id');
 		$customerID = apply_filters('wpsc_merchant_eway_customer_id', $customerID, $isLiveSite, $this->purchase_id);
 
+		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+		$transactionID = apply_filters('wpsc_merchant_eway_trans_number', $this->purchase_id);
+
 		if ($useStored) {
 			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
 		}
@@ -164,7 +167,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
-		$eway->transactionNumber		= $this->purchase_id;								// transaction reference
+		$eway->transactionNumber		= $transactionID;
 		$eway->cardHoldersName			= $this->collected_gateway_data['card_name'];
 		$eway->cardNumber				= $this->collected_gateway_data['card_number'];
 		$eway->cardExpiryMonth			= $this->collected_gateway_data['expiry_month'];
