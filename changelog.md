@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 3.7.0, soon...
+
+* added: filters for changing the transaction ID sent to eWAY; use with caution!
+
 ### 3.6.0, 2016-06-15
 
 * fixed: WooCommerce 2.6 compatibility (deprecated notice on credit card form)

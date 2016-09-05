@@ -1,15 +1,15 @@
 === eWAY Payment Gateway ===
 Contributors: webaware
 Plugin Name: eWAY Payment Gateway
-Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
-Author URI: http://webaware.com.au/
-Donate link: http://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
+Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
+Author URI: https://webaware.com.au/
+Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 4.2
-Tested up to: 4.5.2
+Tested up to: 4.6.1
 Stable tag: 3.6.0
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Integrate some popular WordPress plugins with the eWAY credit card payment gateway
 
@@ -84,7 +84,7 @@ eWAY is a leading provider of online payments solutions for Australia, New Zeala
 
 Not yet. I know it can be done but I haven't had a website that needs it yet, so have not written the code for it.
 
-If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](http://webaware.com.au/get-gravity-forms) and [Gravity Forms eWAY](https://gfeway.webaware.net.au/) which does support recurring payments.
+If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](https://webaware.com.au/get-gravity-forms) and [Gravity Forms eWAY](https://gfeway.webaware.net.au/) which does support recurring payments.
 
 = Can I use other eWAY gateways, outside of Australia? =
 
@@ -119,7 +119,7 @@ Yes, if you deactivate the Gold Cart's eWAY payment gateway and activate this on
 
 = I get an SSL error when my checkout attempts to connect with eWAY =
 
-This is a common problem in local testing environments. Please [read this post](http://snippets.webaware.com.au/howto/stop-turning-off-curlopt_ssl_verifypeer-and-fix-your-php-config/) for more information.
+This is a common problem in local testing environments. Please [read this post](https://snippets.webaware.com.au/howto/stop-turning-off-curlopt_ssl_verifypeer-and-fix-your-php-config/) for more information.
 
 = Can I use this plugin on any shared-hosting environment? =
 

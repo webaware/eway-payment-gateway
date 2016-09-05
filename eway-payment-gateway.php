@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: eWAY Payment Gateway
-Plugin URI: http://shop.webaware.com.au/downloads/eway-payment-gateway/
+Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Description: Integrate some popular WordPress plugins with the eWAY credit card payment gateway
-Version: 3.6.0
+Version: 3.7.0-dev
 Author: WebAware
-Author URI: http://webaware.com.au/
+Author URI: https://webaware.com.au/
 */
 
 /*
@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
 define('EWAY_PAYMENTS_PLUGIN_FILE', __FILE__);
 define('EWAY_PAYMENTS_PLUGIN_ROOT', dirname(__FILE__) . '/');
 define('EWAY_PAYMENTS_PLUGIN_NAME', basename(dirname(__FILE__)) . '/' . basename(__FILE__));
-define('EWAY_PAYMENTS_VERSION', '3.6.0');
+define('EWAY_PAYMENTS_VERSION', '3.7.0-dev');
 
 // special test customer ID for sandbox
 define('EWAY_PAYMENTS_TEST_CUSTOMER', '87654321');
