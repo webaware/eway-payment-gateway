@@ -55,7 +55,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		}
 
 		// add email fields
-		add_filter('woocommerce_email_order_meta_keys', array($this, 'wooEmailOrderMetaKeys'));
+		add_filter('woocommerce_email_order_meta_fields', array($this, 'wooEmailOrderMetaKeys'), 10, 3);
 
 		// create a logger
 		$this->logger = new EwayPaymentsLogging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
@@ -517,10 +517,18 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	/**
 	* add the successful transaction ID to WooCommerce order emails
 	* @param array $keys
+	* @param bool $sent_to_admin
+	* @param mixed $order
 	* @return array
 	*/
-	public function wooEmailOrderMetaKeys( $keys ) {
-		$keys[] = 'Transaction ID';
+	public function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
+		if (apply_filters('woocommerce_eway_email_show_trans_number', true, $order)) {
+			$key = 'Transaction ID';
+			$keys[$key] = array(
+				'label'		=> wptexturize($key),
+				'value'		=> wptexturize(get_post_meta($order->id, $key, true)),
+			);
+		}
 
 		return $keys;
 	}
