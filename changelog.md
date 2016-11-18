@@ -6,6 +6,7 @@
 
 * added: filters for changing the transaction ID sent to eWAY; use with caution!
 * added: filter `woocommerce_eway_email_show_trans_number` for disabling display of transaction ID on new order email
+* fixed: undefined index `eway_form` when saving another payment gateway's settings in WP eCommerce
 
 ### 3.6.0, 2016-06-15
 

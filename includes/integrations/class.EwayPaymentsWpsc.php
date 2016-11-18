@@ -417,8 +417,10 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			update_option('wpsc_merchant_eway_card_msg', sanitize_text_field(wp_unslash($_POST['eway_card_msg'])));
 		}
 
-		foreach ((array)$_POST['eway_form'] as $form => $value) {
-			update_option('eway_form_' . $form, $value ? absint($value) : '');
+		if (isset($_POST['eway_form'])) {
+			foreach ((array)$_POST['eway_form'] as $form => $value) {
+				update_option('eway_form_' . $form, $value ? absint($value) : '');
+			}
 		}
 
 		return true;
