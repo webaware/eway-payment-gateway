@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 3.7.0, soon...
+### 3.7.0, 2016-11-18
 
 * added: filters for changing the transaction ID sent to eWAY; use with caution!
 * added: filter `woocommerce_eway_email_show_trans_number` for disabling display of transaction ID on new order email

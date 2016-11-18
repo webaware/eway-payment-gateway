@@ -6,8 +6,8 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
 Requires at least: 4.2
-Tested up to: 4.6.1
-Stable tag: 3.6.0
+Tested up to: 4.7
+Stable tag: 3.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -196,19 +196,16 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Upgrade Notice ==
 
-= 3.6.0 =
+= 3.7.0 =
 
-added basic logging for eWAY transactions; WordPress 4.6 and WooCommerce 2.6 compatibility
+fixed undefined index `eway_form` when saving another payment gateway's settings in WP eCommerce; added transaction number/ID filters
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 3.6.0, 2016-06-15
+### 3.7.0, 2016-11-18
 
-* fixed: WooCommerce 2.6 compatibility (deprecated notice on credit card form)
-* added: basic logging for eWAY transactions
-* changed: remove dependency on WP eCommerce deprecated function for checkout field list
-* changed: use `wp_remote_retrieve_body()` instead of array access to get eWAY response (WP4.6 compatibility)
-* changed: improved accessibility for credit card forms, admin settings forms
-* changed: minimum required WordPress version is now 4.2
+* added: filters for changing the transaction ID sent to eWAY; use with caution!
+* added: filter `woocommerce_eway_email_show_trans_number` for disabling display of transaction ID on new order email
+* fixed: undefined index `eway_form` when saving another payment gateway's settings in WP eCommerce

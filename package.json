@@ -1,6 +1,6 @@
 {
   "name": "eway-payment-gateway",
-  "version": "3.7.0-dev",
+  "version": "3.7.0",
   "description": "Integrate some popular WordPress plugins with the eWAY credit card payment gateway",
   "main": "Gruntfile.js",
   "devDependencies": {
