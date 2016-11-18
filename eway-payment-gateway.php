@@ -5,7 +5,7 @@ Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Description: Integrate some popular WordPress plugins with the eWAY credit card payment gateway
 Version: 3.7.0-dev
 Author: WebAware
-Author URI: https://webaware.com.au/
+Author URI: https://shop.webaware.com.au/
 */
 
 /*
