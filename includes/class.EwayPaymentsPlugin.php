@@ -181,6 +181,21 @@ class EwayPaymentsPlugin {
 			throw new EwayPaymentsException($response->get_error_message());
 		}
 
+		// error code returned by request
+		$code = wp_remote_retrieve_response_code($response);
+		if ($code !== 200) {
+			$msg = wp_remote_retrieve_response_message($response);
+
+			if (empty($msg)) {
+				$msg = sprintf('Error posting eWAY request: %s', $code);
+			}
+			else {
+				/* translators: 1. the error code; 2. the error message */
+				$msg = sprintf('Error posting eWAY request: %1$s, %2$s', $code, $msg);
+			}
+			throw new EwayPaymentsException($msg);
+		}
+
 		return wp_remote_retrieve_body($response);
 	}
 

@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 3.7.1, soon...
+
+* added: capture and report HTTP errors communicating with the gateway
+
 ### 3.7.0, 2016-11-18
 
 * added: filters for changing the transaction ID sent to eWAY; use with caution!
