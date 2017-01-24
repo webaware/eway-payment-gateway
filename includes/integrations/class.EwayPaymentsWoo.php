@@ -155,7 +155,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'type' 			=> 'select',
 							'description'	=>	sprintf('%s<br/>%s',
 													__('the log file can be found in this folder:', 'eway-payment-gateway'),
-													substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH))),
+													EwayPaymentsLogging::getLogFolderRelative()),
 							'default' 		=> 'off',
 							'options'		=> array(
 								'off' 		=> _x('Off', 'logging settings', 'eway-payment-gateway'),

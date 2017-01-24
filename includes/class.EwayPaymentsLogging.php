@@ -133,4 +133,12 @@ class EwayPaymentsLogging {
 		return $logFolder;
 	}
 
+	/**
+	* get relative path to log folder
+	* @return string
+	*/
+	public static function getLogFolderRelative() {
+		return substr(self::getLogFolder(), strlen(ABSPATH));
+	}
+
 }

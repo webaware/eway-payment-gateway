@@ -120,7 +120,7 @@ class EwayPaymentsAWPCP {
 		$log_descripton = sprintf('<br />%s<br />%s<br />%s',
 							__('enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							__('the log file can be found in this folder:', 'eway-payment-gateway'),
-							substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH)));
+							EwayPaymentsLogging::getLogFolderRelative());
 		$awpcp->settings->add_setting($section, 'eway_logging',
 						_x('Logging', 'AWPCP payment settings', 'eway-payment-gateway'),
 						'select', 'off', $log_descripton, array('options' => $log_options));

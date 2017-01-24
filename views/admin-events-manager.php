@@ -95,7 +95,7 @@ if (!defined('ABSPATH')) {
 			</select>
 			<em><?php esc_html_e('Enable logging to assist trouble shooting;', 'eway-payment-gateway'); ?>
 				<br /><?php esc_html_e('the log file can be found in this folder:', 'eway-payment-gateway'); ?>
-				<br /><?php echo esc_html(substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH))); ?>
+				<br /><?php echo esc_html(EwayPaymentsLogging::getLogFolderRelative()); ?>
 			</em>
 		</td>
 	</tr>
