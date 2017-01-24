@@ -301,11 +301,13 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return array
 	*/
 	protected function getCardFields() {
+		$postdata = new EwayPaymentsFormPost();
+
 		if ($this->eway_card_form == 'yes') {
 			// split expiry field into month and year
-			$expiry = self::getPostValue('eway_payments-card-expiry');
+			$expiry = $postdata->get_value('eway_payments-card-expiry');
 			$expiry = array_map('trim', explode('/', $expiry, 2));
-			if (count($expiry) == 2) {
+			if (count($expiry) === 2) {
 				// prefix year with '20' if it's exactly two digits
 				if (preg_match('/^[0-9]{2}$/', $expiry[1])) {
 					$expiry[1] = '20' . $expiry[1];
@@ -316,20 +318,20 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			}
 
 			$fields = array(
-				'eway_card_number'  => self::getPostValue('eway_payments-card-number'),
-				'eway_card_name'    => self::getPostValue('eway_payments-card-name'),
+				'eway_card_number'  => $postdata->clean_cardnumber($postdata->get_value('eway_payments-card-number')),
+				'eway_card_name'    => $postdata->get_value('eway_payments-card-name'),
 				'eway_expiry_month' => $expiry[0],
 				'eway_expiry_year'  => $expiry[1],
-				'eway_cvn'          => self::getPostValue('eway_payments-card-cvc'),
+				'eway_cvn'          => $postdata->get_value('eway_payments-card-cvc'),
 			);
 		}
 		else {
 			$fields = array(
-				'eway_card_number'  => self::getPostValue('eway_card_number'),
-				'eway_card_name'    => self::getPostValue('eway_card_name'),
-				'eway_expiry_month' => self::getPostValue('eway_expiry_month'),
-				'eway_expiry_year'  => self::getPostValue('eway_expiry_year'),
-				'eway_cvn'          => self::getPostValue('eway_cvn'),
+				'eway_card_number'  => $postdata->clean_cardnumber($postdata->get_value('eway_card_number')),
+				'eway_card_name'    => $postdata->get_value('eway_card_name'),
+				'eway_expiry_month' => $postdata->get_value('eway_expiry_month'),
+				'eway_expiry_year'  => $postdata->get_value('eway_expiry_year'),
+				'eway_cvn'          => $postdata->get_value('eway_cvn'),
 			);
 		}
 
@@ -549,16 +551,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	public static function register($gateways) {
 		$gateways[] = __CLASS__;
 		return $gateways;
-	}
-
-	/**
-	* Read a field from form post input.
-	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
-	* @param string $fieldname name of the field in the form post
-	* @return string
-	*/
-	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? wp_unslash(trim((string) $_POST[$fieldname])) : '';
 	}
 
 }

@@ -67,55 +67,34 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* grab the gateway-specific data from the checkout form post
 	*/
 	public function construct_value_array() {
+		$postdata = new EwayPaymentsFormPost();
+
 		$country_field = get_option('eway_form_country');
-		if ($country_field && !empty($_POST['collected_data'][$country_field][0])) {
-			$country = wp_unslash($_POST['collected_data'][$country_field][0]);
+		if ($country_field) {
+			$country = $postdata->get_subkey('collected_data', get_option('eway_form_first_name'));
+			$country = empty($country[0]) ? '' : $country[0];
 		}
 		else {
 			$country = '';
 		}
 
 		$this->collected_gateway_data = array (
-			'card_number'	=> strtr(self::getPostValue('card_number'), array(' ' => '', '-' => '')),
-			'card_name'		=> self::getPostValue('card_name'),
-			'expiry_month'	=> self::getPostValue('expiry_month'),
-			'expiry_year'	=> self::getPostValue('expiry_year'),
-			'c_v_n'			=> self::getPostValue('cvn'),
+			'card_number'	=> $postdata->clean_cardnumber($postdata->get_value('card_number'));
+			'card_name'		=> $postdata->get_value('card_name'),
+			'expiry_month'	=> $postdata->get_value('expiry_month'),
+			'expiry_year'	=> $postdata->get_value('expiry_year'),
+			'c_v_n'			=> $postdata->get_value('cvn'),
 
 			// additional fields from checkout
-			'first_name'	=> self::getCollectedDataValue(get_option('eway_form_first_name')),
-			'last_name'		=> self::getCollectedDataValue(get_option('eway_form_last_name')),
-			'address'		=> self::getCollectedDataValue(get_option('eway_form_address')),
-			'city'			=> self::getCollectedDataValue(get_option('eway_form_city')),
-			'state'			=> self::getCollectedDataValue(get_option('eway_form_state')),
+			'first_name'	=> $postdata->get_subkey('collected_data', get_option('eway_form_first_name')),
+			'last_name'		=> $postdata->get_subkey('collected_data', get_option('eway_form_last_name')),
+			'address'		=> $postdata->get_subkey('collected_data', get_option('eway_form_address')),
+			'city'			=> $postdata->get_subkey('collected_data', get_option('eway_form_city')),
+			'state'			=> $postdata->get_subkey('collected_data', get_option('eway_form_state')),
 			'country'		=> $country,
-			'post_code'		=> self::getCollectedDataValue(get_option('eway_form_post_code')),
-			'email'			=> self::getCollectedDataValue(get_option('eway_form_email')),
+			'post_code'		=> $postdata->get_subkey('collected_data', get_option('eway_form_post_code')),
+			'email'			=> $postdata->get_subkey('collected_data', get_option('eway_form_email')),
 		);
-	}
-
-	/**
-	* Read a field from form post input.
-	*
-	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
-	*
-	* @return string
-	* @param string $fieldname name of the field in the form post
-	*/
-	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? wp_unslash(trim($_POST[$fieldname])) : '';
-	}
-
-	/**
-	* Read a field from form post input.
-	*
-	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
-	*
-	* @return string
-	* @param string $fieldname name of the field in the form post
-	*/
-	protected static function getCollectedDataValue($fieldname) {
-		return isset($_POST['collected_data'][$fieldname]) ? wp_unslash(trim($_POST['collected_data'][$fieldname])) : '';
 	}
 
 	/**

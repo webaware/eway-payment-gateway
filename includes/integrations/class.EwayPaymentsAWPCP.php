@@ -229,25 +229,26 @@ class EwayPaymentsAWPCP {
     * @return array an array of error messages
     */
     public function verifyForm($transaction) {
-		$errors = array();
-		$expiryError = false;
+		$errors			= array();
+		$expiryError	= false;
+		$postdata		= new EwayPaymentsFormPost();
 
-		if (self::getPostValue('eway_card_number') === '') {
+		if ($postdata->get_value('eway_card_number') === '') {
 			$errors[] = __('Please enter credit card number', 'eway-payment-gateway');
 		}
 
-		if (self::getPostValue('eway_card_name') === '') {
+		if ($postdata->get_value('eway_card_name') === '') {
 			$errors[] = __('Please enter card holder name', 'eway-payment-gateway');
 		}
 
-		$eway_expiry_month = self::getPostValue('eway_expiry_month');
+		$eway_expiry_month = $postdata->get_value('eway_expiry_month');
 		if (empty($eway_expiry_month) || !preg_match('/^(?:0[1-9]|1[012])$/', $eway_expiry_month)) {
 			$errors[] = __('Please select credit card expiry month', 'eway-payment-gateway');
 			$expiryError = true;
 		}
 
 		// FIXME: if this code makes it into the 2100's, update this regex!
-		$eway_expiry_year = self::getPostValue('eway_expiry_year');
+		$eway_expiry_year = $postdata->get_value('eway_expiry_year');
 		if (empty($eway_expiry_year) || !preg_match('/^20\d\d$/', $eway_expiry_year)) {
 			$errors[] = __('Please select credit card expiry year', 'eway-payment-gateway');
 			$expiryError = true;
@@ -262,7 +263,7 @@ class EwayPaymentsAWPCP {
 			}
 		}
 
-		if (self::getPostValue('eway_cvn') === '') {
+		if ($postdata->get_value('eway_cvn') === '') {
 			$errors[] = __('Please enter CVN (Card Verification Number)', 'eway-payment-gateway');
 		}
 
@@ -353,14 +354,16 @@ class EwayPaymentsAWPCP {
 			$eway = new EwayPaymentsPayment($eway_customerid, $isLiveSite);
 		}
 
+		$postdata = new EwayPaymentsFormPost();
+
 		$eway->invoiceDescription			= $item->name;
 		$eway->invoiceReference				= $transaction->id;									// customer invoice reference
 		//~ $eway->transactionNumber		= $transaction->id;									// transaction reference
-		$eway->cardHoldersName				= self::getPostValue('eway_card_name');
-		$eway->cardNumber					= strtr(self::getPostValue('eway_card_number'), array(' ' => '', '-' => ''));
-		$eway->cardExpiryMonth				= self::getPostValue('eway_expiry_month');
-		$eway->cardExpiryYear				= self::getPostValue('eway_expiry_year');
-		$eway->cardVerificationNumber		= self::getPostValue('eway_cvn');
+		$eway->cardHoldersName				= $postdata->get_value('eway_card_name');
+		$eway->cardNumber					= $postdata->clean_cardnumber($postdata->get_value('eway_card_number'));
+		$eway->cardExpiryMonth				= $postdata->get_value('eway_expiry_month');
+		$eway->cardExpiryYear				= $postdata->get_value('eway_expiry_year');
+		$eway->cardVerificationNumber		= $postdata->get_value('eway_cvn');
 
 		list($eway->firstName, $eway->lastName) = self::getContactNames($ad, $user, $eway->cardHoldersName);
 
@@ -482,18 +485,6 @@ class EwayPaymentsAWPCP {
 		}
 
 		return $address;
-	}
-
-	/**
-	* Read a field from form post input.
-	*
-	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
-	*
-	* @return string
-	* @param string $fieldname name of the field in the form post
-	*/
-	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? wp_unslash(trim($_POST[$fieldname])) : '';
 	}
 
 }

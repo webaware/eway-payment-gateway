@@ -72,18 +72,6 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	}
 
 	/**
-	* Read a field from form post input.
-	*
-	* Guaranteed to return a string, trimmed of leading and trailing spaces, sloshes stripped out.
-	*
-	* @return string
-	* @param string $fieldname name of the field in the form post
-	*/
-	protected static function getPostValue($fieldname) {
-		return isset($_POST[$fieldname]) ? wp_unslash(trim($_POST[$fieldname])) : '';
-	}
-
-	/**
 	* attempt to map country code to name
 	* @param string $countryCode
 	* @return string
@@ -126,16 +114,18 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 				'x_card_code'		=> __('You must enter credit card CVN/CCV.', 'eway-payment-gateway'),
 			);
 
+			$postdata = new EwayPaymentsFormPost();
+
 			foreach ($required as $name => $msg) {
-				$value = self::getPostValue($name);
+				$value = $postdata->get_value($name);
 				if (empty($value)) {
 					$EM_Booking->add_error($msg);
 					$result = false;
 				}
 			}
 
-			$x_exp_date_month = self::getPostValue('x_exp_date_month');
-			$x_exp_date_year  = self::getPostValue('x_exp_date_year');
+			$x_exp_date_month = $postdata->get_value('x_exp_date_month');
+			$x_exp_date_year  = $postdata->get_value('x_exp_date_year');
 			if (!empty($x_exp_date_month) && !empty($x_exp_date_year)) {
 				// check that first day of month after expiry isn't earlier than today
 				$expired = mktime(0, 0, 0, 1 + $x_exp_date_month, 0, $x_exp_date_year);
@@ -306,13 +296,15 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	public function booking_form(){
 		$card_msg	= esc_html(get_option("em_{$this->gateway}_card_msg"));
 
-		$card_num	= esc_html(self::getPostValue('x_card_num'));
-		$card_name	= esc_html(self::getPostValue('x_card_name'));
-		$card_code	= esc_html(self::getPostValue('x_card_code'));
+		$postdata = new EwayPaymentsFormPost();
+
+		$card_num	= esc_html($postdata->get_value('x_card_num'));
+		$card_name	= esc_html($postdata->get_value('x_card_name'));
+		$card_code	= esc_html($postdata->get_value('x_card_code'));
 
 		// build drop-down items for months
 		$optMonths = '';
-		$exp_date_month = self::getPostValue('x_exp_date_month');
+		$exp_date_month = $postdata->get_value('x_exp_date_month');
 		foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
 			$selected = selected($option, $exp_date_month, false);
 			$optMonths .= "<option $selected value='$option'>$option</option>\n";
@@ -321,7 +313,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		// build drop-down items for years
 		$thisYear = (int) date('Y');
 		$optYears = '';
-  		$exp_date_year = self::getPostValue('x_exp_date_year');
+  		$exp_date_year = $postdata->get_value('x_exp_date_year');
 		foreach (range($thisYear, $thisYear + 15) as $year) {
 			$selected = selected($year, $exp_date_year, false);
 			$optYears .= "<option $selected value='$year'>$year</option>\n";
@@ -363,17 +355,19 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			$eway = new EwayPaymentsPayment($customerID, $isLiveSite);
 		}
 
+		$postdata = new EwayPaymentsFormPost();
+
 		$eway->invoiceDescription			= $EM_Booking->get_event()->event_name;
 		//~ $eway->invoiceDescription		= $EM_Booking->output('#_BOOKINGTICKETDESCRIPTION');
 		$eway->invoiceReference				= $EM_Booking->booking_id;						// customer invoice reference
 		$eway->transactionNumber			= $transactionID;
-		$eway->cardHoldersName				= self::getPostValue('x_card_name');
-		$eway->cardNumber					= strtr(self::getPostValue('x_card_num'), array(' ' => '', '-' => ''));
-		$eway->cardExpiryMonth				= self::getPostValue('x_exp_date_month');
-		$eway->cardExpiryYear				= self::getPostValue('x_exp_date_year');
-		$eway->cardVerificationNumber		= self::getPostValue('x_card_code');
+		$eway->cardHoldersName				= $postdata->get_value('x_card_name');
+		$eway->cardNumber					= $postdata->clean_cardnumber($postdata->get_value('x_card_num'));
+		$eway->cardExpiryMonth				= $postdata->get_value('x_exp_date_month');
+		$eway->cardExpiryYear				= $postdata->get_value('x_exp_date_year');
+		$eway->cardVerificationNumber		= $postdata->get_value('x_card_code');
 		$eway->emailAddress					= $EM_Booking->get_person()->user_email;
-		$eway->postcode						= self::getPostValue('zip');
+		$eway->postcode						= $postdata->get_value('zip');
 
 		// for Beagle (free) security
 		if (get_option("em_{$this->gateway}_beagle")) {
