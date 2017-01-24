@@ -68,9 +68,9 @@ class EwayPaymentsAWPCP {
 
 		$method = new stdClass;
 		$method->slug			= self::PAYMENT_METHOD;
-		$method->name			= 'eWAY Payment Gateway';
+		$method->name			= _x('eWAY Payment Gateway', 'AWPCP payment method name', 'eway-payment-gateway');
 		$method->icon			= $icon;
-		$method->description	= 'Credit card payment via eWAY';
+		$method->description	= _x('Credit card payment via eWAY', 'AWPCP payment method description', 'eway-payment-gateway');
 
 		$methods[] = $method;
 
@@ -84,43 +84,62 @@ class EwayPaymentsAWPCP {
 		global $awpcp;
 
 		// create a new section
-		$section = $awpcp->settings->add_section('payment-settings', 'eWAY Payment Gateway', 'eway', 100, array($awpcp->settings, 'section'));
+		$section = $awpcp->settings->add_section('payment-settings',
+						_x('eWAY Payment Gateway', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'eway', 100, array($awpcp->settings, 'section'));
 
-		$awpcp->settings->add_setting($section, 'activateeway', 'Activate eWAY?',
-			'checkbox', 1, 'Activate eWAY?');
+		$awpcp->settings->add_setting($section, 'activateeway',
+						_x('Activate eWAY?', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'checkbox', 1,
+						_x('Activate eWAY?', 'AWPCP payment settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_customerid', 'eWAY customer ID', 'textfield', EWAY_PAYMENTS_TEST_CUSTOMER,
-			'<br />your eWAY customer ID');
+		$awpcp->settings->add_setting($section, 'eway_customerid',
+						_x('eWAY customer ID', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textfield', EWAY_PAYMENTS_TEST_CUSTOMER,
+						'<br />' . _x('your eWAY customer ID', 'AWPCP payment settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_test_force', 'Force test ID for sandbox?',
-			'checkbox', 1, 'Force special test ID 87654321 for sandbox?');
+		$awpcp->settings->add_setting($section, 'eway_test_force',
+						_x('Force test ID for sandbox?', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'checkbox', 1,
+						_x('Force special test ID 87654321 for sandbox?', 'AWPCP payment settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_stored', 'Stored payments', 'checkbox', 0,
-			"Stored payments records payment details but doesn't bill immediately. Useful when ads must be approved by admin, allowing you to reject payments for rejected ads.");
+		$awpcp->settings->add_setting($section, 'eway_stored',
+						_x('Stored payments', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'checkbox', 0,
+						__("Stored payments records payment details but doesn't bill immediately. Useful when ads must be approved by admin, allowing you to reject payments for rejected ads.", 'eway-payment-gateway'));
 
 		// TODO: add Beagle if new version supports taking country info before billing
 		//~ $awpcp->settings->add_setting($section, 'eway_beagle', 'Beagle (anti-fraud)', 'checkbox', 0,
 			//~ "<a href='https://www.eway.com.au/developers/api/beagle-lite' target='_blank'>Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle");
 
 		$log_options = array(
-			'off' 		=> 'Off',
-			'info'	 	=> 'All messages',
-			'error' 	=> 'Errors only',
+			'off' 		=> _x('Off', 'logging settings', 'eway-payment-gateway'),
+			'info'	 	=> _x('All messages', 'logging settings', 'eway-payment-gateway'),
+			'error' 	=> _x('Errors only', 'logging settings', 'eway-payment-gateway'),
 		);
 		$log_descripton = sprintf('<br />%s<br />%s<br />%s',
-			'enable logging to assist trouble shooting',
-			'the log file can be found in:',
-			substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH)));
-		$awpcp->settings->add_setting($section, 'eway_logging', 'Logging', 'select', 'off', $log_descripton, array('options' => $log_options));
+							__('enable logging to assist trouble shooting', 'eway-payment-gateway'),
+							__('the log file can be found in this folder:', 'eway-payment-gateway'),
+							substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH)));
+		$awpcp->settings->add_setting($section, 'eway_logging',
+						_x('Logging', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'select', 'off', $log_descripton, array('options' => $log_options));
 
-		$awpcp->settings->add_setting($section, 'eway_card_message', 'Credit card message', 'textfield', '',
-			'<br />Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;');
+		$awpcp->settings->add_setting($section, 'eway_card_message',
+						_x('Credit card message', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textfield', '',
+						'<br />' . _x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'AWPCP payment settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_site_seal_code', 'eWAY Site Seal', 'textarea', '',
-			'<br /><a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">generate your site seal on the eWAY website</a> and paste it here');
+		$awpcp->settings->add_setting($section, 'eway_site_seal_code',
+						_x('eWAY Site Seal', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textarea', '',
+						sprintf('<br /><a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
+							__('generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')));
 
-		$awpcp->settings->add_setting($section, 'eway_icon', 'Payment Method Icon', 'textfield', '',
-			'<br />URL to a custom icon to show for the payment method.');
+		$awpcp->settings->add_setting($section, 'eway_icon',
+						_x('Payment Method Icon', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textfield', '',
+						'<br />' . _x('URL to a custom icon to show for the payment method.', 'AWPCP payment settings label', 'eway-payment-gateway'));
 	}
 
 	/**
@@ -128,7 +147,8 @@ class EwayPaymentsAWPCP {
 	*/
 	public function awpcpCheckoutStepText($text, $form_values, $transaction) {
 		if ($transaction->get('payment-method') == self::PAYMENT_METHOD) {
-			$text = "Please enter your credit card details for secure payment via <a target='_blank' href='https://www.eway.com.au/'>eWAY</a>.";
+			$text = sprintf(__('Please enter your credit card details for secure payment via <a target="_blank" href="%s">eWAY</a>.', 'eway-payment-gateway'),
+						'https://www.eway.com.au/');
 			$text = apply_filters('awpcp_eway_checkout_message', $text, $form_values, $transaction);
 		}
 
@@ -146,7 +166,7 @@ class EwayPaymentsAWPCP {
 
 			$item = $transaction->get_item(0); // no support for multiple items
 			if (is_null($item)) {
-				return __('There was an error processing your payment.', 'AWPCP');
+				return __('There was an error processing your payment.', 'eway-payment-gateway');
 			}
 
 			// get URL for where to post the checkout form data
@@ -213,23 +233,23 @@ class EwayPaymentsAWPCP {
 		$expiryError = false;
 
 		if (self::getPostValue('eway_card_number') === '') {
-			$errors[] = 'Please enter credit card number';
+			$errors[] = __('Please enter credit card number', 'eway-payment-gateway');
 		}
 
 		if (self::getPostValue('eway_card_name') === '') {
-			$errors[] = 'Please enter card holder name';
+			$errors[] = __('Please enter card holder name', 'eway-payment-gateway');
 		}
 
 		$eway_expiry_month = self::getPostValue('eway_expiry_month');
 		if (empty($eway_expiry_month) || !preg_match('/^(?:0[1-9]|1[012])$/', $eway_expiry_month)) {
-			$errors[] = 'Please select credit card expiry month';
+			$errors[] = __('Please select credit card expiry month', 'eway-payment-gateway');
 			$expiryError = true;
 		}
 
 		// FIXME: if this code makes it into the 2100's, update this regex!
 		$eway_expiry_year = self::getPostValue('eway_expiry_year');
 		if (empty($eway_expiry_year) || !preg_match('/^20\d\d$/', $eway_expiry_year)) {
-			$errors[] = 'Please select credit card expiry year';
+			$errors[] = __('Please select credit card expiry year', 'eway-payment-gateway');
 			$expiryError = true;
 		}
 
@@ -238,12 +258,12 @@ class EwayPaymentsAWPCP {
 			$expired = mktime(0, 0, 0, 1 + $eway_expiry_month, 0, $eway_expiry_year);
 			$today = time();
 			if ($expired < $today) {
-				$errors[] = 'Credit card expiry has passed';
+				$errors[] = __('Credit card expiry has passed', 'eway-payment-gateway');
 			}
 		}
 
 		if (self::getPostValue('eway_cvn') === '') {
-			$errors[] = 'Please enter CVN (Card Verification Number)';
+			$errors[] = __('Please enter CVN (Card Verification Number)', 'eway-payment-gateway');
 		}
 
 		return $errors;
@@ -284,7 +304,7 @@ class EwayPaymentsAWPCP {
 					// transaction was unsuccessful, so record transaction number and the error
 					$transaction->set('txn-id', $response->transactionNumber);
 					$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_FAILED);
-					$transaction->errors[] = nl2br(esc_html($response->error . "\nuse your browser's back button to try again."));
+					$transaction->errors[] = nl2br(esc_html($response->error . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway')));
 					$valid = false;
 
 					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->error));
@@ -293,7 +313,7 @@ class EwayPaymentsAWPCP {
 			catch (EwayPaymentsException $e) {
 				// an exception occured, so record the error
 				$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_FAILED);
-				$transaction->errors[] = nl2br(esc_html($e->getMessage() . "\nuse your browser's back button to try again."));
+				$transaction->errors[] = nl2br(esc_html($e->getMessage() . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway')));
 				$valid = false;
 
 				$this->logger->log('error', $e->getMessage());

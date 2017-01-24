@@ -34,6 +34,7 @@ class EwayPaymentsPlugin {
 		$this->urlBase = plugin_dir_url(EWAY_PAYMENTS_PLUGIN_FILE);
 
 		add_action('init', array($this, 'init'));
+		add_action('init', array($this, 'loadTextDomain'));
 		add_filter('plugin_row_meta', array($this, 'addPluginDetailsLinks'), 10, 2);
 		add_action('admin_notices', array($this, 'checkPrerequisites'));
 
@@ -64,6 +65,13 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
+	* load text translations
+	*/
+	public function loadTextDomain() {
+		load_plugin_textdomain('eway-payment-gateway');
+	}
+
+	/**
 	* check for required PHP extensions, tell admin if any are missing
 	*/
 	public function checkPrerequisites() {
@@ -74,7 +82,7 @@ class EwayPaymentsPlugin {
 		}
 
 		// need these PHP extensions too
-		$prereqs = array('libxml', 'SimpleXML', 'xmlwriter');
+		$prereqs = array('json', 'libxml', 'pcre', 'SimpleXML', 'xmlwriter');
 		$missing = array();
 		foreach ($prereqs as $ext) {
 			if (!extension_loaded($ext)) {
@@ -113,10 +121,11 @@ class EwayPaymentsPlugin {
 	* action hook for adding plugin details links
 	*/
 	public function addPluginDetailsLinks($links, $file) {
-		if ($file == EWAY_PAYMENTS_PLUGIN_NAME) {
-			$links[] = '<a href="https://wordpress.org/support/plugin/eway-payment-gateway">' . __('Get help') . '</a>';
-			$links[] = '<a href="https://wordpress.org/plugins/eway-payment-gateway/">' . __('Rating') . '</a>';
-			$links[] = '<a href="https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway">' . __('Donate') . '</a>';
+		if ($file === EWAY_PAYMENTS_PLUGIN_NAME) {
+			$links[] = sprintf('<a href="https://wordpress.org/support/plugin/eway-payment-gateway" target="_blank">%s</a>', _x('Get help', 'plugin details links', 'eway-payment-gateway'));
+			$links[] = sprintf('<a href="https://wordpress.org/plugins/eway-payment-gateway/" target="_blank">%s</a>', _x('Rating', 'plugin details links', 'eway-payment-gateway'));
+			$links[] = sprintf('<a href="https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway" target="_blank">%s</a>', _x('Translate', 'plugin details links', 'eway-payment-gateway'));
+			$links[] = sprintf('<a href="https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway" target="_blank">%s</a>', _x('Donate', 'plugin details links', 'eway-payment-gateway'));
 		}
 
 		return $links;
@@ -187,11 +196,12 @@ class EwayPaymentsPlugin {
 			$msg = wp_remote_retrieve_response_message($response);
 
 			if (empty($msg)) {
-				$msg = sprintf('Error posting eWAY request: %s', $code);
+				/* translators: %s = the error code */
+				$msg = sprintf(__('Error posting eWAY request: %s', 'eway-payment-gateway'), $code);
 			}
 			else {
 				/* translators: 1. the error code; 2. the error message */
-				$msg = sprintf('Error posting eWAY request: %1$s, %2$s', $code, $msg);
+				$msg = sprintf(__('Error posting eWAY request: %1$s, %2$s', 'eway-payment-gateway'), $code, $msg);
 			}
 			throw new EwayPaymentsException($msg);
 		}

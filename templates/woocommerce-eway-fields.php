@@ -21,34 +21,34 @@ if (!defined('ABSPATH')) {
 	<?php endif; ?>
 
 	<p class="form-row form-row-first">
-		<label for="eway_card_number">Credit Card Number <span class="required">*</span></label>
+		<label for="eway_card_number"><?php esc_html_e('Credit Card Number', 'eway-payment-gateway'); ?> <span class="required">*</span></label>
 		<input type="text" value="" pattern="[0-9]*" name="eway_card_number" id="eway_card_number"
-			title="only digits 0-9 are accepted" autocomplete="off" />
+			title="<?php esc_html_e('only digits 0-9 are accepted', 'eway-payment-gateway'); ?>" autocomplete="off" />
 	</p>
 
 	<p class="form-row form-row-last">
-		<label for="eway_card_name">Card Holder's Name <span class="required">*</span></label>
+		<label for="eway_card_name"><?php esc_html_e("Card Holder's Name", 'eway-payment-gateway'); ?> <span class="required">*</span></label>
 		<input type="text" value="" name="eway_card_name" id="eway_card_name" autocomplete="off" />
 	</p>
 
 	<div class="clear"></div>
 
 	<p class="form-row form-row-first">
-		<label for="eway_expiry_month">Credit Card Expiry <span class="required">*</span></label>
-		<select name="eway_expiry_month" id="eway_expiry_month" class="woocommerce-select woocommerce-cc-month" title="credit card expiry month">
-			<option value="">Month</option>
+		<label for="eway_expiry_month"><?php esc_html_e('Credit Card Expiry', 'eway-payment-gateway'); ?> <span class="required">*</span></label>
+		<select name="eway_expiry_month" id="eway_expiry_month" class="woocommerce-select woocommerce-cc-month" title="<?php esc_html_e('credit card expiry month', 'eway-payment-gateway'); ?>">
+			<option value=""><?php echo esc_html_x('Month', 'credit card field', 'eway-payment-gateway'); ?></option>
 			<?php echo $optMonths; ?>
 		</select>
-		<select name="eway_expiry_year" class="woocommerce-select woocommerce-cc-year" title="credit card expiry year">
-			<option value="">Year</option>
+		<select name="eway_expiry_year" class="woocommerce-select woocommerce-cc-year" title="<?php esc_html_e('credit card expiry year', 'eway-payment-gateway'); ?>">
+			<option value=""><?php echo esc_html_x('Year', 'credit card field', 'eway-payment-gateway'); ?></option>
 			<?php echo $optYears; ?>
 		</select>
 	</p>
 
 	<p class="form-row form-row-last">
-		<label for="eway_cvn">CVN/CVV <span class="required">*</span></label>
+		<label for="eway_cvn"><?php echo esc_html_e('CVN/CVV', 'eway-payment-gateway'); ?> <span class="required">*</span></label>
 		<input type="text" size="4" maxlength="4" value="" pattern="[0-9]*" name="eway_cvn" id="eway_cvn"
-			title="only digits 0-9 are accepted" autocomplete="off" />
+			title="<?php esc_html_e('only digits 0-9 are accepted', 'eway-payment-gateway'); ?>" autocomplete="off" />
 	</p>
 
 	<div class="clear"></div>

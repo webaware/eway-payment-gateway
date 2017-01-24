@@ -19,17 +19,17 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	*/
 	public function __construct() {
 		$this->gateway						= 'eway';
-		$this->title						= 'eWAY';
+		$this->title						= _x('eWAY', 'Events Manager payment method title', 'eway-payment-gateway');
 		$this->status						= 4;
-		$this->status_txt					= 'Processing (eWAY)';
+		$this->status_txt					= _x('Processing (eWAY)', 'Events Manager status text', 'eway-payment-gateway');
 		$this->button_enabled				= false;
 		$this->supports_multiple_bookings	= true;
 
 		// ensure options are present, set to defaults if not
 		$defaults = array (
-			"em_{$this->gateway}_option_name"				=> 'Credit Card',
-			"em_{$this->gateway}_booking_feedback"			=> 'Booking successful.',
-			"em_{$this->gateway}_booking_feedback_free"		=> 'Booking successful. You have not been charged for this booking.',
+			"em_{$this->gateway}_option_name"				=> _x('Credit Card', 'Events Manager payment method name', 'eway-payment-gateway'),
+			"em_{$this->gateway}_booking_feedback"			=> _x('Booking successful.', 'Events Manager booking feedback', 'eway-payment-gateway'),
+			"em_{$this->gateway}_booking_feedback_free"		=> _x('Booking successful. You have not been charged for this booking.', 'Events Manager booking feedback free', 'eway-payment-gateway'),
 			"em_{$this->gateway}_cust_id"					=> EWAY_PAYMENTS_TEST_CUSTOMER,
 			"em_{$this->gateway}_stored"					=> '0',
 			"em_{$this->gateway}_beagle"					=> '0',
@@ -119,11 +119,11 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		// only perform validation if this payment method has been selected
 		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] == $this->gateway) {
 			$required = array (
-				'x_card_name'		=> 'You must enter credit card holder name.',
-				'x_card_num'		=> 'You must enter credit card number.',
-				'x_exp_date_month'	=> 'You must enter credit card expiry month.',
-				'x_exp_date_year'	=> 'You must enter credit card expiry year.',
-				'x_card_code'		=> 'You must enter credit card CVN/CCV.',
+				'x_card_name'		=> __('You must enter credit card holder name.', 'eway-payment-gateway'),
+				'x_card_num'		=> __('You must enter credit card number.', 'eway-payment-gateway'),
+				'x_exp_date_month'	=> __('You must enter credit card expiry month.', 'eway-payment-gateway'),
+				'x_exp_date_year'	=> __('You must enter credit card expiry year.', 'eway-payment-gateway'),
+				'x_card_code'		=> __('You must enter credit card CVN/CCV.', 'eway-payment-gateway'),
 			);
 
 			foreach ($required as $name => $msg) {
@@ -141,7 +141,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 				$expired = mktime(0, 0, 0, 1 + $x_exp_date_month, 0, $x_exp_date_year);
 				$today = time();
 				if ($expired < $today) {
-					$EM_Booking->add_error('Credit card expiry has passed');
+					$EM_Booking->add_error(__('Credit card expiry has passed', 'eway-payment-gateway'));
 					$result = false;
 				}
 			}
@@ -436,10 +436,10 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 				$notes = array();
 				if (!empty($response->authCode)) {
-					$notes[] = 'Authcode: ' . $response->authCode;
+					$notes[] = sprintf(__('Authcode: %s', 'eway-payment-gateway'), $response->authCode);
 				}
 				if (!empty($response->beagleScore)) {
-					$notes[] = 'Beagle score: ' . $response->beagleScore;
+					$notes[] = sprintf(__('Beagle score: %s', 'eway-payment-gateway'), $response->beagleScore);
 				}
 				$note = implode("\n", $notes);
 

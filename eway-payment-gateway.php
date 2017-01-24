@@ -6,6 +6,7 @@ Description: Integrate some popular WordPress plugins with the eWAY credit card 
 Version: 4.0.0-dev
 Author: WebAware
 Author URI: https://shop.webaware.com.au/
+Text Domain: eway-payment-gateway
 */
 
 /*

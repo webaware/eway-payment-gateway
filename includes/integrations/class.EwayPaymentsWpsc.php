@@ -24,14 +24,14 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	public static function register($gateways) {
 		// register the gateway class and additional functions
 		$gateways[] = array (
-			'name'						=> 'eWAY payment gateway',
+			'name'						=> _x('eWAY payment gateway', 'WP eCommerce payment method name', 'eway-payment-gateway'),
 			'api_version'				=> 2.0,
 			'image'						=> EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png',
 			'internalname'				=> self::WPSC_GATEWAY_NAME,
 			'class_name'				=> __CLASS__,
 			'has_recurring_billing'		=> false,
 			'wp_admin_cannot_cancel'	=> true,
-			'display_name'				=> 'eWAY Credit Card Payment',
+			'display_name'				=> _x('eWAY Credit Card Payment', 'WP eCommerce payment method display name', 'eway-payment-gateway'),
 			'form'						=> 'EwayPaymentsWpsc_configForm',		// called as variable function name, wp-e-commerce is _doing_it_wrong(), again!
 			'submit_function'			=> array(__CLASS__, 'saveConfig'),
 			'payment_type'				=> 'credit_card',
@@ -144,7 +144,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			$this->purchase_id = $purchase_logs->get('id');
 		}
 		else {
-			$this->set_error_message('No cart ID and no active session!');
+			$this->set_error_message(__('No cart ID and no active session!', 'eway-payment-gateway'));
 			return;
 		}
 
@@ -236,7 +236,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 				);
 
 				if (!empty($response->beagleScore)) {
-					$log_details['notes'] = 'Beagle score: ' . $response->beagleScore;
+					$log_details['notes'] = sprintf(__('Beagle score: %s', 'eway-payment-gateway'), $response->beagleScore);
 				}
 
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
@@ -301,24 +301,24 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$expiryError = FALSE;
 
 		if (empty($this->collected_gateway_data['card_number'])) {
-			$this->set_error_message('Please enter credit card number');
+			$this->set_error_message(__('Please enter credit card number', 'eway-payment-gateway'));
 			$errors++;
 		}
 
 		if (empty($this->collected_gateway_data['card_name'])) {
-			$this->set_error_message('Please enter card holder name');
+			$this->set_error_message(__('Please enter card holder name', 'eway-payment-gateway'));
 			$errors++;
 		}
 
 		if (empty($this->collected_gateway_data['expiry_month']) || !preg_match('/^(?:0[1-9]|1[012])$/', $this->collected_gateway_data['expiry_month'])) {
-			$this->set_error_message('Please select credit card expiry month');
+			$this->set_error_message(__('Please select credit card expiry month', 'eway-payment-gateway'));
 			$errors++;
 			$expiryError = TRUE;
 		}
 
 		// FIXME: if this code makes it into the 2100's, update this regex!
 		if (empty($this->collected_gateway_data['expiry_year']) || !preg_match('/^20\d\d$/', $this->collected_gateway_data['expiry_year'])) {
-			$this->set_error_message('Please select credit card expiry year');
+			$this->set_error_message(__('Please select credit card expiry year', 'eway-payment-gateway'));
 			$errors++;
 			$expiryError = TRUE;
 		}
@@ -328,13 +328,13 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			$expired = mktime(0, 0, 0, 1 + $this->collected_gateway_data['expiry_month'], 0, $this->collected_gateway_data['expiry_year']);
 			$today = time();
 			if ($expired < $today) {
-				$this->set_error_message('Credit card expiry has passed');
+				$this->set_error_message(__('Credit card expiry has passed', 'eway-payment-gateway'));
 				$errors++;
 			}
 		}
 
 		if (empty($this->collected_gateway_data['c_v_n'])) {
-			$this->set_error_message('Please enter CVN (Card Verification Number)');
+			$this->set_error_message(__('Please enter CVN (Card Verification Number)', 'eway-payment-gateway'));
 			$errors++;
 		}
 

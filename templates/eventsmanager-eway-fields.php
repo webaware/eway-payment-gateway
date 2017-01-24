@@ -22,28 +22,28 @@ if (!defined('ABSPATH')) {
 <?php endif; ?>
 
 <p class="em-bookings-form-gateway-cardno">
-	<label for="eway_card_num"><?php  _e('Credit Card Number','em-pro'); ?></label>
+	<label for="eway_card_num"><?php esc_html_e('Credit Card Number', 'eway-payment-gateway'); ?></label>
 	<input type="text" size="15" name="x_card_num" id="eway_card_num" value="<?php echo $card_num; ?>" class="input" pattern="[0-9]*"
-		title="only digits 0-9 are accepted" autocomplete="off" />
+		title="<?php esc_html_e('only digits 0-9 are accepted', 'eway-payment-gateway'); ?>" autocomplete="off" />
 </p>
 
 <p class="em-bookings-form-gateway-cardname">
-	<label for="eway_card_name">Name of Card Holder</label>
+	<label for="eway_card_name"><?php esc_html_e("Card Holder's Name", 'eway-payment-gateway'); ?></label>
 	<input type="text" size="15" name="x_card_name" id="eway_card_name" value="<?php echo $card_name; ?>" class="input" autocomplete="off" />
 </p>
 
 <p class="em-bookings-form-gateway-expiry">
-	<label for="eway_exp_date_month"><?php  _e('Expiry Date','em-pro'); ?></label>
-	<select name="x_exp_date_month" id="eway_exp_date_month" title="credit card expiry month">
+	<label for="eway_exp_date_month"><?php esc_html_e('Credit Card Expiry', 'eway-payment-gateway'); ?></label>
+	<select name="x_exp_date_month" id="eway_exp_date_month" title="<?php esc_html_e('credit card expiry month', 'eway-payment-gateway'); ?>">
 		<?php echo $optMonths; ?>
 	</select> /
-	<select name="x_exp_date_year" title="credit card expiry year">
+	<select name="x_exp_date_year" title="<?php esc_html_e('credit card expiry year', 'eway-payment-gateway'); ?>">
 		<?php echo $optYears; ?>
 	</select>
 </p>
 
 <p class="em-bookings-form-ccv">
-	<label for="eway_card_code">CVN/CVV</label>
+	<label for="eway_card_code"><?php echo esc_html_e('CVN/CVV', 'eway-payment-gateway'); ?></label>
 	<input type="text" size="4" name="x_card_code" id="eway_card_code" value="<?php echo $card_code; ?>" class="input" maxlength="4" pattern="[0-9]*"
-		title="only digits 0-9 are accepted" autocomplete="off" />
+		title="<?php esc_html_e('only digits 0-9 are accepted', 'eway-payment-gateway'); ?>" autocomplete="off" />
 </p>

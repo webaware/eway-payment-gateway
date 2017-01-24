@@ -20,9 +20,9 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 		$this->id						= 'eway_payments';
 		$this->icon						= apply_filters('woocommerce_eway_icon', EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png');
-		$this->method_title				= 'eWAY';
-		$this->admin_page_heading 		= 'eWAY payment gateway';
-		$this->admin_page_description 	= 'Integration with the eWAY Direct API credit card payment gateway.';
+		$this->method_title				= _x('eWAY', 'WooCommerce payment method title', 'eway-payment-gateway');
+		$this->admin_page_heading 		= _x('eWAY payment gateway', 'WooCommerce admin page heading', 'eway-payment-gateway');
+		$this->admin_page_description 	= _x('Integration with the eWAY credit card payment gateway.', 'eway-payment-gateway');
 		$this->has_fields = true;
 
 		// load form fields.
@@ -78,37 +78,37 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 		$this->form_fields = array(
 			'enabled' => array(
-							'title' 		=> __( 'Enable/Disable', 'woocommerce' ),
+							'title' 		=> translate('Enable/Disable', 'woocommerce'),
 							'type' 			=> 'checkbox',
-							'label' 		=> 'Enable eWAY credit card payment',
+							'label' 		=> __('Enable eWAY credit card payment', 'eway-payment-gateway'),
 							'default' 		=> 'no',
 						),
 			'title' => array(
-							'title' 		=> __( 'Method Title', 'woocommerce' ),
+							'title' 		=> translate('Method Title', 'woocommerce'),
 							'type' 			=> 'text',
-							'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
+							'description' 	=> translate('This controls the title which the user sees during checkout.', 'woocommerce'),
 							'desc_tip'		=> true,
-							'default'		=> 'Credit card',
+							'default'		=> _x('Credit card', 'WooCommerce payment method title', 'eway-payment-gateway'),
 						),
 			'description' => array(
-							'title' 		=> __( 'Description', 'woocommerce' ),
+							'title' 		=> translate('Description', 'woocommerce'),
 							'type' 			=> 'textarea',
-							'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
+							'description' 	=> translate('This controls the description which the user sees during checkout.', 'woocommerce'),
 							'desc_tip'		=> true,
-							'default'		=> 'Pay with your credit card using eWAY secure checkout',
+							'default'		=> _x('Pay with your credit card using eWAY secure checkout', 'WooCommerce payment method description', 'eway-payment-gateway'),
 						),
 			'availability' => array(
-							'title' 		=> __( 'Method availability', 'woocommerce' ),
+							'title' 		=> translate('Method availability', 'woocommerce'),
 							'type' 			=> 'select',
 							'default' 		=> 'all',
 							'class'			=> 'availability',
 							'options'		=> array(
-								'all' 		=> __( 'All allowed countries', 'woocommerce' ),
-								'specific' 	=> __( 'Specific Countries', 'woocommerce' ),
+								'all' 		=> translate('All allowed countries', 'woocommerce'),
+								'specific' 	=> translate('Specific Countries', 'woocommerce'),
 							),
 						),
 			'countries' => array(
-							'title' 		=> __( 'Specific Countries', 'woocommerce' ),
+							'title' 		=> translate('Specific Countries', 'woocommerce'),
 							'type' 			=> 'multiselect',
 							'class'			=> 'chosen_select',
 							'css'			=> 'width: 450px;',
@@ -117,71 +117,79 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 						),
 
 			'eway_customerid' => array(
-							'title' 		=> 'eWAY customer ID',
+							'title' 		=> _x('eWAY customer ID', 'WooCommerce settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'description' 	=> '',
 							'default' 		=> EWAY_PAYMENTS_TEST_CUSTOMER,
 						),
 			'eway_stored' => array(
-							'title' 		=> 'Stored payments',
-							'label' 		=> 'enable stored payments',
+							'title' 		=> _x('Stored payments', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'label' 		=> __('enable stored payments', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> "Stored payments records payment details but doesn't bill immediately. Useful for drop-shipping merchants.<em id='woocommerce-eway-admin-stored-test' style='color:#c00'><br />NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.</em>",
+							'description' 	=> sprintf('%s <em id="woocommerce-eway-admin-stored-test" style="color:#c00"><br />%s</em>',
+													__("Stored payments records payment details but doesn't bill immediately. Useful for drop-shipping merchants.", 'eway-payment-gateway'),
+													__('NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.', 'eway-payment-gateway')),
 							'default' 		=> 'no',
 						),
 			'eway_sandbox' => array(
-							'title' 		=> 'Sandbox mode',
-							'label' 		=> 'enable sandbox (testing) mode',
+							'title' 		=> _x('Sandbox mode', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'label' 		=> __('enable sandbox (testing) mode', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> 'Use the sandbox testing environment, no live payments are accepted; use test card number 4444333322221111',
+							'description' 	=> __('Use the sandbox testing environment, no live payments are accepted; use test card number 4444333322221111', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'yes',
 						),
 			'eway_beagle' => array(
-							'title' 		=> 'Beagle (anti-fraud)',
-							'label' 		=> 'enable Beagle (free) anti-fraud',
+							'title' 		=> _x('Beagle (anti-fraud)', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'label' 		=> __('enable Beagle (free) anti-fraud', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> '<a href="https://www.eway.com.au/developers/api/beagle-lite" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle.<em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />Beagle is not available for Stored Payments</em>',
+							'description' 	=> sprintf('%s <em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />%s</em>',
+													sprintf(__('<a href="%s" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle.', 'eway-payment-gateway'),
+														'https://www.eway.com.au/developers/api/beagle-lite'),
+													__('Beagle is not available for Stored Payments.', 'eway-payment-gateway')),
 							'default' 		=> 'no',
 						),
 			'eway_logging' => array(
-							'title' 		=> 'Logging',
-							'label' 		=> 'enable logging to assist trouble shooting',
+							'title' 		=> _x('Logging', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'label' 		=> __('enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							'type' 			=> 'select',
-							'description'	=> 'the log file can be found in ' . substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH)),
+							'description'	=>	sprintf('%s<br/>%s',
+													__('the log file can be found in this folder:', 'eway-payment-gateway'),
+													substr(EwayPaymentsLogging::getLogFolder(), strlen(ABSPATH))),
 							'default' 		=> 'off',
 							'options'		=> array(
-								'off' 		=> 'Off',
-								'info'	 	=> 'All messages',
-								'error' 	=> 'Errors only',
+								'off' 		=> _x('Off', 'logging settings', 'eway-payment-gateway'),
+								'info'	 	=> _x('All messages', 'logging settings', 'eway-payment-gateway'),
+								'error' 	=> _x('Errors only', 'logging settings', 'eway-payment-gateway'),
 							),
 						),
 			'eway_card_form' => array(
-							'title' 		=> 'Credit card fields',
-							'label' 		=> 'use WooCommerce standard credit card fields',
+							'title' 		=> _x('Credit card fields', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'label' 		=> __('use WooCommerce standard credit card fields', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> 'Ticked, the standard WooCommerce credit card fields will be used. Unticked, a custom template will be used for the credit card fields.',
+							'description' 	=> __('Ticked, the standard WooCommerce credit card fields will be used. Unticked, a custom template will be used for the credit card fields.', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> (is_array($settings) ? 'no' : 'yes'),
 						),
 			'eway_card_msg' => array(
-							'title' 		=> 'Credit card message',
+							'title' 		=> _x('Credit card message', 'WooCommerce settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
-							'description' 	=> 'Message to show above credit card fields, e.g. "Visa and Mastercard only"',
+							'description' 	=> __('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default'		=> '',
 						),
 			'eway_site_seal' => array(
-							'title' 		=> 'Show eWAY Site Seal',
-							'label' 		=> 'show the eWAY site seal after the credit card fields',
+							'title' 		=> _x('Show eWAY Site Seal', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'label' 		=> __('show the eWAY site seal after the credit card fields', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> 'Add the verified eWAY Site Seal to your checkout',
+							'description' 	=> __('Add the verified eWAY Site Seal to your checkout', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
 						),
 			'eway_site_seal_code' => array(
 							'type' 			=> 'textarea',
-							'description' 	=> '<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">generate your site seal on the eWAY website</a> and paste it here',
+							'description' 	=> sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
+													__('generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
 							'default'		=> '',
 							'css'			=> 'height:14em',
 						),
@@ -339,24 +347,24 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$ccfields = $this->getCardFields();
 
 		if ($ccfields['eway_card_number'] === '') {
-			wc_add_notice('Please enter credit card number', 'error');
+			wc_add_notice(__('Please enter credit card number', 'eway-payment-gateway'), 'error');
 			$errors++;
 		}
 
 		if ($ccfields['eway_card_name'] === '') {
-			wc_add_notice('Please enter card holder name', 'error');
+			wc_add_notice(__('Please enter card holder name', 'eway-payment-gateway'), 'error');
 			$errors++;
 		}
 
 		if (empty($ccfields['eway_expiry_month']) || !preg_match('/^(?:0[1-9]|1[012])$/', $ccfields['eway_expiry_month'])) {
-			wc_add_notice('Please select credit card expiry month', 'error');
+			wc_add_notice(__('Please select credit card expiry month', 'eway-payment-gateway'), 'error');
 			$errors++;
 			$expiryError = true;
 		}
 
 		// FIXME: if this code makes it into the 2100's, update this regex!
 		if (empty($ccfields['eway_expiry_year']) || !preg_match('/^20\d\d$/', $ccfields['eway_expiry_year'])) {
-			wc_add_notice('Please select credit card expiry year', 'error');
+			wc_add_notice(__('Please select credit card expiry year', 'eway-payment-gateway'), 'error');
 			$errors++;
 			$expiryError = true;
 		}
@@ -366,13 +374,13 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			$expired = mktime(0, 0, 0, 1 + $ccfields['eway_expiry_month'], 0, $ccfields['eway_expiry_year']);
 			$today = time();
 			if ($expired < $today) {
-				wc_add_notice('Credit card expiry has passed', 'error');
+				wc_add_notice(__('Credit card expiry has passed', 'eway-payment-gateway'), 'error');
 				$errors++;
 			}
 		}
 
 		if ($ccfields['eway_cvn'] === '') {
-			wc_add_notice('Please enter CVN (Card Verification Number)', 'error');
+			wc_add_notice(__('Please enter CVN (Card Verification Number)', 'eway-payment-gateway'), 'error');
 			$errors++;
 		}
 
@@ -476,7 +484,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 				if ($this->eway_stored == 'yes') {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
 					$order->reduce_order_stock();
-					$order->update_status('on-hold', 'Awaiting stored payment');
+					$order->update_status('on-hold', __('Awaiting stored payment', 'eway-payment-gateway'));
 					unset($_SESSION['order_awaiting_payment']);
 				}
 				else {

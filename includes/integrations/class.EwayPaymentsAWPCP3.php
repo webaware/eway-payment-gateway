@@ -105,7 +105,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 					// transaction was unsuccessful, so record transaction number and the error
 					$transaction->set('txn-id', $response->transactionNumber);
 					$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
-					$transaction->errors['validation'] = nl2br(esc_html($response->error . "\nuse your browser's back button to try again."));
+					$transaction->errors['validation'] = nl2br(esc_html($response->error . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway')));
 					$success = false;
 
 					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->error));
@@ -114,7 +114,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 			catch (EwayPaymentsException $e) {
 				// an exception occured, so record the error
 				$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
-				$transaction->errors['validation'] = nl2br(esc_html($e->getMessage()) . "\nuse your browser's back button to try again.");
+				$transaction->errors['validation'] = nl2br(esc_html($e->getMessage()) . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway'));
 				$success = false;
 
 				$this->logger->log('error', $e->getMessage());
