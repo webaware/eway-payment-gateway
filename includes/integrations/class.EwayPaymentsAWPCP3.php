@@ -18,48 +18,48 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* @param EwayPaymentsAWPCP $integration the integration code for AWPCP v < 3.0
 	* @param EwayPaymentsLogging $logger
 	*/
-    public function __construct($integration, $logger) {
+	public function __construct($integration, $logger) {
 		$this->integration = $integration;
 		$this->logger      = $logger;
 
 		$methods = $this->integration->awpcpPaymentMethods(array());
 		$method = $methods[0];
 
-        parent::__construct($method->slug, $method->name, $method->description, $method->icon);
-    }
+		parent::__construct($method->slug, $method->name, $method->description, $method->icon);
+	}
 
 	/**
 	* declare type of integration as showing a custom form for credit card details
 	* @return string
 	*/
-    public function get_integration_type() {
-        return self::INTEGRATION_CUSTOM_FORM;
-    }
+	public function get_integration_type() {
+		return self::INTEGRATION_CUSTOM_FORM;
+	}
 
 	/**
 	* process payment of a transaction -- show the checkout form
 	* @param AWPCP_Payment_Transaction $transaction
 	* @return string
 	*/
-    public function process_payment($transaction) {
+	public function process_payment($transaction) {
 		$form = "<p>" . $this->integration->awpcpCheckoutStepText('', false, $transaction) . "</p>\n";
-        $form .= $this->integration->awpcpCheckoutForm('', $transaction);
-        return $form;
-    }
+		$form .= $this->integration->awpcpCheckoutForm('', $transaction);
+		return $form;
+	}
 
 	/**
 	* process payment notification
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
-    public function process_payment_notification($transaction) {
+	public function process_payment_notification($transaction) {
 		return;
-    }
+	}
 
 	/**
 	* process completed transaction
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
-    public function process_payment_completed($transaction) {
+	public function process_payment_completed($transaction) {
 		$errors = $this->integration->verifyForm($transaction);
 		$success = (count($errors) === 0);
 
@@ -128,8 +128,8 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* process payment cancellation
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
-    public function process_payment_canceled($transaction) {
-        // TODO: process_payment_canceled
-    }
+	public function process_payment_canceled($transaction) {
+		// TODO: process_payment_canceled
+	}
 
 }
