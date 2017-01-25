@@ -67,6 +67,7 @@ class EwayPaymentsFormPost {
     */
     public function verifyCardDetails($fields) {
 		$errors = array();
+		$expiryError = false;
 
 		if ($fields['card_number'] === '') {
 			$errors[] = __('Please enter credit card number', 'eway-payment-gateway');
@@ -82,7 +83,6 @@ class EwayPaymentsFormPost {
 		}
 
 		// FIXME: if this code makes it into the 2100's, update this regex!
-		$expiryError = false;
 		if (empty($fields['expiry_year']) || !preg_match('/^20[0-9]{2}$/', $fields['expiry_year'])) {
 			$errors[] = __('Please select credit card expiry year', 'eway-payment-gateway');
 			$expiryError = true;
