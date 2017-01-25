@@ -179,18 +179,8 @@ class EwayPaymentsAWPCP {
 
 			$card_msg = esc_html(get_awpcp_option('eway_card_message'));
 
-			// build drop-down items for months
-			$optMonths = '';
-			foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
-				$optMonths .= "<option value='$option'>$option</option>\n";
-			}
-
-			// build drop-down items for years
-			$thisYear = (int) date('Y');
-			$optYears = '';
-			foreach (range($thisYear, $thisYear + 15) as $year) {
-				$optYears .= "<option value='$year'>$year</option>\n";
-			}
+			$optMonths = EwayPaymentsFormUtils::getMonthOptions();
+			$optYears  = EwayPaymentsFormUtils::getYearOptions();
 
 			// load template with passed values
 			ob_start();
@@ -233,22 +223,22 @@ class EwayPaymentsAWPCP {
 		$expiryError	= false;
 		$postdata		= new EwayPaymentsFormPost();
 
-		if ($postdata->get_value('eway_card_number') === '') {
+		if ($postdata->getValue('eway_card_number') === '') {
 			$errors[] = __('Please enter credit card number', 'eway-payment-gateway');
 		}
 
-		if ($postdata->get_value('eway_card_name') === '') {
+		if ($postdata->getValue('eway_card_name') === '') {
 			$errors[] = __('Please enter card holder name', 'eway-payment-gateway');
 		}
 
-		$eway_expiry_month = $postdata->get_value('eway_expiry_month');
+		$eway_expiry_month = $postdata->getValue('eway_expiry_month');
 		if (empty($eway_expiry_month) || !preg_match('/^(?:0[1-9]|1[012])$/', $eway_expiry_month)) {
 			$errors[] = __('Please select credit card expiry month', 'eway-payment-gateway');
 			$expiryError = true;
 		}
 
 		// FIXME: if this code makes it into the 2100's, update this regex!
-		$eway_expiry_year = $postdata->get_value('eway_expiry_year');
+		$eway_expiry_year = $postdata->getValue('eway_expiry_year');
 		if (empty($eway_expiry_year) || !preg_match('/^20\d\d$/', $eway_expiry_year)) {
 			$errors[] = __('Please select credit card expiry year', 'eway-payment-gateway');
 			$expiryError = true;
@@ -263,7 +253,7 @@ class EwayPaymentsAWPCP {
 			}
 		}
 
-		if ($postdata->get_value('eway_cvn') === '') {
+		if ($postdata->getValue('eway_cvn') === '') {
 			$errors[] = __('Please enter CVN (Card Verification Number)', 'eway-payment-gateway');
 		}
 
@@ -359,11 +349,11 @@ class EwayPaymentsAWPCP {
 		$eway->invoiceDescription			= $item->name;
 		$eway->invoiceReference				= $transaction->id;									// customer invoice reference
 		//~ $eway->transactionNumber		= $transaction->id;									// transaction reference
-		$eway->cardHoldersName				= $postdata->get_value('eway_card_name');
-		$eway->cardNumber					= $postdata->clean_cardnumber($postdata->get_value('eway_card_number'));
-		$eway->cardExpiryMonth				= $postdata->get_value('eway_expiry_month');
-		$eway->cardExpiryYear				= $postdata->get_value('eway_expiry_year');
-		$eway->cardVerificationNumber		= $postdata->get_value('eway_cvn');
+		$eway->cardHoldersName				= $postdata->getValue('eway_card_name');
+		$eway->cardNumber					= $postdata->cleanCardnumber($postdata->getValue('eway_card_number'));
+		$eway->cardExpiryMonth				= $postdata->getValue('eway_expiry_month');
+		$eway->cardExpiryYear				= $postdata->getValue('eway_expiry_year');
+		$eway->cardVerificationNumber		= $postdata->getValue('eway_cvn');
 
 		list($eway->firstName, $eway->lastName) = self::getContactNames($ad, $user, $eway->cardHoldersName);
 

@@ -26,7 +26,7 @@ class EwayPaymentsFormPost {
 	* @param string $field_name
 	* @return mixed|null
 	*/
-	public function get_value($field_name) {
+	public function getValue($field_name) {
 		if (!isset($this->postdata[$field_name])) {
 			return null;
 		}
@@ -42,7 +42,7 @@ class EwayPaymentsFormPost {
 	* @param string $subkey
 	* @return mixed|null
 	*/
-	public function get_subkey($field_name, $subkey) {
+	public function getSubkey($field_name, $subkey) {
 		if (!isset($this->postdata[$field_name][$subkey])) {
 			return null;
 		}
@@ -57,7 +57,7 @@ class EwayPaymentsFormPost {
 	* @param string $value
 	* @return string
 	*/
-	public function clean_cardnumber($value) {
+	public function cleanCardnumber($value) {
 		return strtr($value, array(' ' => '', '-' => ''));
 	}
 

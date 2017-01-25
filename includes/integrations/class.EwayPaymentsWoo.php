@@ -277,18 +277,8 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			$this->form();
 		}
 		else {
-			// build drop-down items for months
-			$optMonths = '';
-			foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
-				$optMonths .= "<option value='$option'>$option</option>\n";
-			}
-
-			// build drop-down items for years
-			$thisYear = (int) date('Y');
-			$optYears = '';
-			foreach (range($thisYear, $thisYear + 15) as $year) {
-				$optYears .= "<option value='$year'>$year</option>\n";
-			}
+			$optMonths = EwayPaymentsFormUtils::getMonthOptions();
+			$optYears  = EwayPaymentsFormUtils::getYearOptions();
 
 			// load payment fields template with passed values
 			$settings = $this->settings;
@@ -305,7 +295,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 		if ($this->eway_card_form == 'yes') {
 			// split expiry field into month and year
-			$expiry = $postdata->get_value('eway_payments-card-expiry');
+			$expiry = $postdata->getValue('eway_payments-card-expiry');
 			$expiry = array_map('trim', explode('/', $expiry, 2));
 			if (count($expiry) === 2) {
 				// prefix year with '20' if it's exactly two digits
@@ -318,20 +308,20 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			}
 
 			$fields = array(
-				'eway_card_number'  => $postdata->clean_cardnumber($postdata->get_value('eway_payments-card-number')),
-				'eway_card_name'    => $postdata->get_value('eway_payments-card-name'),
+				'eway_card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_payments-card-number')),
+				'eway_card_name'    => $postdata->getValue('eway_payments-card-name'),
 				'eway_expiry_month' => $expiry[0],
 				'eway_expiry_year'  => $expiry[1],
-				'eway_cvn'          => $postdata->get_value('eway_payments-card-cvc'),
+				'eway_cvn'          => $postdata->getValue('eway_payments-card-cvc'),
 			);
 		}
 		else {
 			$fields = array(
-				'eway_card_number'  => $postdata->clean_cardnumber($postdata->get_value('eway_card_number')),
-				'eway_card_name'    => $postdata->get_value('eway_card_name'),
-				'eway_expiry_month' => $postdata->get_value('eway_expiry_month'),
-				'eway_expiry_year'  => $postdata->get_value('eway_expiry_year'),
-				'eway_cvn'          => $postdata->get_value('eway_cvn'),
+				'eway_card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_card_number')),
+				'eway_card_name'    => $postdata->getValue('eway_card_name'),
+				'eway_expiry_month' => $postdata->getValue('eway_expiry_month'),
+				'eway_expiry_year'  => $postdata->getValue('eway_expiry_year'),
+				'eway_cvn'          => $postdata->getValue('eway_cvn'),
 			);
 		}
 
@@ -417,7 +407,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$eway->invoiceReference			= $order->get_order_number();						// customer invoice reference
 		$eway->transactionNumber		= $transactionID;
 		$eway->cardHoldersName			= $ccfields['eway_card_name'];
-		$eway->cardNumber				= strtr($ccfields['eway_card_number'], array(' ' => '', '-' => ''));
+		$eway->cardNumber				= $ccfields['eway_card_number'];
 		$eway->cardExpiryMonth			= $ccfields['eway_expiry_month'];
 		$eway->cardExpiryYear			= $ccfields['eway_expiry_year'];
 		$eway->cardVerificationNumber	= $ccfields['eway_cvn'];

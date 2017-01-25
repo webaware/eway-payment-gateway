@@ -250,6 +250,7 @@ class EwayPaymentsPlugin {
 	public static function autoload($class_name) {
 		static $classMap = array (
 			'EwayPaymentsFormPost'				=> 'includes/class.EwayPaymentsFormPost.php',
+			'EwayPaymentsFormUtils'				=> 'includes/class.EwayPaymentsFormUtils.php',
 			'EwayPaymentsPayment'				=> 'includes/class.EwayPaymentsPayment.php',
 			'EwayPaymentsStoredPayment'			=> 'includes/class.EwayPaymentsStoredPayment.php',
 		);

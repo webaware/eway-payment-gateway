@@ -79,21 +79,21 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		}
 
 		$this->collected_gateway_data = array (
-			'card_number'	=> $postdata->clean_cardnumber($postdata->get_value('card_number'));
-			'card_name'		=> $postdata->get_value('card_name'),
-			'expiry_month'	=> $postdata->get_value('expiry_month'),
-			'expiry_year'	=> $postdata->get_value('expiry_year'),
-			'c_v_n'			=> $postdata->get_value('cvn'),
+			'card_number'	=> $postdata->cleanCardnumber($postdata->getValue('card_number'));
+			'card_name'		=> $postdata->getValue('card_name'),
+			'expiry_month'	=> $postdata->getValue('expiry_month'),
+			'expiry_year'	=> $postdata->getValue('expiry_year'),
+			'c_v_n'			=> $postdata->getValue('cvn'),
 
 			// additional fields from checkout
-			'first_name'	=> $postdata->get_subkey('collected_data', get_option('eway_form_first_name')),
-			'last_name'		=> $postdata->get_subkey('collected_data', get_option('eway_form_last_name')),
-			'address'		=> $postdata->get_subkey('collected_data', get_option('eway_form_address')),
-			'city'			=> $postdata->get_subkey('collected_data', get_option('eway_form_city')),
-			'state'			=> $postdata->get_subkey('collected_data', get_option('eway_form_state')),
+			'first_name'	=> $postdata->getSubkey('collected_data', get_option('eway_form_first_name')),
+			'last_name'		=> $postdata->getSubkey('collected_data', get_option('eway_form_last_name')),
+			'address'		=> $postdata->getSubkey('collected_data', get_option('eway_form_address')),
+			'city'			=> $postdata->getSubkey('collected_data', get_option('eway_form_city')),
+			'state'			=> $postdata->getSubkey('collected_data', get_option('eway_form_state')),
 			'country'		=> $country,
-			'post_code'		=> $postdata->get_subkey('collected_data', get_option('eway_form_post_code')),
-			'email'			=> $postdata->get_subkey('collected_data', get_option('eway_form_email')),
+			'post_code'		=> $postdata->getSubkey('collected_data', get_option('eway_form_post_code')),
+			'email'			=> $postdata->getSubkey('collected_data', get_option('eway_form_email')),
 		);
 	}
 
@@ -328,18 +328,8 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		// check if this gateway is selected for checkout payments
 		if (in_array(self::WPSC_GATEWAY_NAME, (array) get_option('custom_gateway_options'))) {
-			// build drop-down items for months
-			$optMonths = '';
-			foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $option) {
-				$optMonths .= "<option value='$option'>$option</option>\n";
-			}
-
-			// build drop-down items for years
-			$thisYear = (int) date('Y');
-			$optYears = '';
-			foreach (range($thisYear, $thisYear + 15) as $year) {
-				$optYears .= "<option value='$year'>$year</option>\n";
-			}
+			$optMonths = EwayPaymentsFormUtils::getMonthOptions();
+			$optYears  = EwayPaymentsFormUtils::getYearOptions();
 
 			// use TH for field label cells if selected, otherwise use TD (default wp-e-commerce behaviour)
 			$th = get_option('wpsc_merchant_eway_th') ? 'th' : 'td';
