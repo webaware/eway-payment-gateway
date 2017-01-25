@@ -9,16 +9,15 @@ if (!defined('ABSPATH')) {
 */
 class EwayPaymentsFormPost {
 
-	protected $postdata;
+	protected static $postdata = null;
 
 	/**
 	* maybe unslash the post data and store for access
 	*/
 	public function __construct() {
-		$this->postdata = wp_unslash($_POST);
-
-//~ error_log(__CLASS__ . ": postdata =\n" . print_r($this->postdata,1));
-
+		if (is_null(self::$postdata)) {
+			self::$postdata = wp_unslash($_POST);
+		}
 	}
 
 	/**
@@ -27,11 +26,11 @@ class EwayPaymentsFormPost {
 	* @return mixed|null
 	*/
 	public function getValue($field_name) {
-		if (!isset($this->postdata[$field_name])) {
+		if (!isset(self::$postdata[$field_name])) {
 			return null;
 		}
 
-		$value = $this->postdata[$field_name];
+		$value = self::$postdata[$field_name];
 
 		return is_string($value) ? trim($value) : $value;
 	}
@@ -43,11 +42,11 @@ class EwayPaymentsFormPost {
 	* @return mixed|null
 	*/
 	public function getSubkey($field_name, $subkey) {
-		if (!isset($this->postdata[$field_name][$subkey])) {
+		if (!isset(self::$postdata[$field_name][$subkey])) {
 			return null;
 		}
 
-		$value = $this->postdata[$field_name][$subkey];
+		$value = self::$postdata[$field_name][$subkey];
 
 		return is_string($value) ? trim($value) : $value;
 	}
