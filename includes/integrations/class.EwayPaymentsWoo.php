@@ -308,20 +308,20 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			}
 
 			$fields = array(
-				'eway_card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_payments-card-number')),
-				'eway_card_name'    => $postdata->getValue('eway_payments-card-name'),
-				'eway_expiry_month' => $expiry[0],
-				'eway_expiry_year'  => $expiry[1],
-				'eway_cvn'          => $postdata->getValue('eway_payments-card-cvc'),
+				'card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_payments-card-number')),
+				'card_name'    => $postdata->getValue('eway_payments-card-name'),
+				'expiry_month' => $expiry[0],
+				'expiry_year'  => $expiry[1],
+				'cvn'          => $postdata->getValue('eway_payments-card-cvc'),
 			);
 		}
 		else {
 			$fields = array(
-				'eway_card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_card_number')),
-				'eway_card_name'    => $postdata->getValue('eway_card_name'),
-				'eway_expiry_month' => $postdata->getValue('eway_expiry_month'),
-				'eway_expiry_year'  => $postdata->getValue('eway_expiry_year'),
-				'eway_cvn'          => $postdata->getValue('eway_cvn'),
+				'card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_card_number')),
+				'card_name'    => $postdata->getValue('eway_card_name'),
+				'expiry_month' => $postdata->getValue('eway_expiry_month'),
+				'expiry_year'  => $postdata->getValue('eway_expiry_year'),
+				'cvn'          => $postdata->getValue('eway_cvn'),
 			);
 		}
 
@@ -333,50 +333,17 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return bool
 	*/
 	public function validate_fields() {
-		// check for missing or invalid values
-		$errors = 0;
-		$expiryError = false;
-		$ccfields = $this->getCardFields();
+		$postdata		= new EwayPaymentsFormPost();
+		$fields			= $this->getCardFields();
+		$errors			= $postdata->verifyCardDetails($fields);
 
-		if ($ccfields['eway_card_number'] === '') {
-			wc_add_notice(__('Please enter credit card number', 'eway-payment-gateway'), 'error');
-			$errors++;
-		}
-
-		if ($ccfields['eway_card_name'] === '') {
-			wc_add_notice(__('Please enter card holder name', 'eway-payment-gateway'), 'error');
-			$errors++;
-		}
-
-		if (empty($ccfields['eway_expiry_month']) || !preg_match('/^(?:0[1-9]|1[012])$/', $ccfields['eway_expiry_month'])) {
-			wc_add_notice(__('Please select credit card expiry month', 'eway-payment-gateway'), 'error');
-			$errors++;
-			$expiryError = true;
-		}
-
-		// FIXME: if this code makes it into the 2100's, update this regex!
-		if (empty($ccfields['eway_expiry_year']) || !preg_match('/^20\d\d$/', $ccfields['eway_expiry_year'])) {
-			wc_add_notice(__('Please select credit card expiry year', 'eway-payment-gateway'), 'error');
-			$errors++;
-			$expiryError = true;
-		}
-
-		if (!$expiryError) {
-			// check that first day of month after expiry isn't earlier than today
-			$expired = mktime(0, 0, 0, 1 + $ccfields['eway_expiry_month'], 0, $ccfields['eway_expiry_year']);
-			$today = time();
-			if ($expired < $today) {
-				wc_add_notice(__('Credit card expiry has passed', 'eway-payment-gateway'), 'error');
-				$errors++;
+		if (!empty($errors)) {
+			foreach ($errors as $error) {
+				wc_add_notice($error, 'error');
 			}
 		}
 
-		if ($ccfields['eway_cvn'] === '') {
-			wc_add_notice(__('Please enter CVN (Card Verification Number)', 'eway-payment-gateway'), 'error');
-			$errors++;
-		}
-
-		return $errors === 0;
+		return empty($errors);
 	}
 
 	/**
@@ -406,11 +373,11 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $order->get_order_number();						// customer invoice reference
 		$eway->transactionNumber		= $transactionID;
-		$eway->cardHoldersName			= $ccfields['eway_card_name'];
-		$eway->cardNumber				= $ccfields['eway_card_number'];
-		$eway->cardExpiryMonth			= $ccfields['eway_expiry_month'];
-		$eway->cardExpiryYear			= $ccfields['eway_expiry_year'];
-		$eway->cardVerificationNumber	= $ccfields['eway_cvn'];
+		$eway->cardHoldersName			= $ccfields['card_name'];
+		$eway->cardNumber				= $ccfields['card_number'];
+		$eway->cardExpiryMonth			= $ccfields['expiry_month'];
+		$eway->cardExpiryYear			= $ccfields['expiry_year'];
+		$eway->cardVerificationNumber	= $ccfields['cvn'];
 		$eway->firstName				= $order->billing_first_name;
 		$eway->lastName					= $order->billing_last_name;
 		$eway->emailAddress				= $order->billing_email;

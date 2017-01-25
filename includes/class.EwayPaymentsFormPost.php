@@ -60,4 +60,48 @@ class EwayPaymentsFormPost {
 		return strtr($value, array(' ' => '', '-' => ''));
 	}
 
+    /**
+    * verify credit card details
+    * @param array $ map of field names to values, using standardised field names
+    * @return array an array of error messages
+    */
+    public function verifyCardDetails($fields) {
+		$errors = array();
+
+		if ($fields['card_number'] === '') {
+			$errors[] = __('Please enter credit card number', 'eway-payment-gateway');
+		}
+
+		if ($fields['card_name'] === '') {
+			$errors[] = __('Please enter card holder name', 'eway-payment-gateway');
+		}
+
+		if (empty($fields['expiry_month']) || !preg_match('/^(?:0[1-9]|1[012])$/', $fields['expiry_month'])) {
+			$errors[] = __('Please select credit card expiry month', 'eway-payment-gateway');
+			$expiryError = true;
+		}
+
+		// FIXME: if this code makes it into the 2100's, update this regex!
+		$expiryError = false;
+		if (empty($fields['expiry_year']) || !preg_match('/^20\d\d$/', $fields['expiry_year'])) {
+			$errors[] = __('Please select credit card expiry year', 'eway-payment-gateway');
+			$expiryError = true;
+		}
+
+		if (!$expiryError) {
+			// check that first day of month after expiry isn't earlier than today
+			$expired = mktime(0, 0, 0, 1 + $fields['expiry_month'], 0, $fields['expiry_year']);
+			$today = time();
+			if ($expired < $today) {
+				$errors[] = __('Credit card expiry has passed', 'eway-payment-gateway');
+			}
+		}
+
+		if ($fields['cvn'] === '') {
+			$errors[] = __('Please enter CVN (Card Verification Number)', 'eway-payment-gateway');
+		}
+
+		return $errors;
+	}
+
 }

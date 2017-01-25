@@ -105,37 +105,25 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	*/
 	public function emBookingValidate($result, $EM_Booking) {
 		// only perform validation if this payment method has been selected
-		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] == $this->gateway) {
-			$required = array (
-				'x_card_name'		=> __('You must enter credit card holder name.', 'eway-payment-gateway'),
-				'x_card_num'		=> __('You must enter credit card number.', 'eway-payment-gateway'),
-				'x_exp_date_month'	=> __('You must enter credit card expiry month.', 'eway-payment-gateway'),
-				'x_exp_date_year'	=> __('You must enter credit card expiry year.', 'eway-payment-gateway'),
-				'x_card_code'		=> __('You must enter credit card CVN/CCV.', 'eway-payment-gateway'),
+		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] === $this->gateway) {
+			$postdata		= new EwayPaymentsFormPost();
+
+			$fields			= array(
+				'card_number'	=> $postdata->getValue('x_card_num'),
+				'card_name'		=> $postdata->getValue('x_card_name'),
+				'expiry_month'	=> $postdata->getValue('x_exp_date_month'),
+				'expiry_year'	=> $postdata->getValue('x_exp_date_year'),
+				'cvn'			=> $postdata->getValue('x_card_code'),
 			);
 
-			$postdata = new EwayPaymentsFormPost();
+			$errors			= $postdata->verifyCardDetails($fields);
 
-			foreach ($required as $name => $msg) {
-				$value = $postdata->getValue($name);
-				if (empty($value)) {
-					$EM_Booking->add_error($msg);
-					$result = false;
+			if (!empty($errors)) {
+				foreach ($errors as $error) {
+					$EM_Booking->add_error($error);
 				}
+				$result = false;
 			}
-
-			$x_exp_date_month = $postdata->getValue('x_exp_date_month');
-			$x_exp_date_year  = $postdata->getValue('x_exp_date_year');
-			if (!empty($x_exp_date_month) && !empty($x_exp_date_year)) {
-				// check that first day of month after expiry isn't earlier than today
-				$expired = mktime(0, 0, 0, 1 + $x_exp_date_month, 0, $x_exp_date_year);
-				$today = time();
-				if ($expired < $today) {
-					$EM_Booking->add_error(__('Credit card expiry has passed', 'eway-payment-gateway'));
-					$result = false;
-				}
-			}
-
 		}
 
 		return $result;

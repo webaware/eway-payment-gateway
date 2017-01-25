@@ -71,7 +71,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		$country_field = get_option('eway_form_country');
 		if ($country_field) {
-			$country = $postdata->get_subkey('collected_data', get_option('eway_form_first_name'));
+			$country = $postdata->getSubkey('collected_data', get_option('eway_form_first_name'));
 			$country = empty($country[0]) ? '' : $country[0];
 		}
 		else {
@@ -79,7 +79,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		}
 
 		$this->collected_gateway_data = array (
-			'card_number'	=> $postdata->cleanCardnumber($postdata->getValue('card_number'));
+			'card_number'	=> $postdata->cleanCardnumber($postdata->getValue('card_number')),
 			'card_name'		=> $postdata->getValue('card_name'),
 			'expiry_month'	=> $postdata->getValue('expiry_month'),
 			'expiry_year'	=> $postdata->getValue('expiry_year'),
@@ -275,49 +275,25 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* @return int number of errors found
 	*/
 	protected function validateData() {
-		// check for missing or invalid values
-		$errors = 0;
-		$expiryError = FALSE;
+		$postdata		= new EwayPaymentsFormPost();
 
-		if (empty($this->collected_gateway_data['card_number'])) {
-			$this->set_error_message(__('Please enter credit card number', 'eway-payment-gateway'));
-			$errors++;
-		}
+		$fields			= array(
+			'card_number'	=> $postdata->getValue('card_number'),
+			'card_name'		=> $postdata->getValue('card_name'),
+			'expiry_month'	=> $postdata->getValue('expiry_month'),
+			'expiry_year'	=> $postdata->getValue('expiry_year'),
+			'cvn'			=> $postdata->getValue('cvn'),
+		);
 
-		if (empty($this->collected_gateway_data['card_name'])) {
-			$this->set_error_message(__('Please enter card holder name', 'eway-payment-gateway'));
-			$errors++;
-		}
+		$errors			= $postdata->verifyCardDetails($fields);
 
-		if (empty($this->collected_gateway_data['expiry_month']) || !preg_match('/^(?:0[1-9]|1[012])$/', $this->collected_gateway_data['expiry_month'])) {
-			$this->set_error_message(__('Please select credit card expiry month', 'eway-payment-gateway'));
-			$errors++;
-			$expiryError = TRUE;
-		}
-
-		// FIXME: if this code makes it into the 2100's, update this regex!
-		if (empty($this->collected_gateway_data['expiry_year']) || !preg_match('/^20\d\d$/', $this->collected_gateway_data['expiry_year'])) {
-			$this->set_error_message(__('Please select credit card expiry year', 'eway-payment-gateway'));
-			$errors++;
-			$expiryError = TRUE;
-		}
-
-		if (!$expiryError) {
-			// check that first day of month after expiry isn't earlier than today
-			$expired = mktime(0, 0, 0, 1 + $this->collected_gateway_data['expiry_month'], 0, $this->collected_gateway_data['expiry_year']);
-			$today = time();
-			if ($expired < $today) {
-				$this->set_error_message(__('Credit card expiry has passed', 'eway-payment-gateway'));
-				$errors++;
+		if (!empty($errors)) {
+			foreach ($errors as $error) {
+				$this->set_error_message($error);
 			}
 		}
 
-		if (empty($this->collected_gateway_data['c_v_n'])) {
-			$this->set_error_message(__('Please enter CVN (Card Verification Number)', 'eway-payment-gateway'));
-			$errors++;
-		}
-
-		return $errors;
+		return count($errors);
 	}
 
 	/**
