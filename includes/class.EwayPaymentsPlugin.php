@@ -9,8 +9,6 @@ if (!defined('ABSPATH')) {
 */
 class EwayPaymentsPlugin {
 
-	public $urlBase;									// string: base URL path to files in plugin
-
 	/**
 	* static method for getting the instance of this singleton object
 	* @return EwayPaymentsPlugin
@@ -30,8 +28,6 @@ class EwayPaymentsPlugin {
 	*/
 	private function __construct() {
 		spl_autoload_register(array(__CLASS__, 'autoload'));
-
-		$this->urlBase = plugin_dir_url(EWAY_PAYMENTS_PLUGIN_FILE);
 
 		add_action('init', array($this, 'init'));
 		add_action('init', array($this, 'loadTextDomain'));
@@ -157,15 +153,6 @@ class EwayPaymentsPlugin {
 		}
 
 		require $templatePath;
-	}
-
-	/**
-	* get base URL path for plugin files
-	* @return string
-	*/
-	public static function getUrlPath() {
-		$plugin = self::getInstance();
-		return $plugin->urlBase;
 	}
 
 	/**

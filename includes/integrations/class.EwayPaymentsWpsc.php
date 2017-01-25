@@ -26,7 +26,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$gateways[] = array (
 			'name'						=> _x('eWAY payment gateway', 'WP eCommerce payment method name', 'eway-payment-gateway'),
 			'api_version'				=> 2.0,
-			'image'						=> EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png',
+			'image'						=> plugins_url('images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE),
 			'internalname'				=> self::WPSC_GATEWAY_NAME,
 			'class_name'				=> __CLASS__,
 			'has_recurring_billing'		=> false,

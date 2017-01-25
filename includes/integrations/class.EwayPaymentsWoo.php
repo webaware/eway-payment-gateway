@@ -19,7 +19,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		//~ parent::__construct();		// no parent constructor (yet!)
 
 		$this->id						= 'eway_payments';
-		$this->icon						= apply_filters('woocommerce_eway_icon', EwayPaymentsPlugin::getUrlPath() . 'images/eway-tiny.png');
+		$this->icon						= apply_filters('woocommerce_eway_icon', plugins_url('images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE));
 		$this->method_title				= _x('eWAY', 'WooCommerce payment method title', 'eway-payment-gateway');
 		$this->admin_page_heading 		= _x('eWAY payment gateway', 'WooCommerce admin page heading', 'eway-payment-gateway');
 		$this->admin_page_description 	= _x('Integration with the eWAY credit card payment gateway.', 'eway-payment-gateway');
