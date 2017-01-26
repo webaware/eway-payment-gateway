@@ -9,6 +9,8 @@
 	"browser": true,
 	"jquery": true,
 	"globals": {
+		"eway_ecrypt_vars": false,
+		"eCrypt": false,
 		"module": false,
 		"require": false
 	}

@@ -53,8 +53,10 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$this->eway_site_seal			= $this->settings['eway_site_seal'];
 		$this->eway_site_seal_code		= $this->settings['eway_site_seal_code'];
 
+		add_action('wp_enqueue_scripts', array($this, 'registerScripts'));
+
 		// handle support for standard WooCommerce credit card form instead of our custom template
-		if ($this->eway_card_form == 'yes') {
+		if ($this->eway_card_form === 'yes') {
 			$this->supports[]			= 'default_credit_card_form';
 			add_filter('woocommerce_credit_card_form_fields', array($this, 'wooCcFormFields'), 10, 2);
 			add_action('woocommerce_credit_card_form_start', array($this, 'wooCcFormStart'));
@@ -72,6 +74,14 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		add_action('woocommerce_update_options_payment_gateways', array($this, 'process_admin_options'));
 		// v2.0+
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
+	}
+
+	/**
+	* register and enqueue required scripts
+	*/
+	public function registerScripts() {
+		$min = SCRIPT_DEBUG ? '' : '.min';
+		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", array('jquery'), null, true);
 	}
 
 	/**
@@ -289,7 +299,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return array
 	*/
 	public function wooCcFormFields($fields, $gateway) {
-		if ($gateway == $this->id) {
+		if ($gateway === $this->id) {
 			ob_start();
 			require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/woocommerce-ccfields-card-name.php';
 			$card_name = ob_get_clean();
@@ -305,11 +315,42 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @param string $gateway
 	*/
 	public function wooCcFormStart($gateway) {
-		if ($gateway == $this->id) {
+		if ($gateway === $this->id) {
 			if (!empty($this->settings['eway_card_msg'])) {
 				printf('<span class="eway-credit-card-message">%s</span>', esc_html($this->settings['eway_card_msg']));
 			}
+
+			// maybe set up Client Side Encryption
+			$creds = $this->getApiCredentials();
+			if (!empty($creds['ecrypt_key'])) {
+				wp_enqueue_script('eway-ecrypt');
+				add_action('wp_print_footer_scripts', array($this, 'ecryptScript'));
+			}
 		}
+	}
+
+	/**
+	* inline scripts for client-side encryption
+	*/
+	public function ecryptScript() {
+		$creds	= $this->getApiCredentials();
+		$min	= SCRIPT_DEBUG ? '' : '.min';
+
+		$vars = array(
+			'key'		=> $creds['ecrypt_key'],
+			'form'		=> 'form.checkout',
+			'fields'	=> array(
+							"#{$this->id}-card-number"	=> "cse:{$this->id}-card-number",
+							"#{$this->id}-card-cvc"		=> "cse:{$this->id}-card-cvc",
+							'#eway_card_number'			=> 'cse:eway_card_number',
+							'#eway_cvn'					=> 'cse:eway_cvn',
+						),
+		);
+
+		echo '<script>';
+		echo 'var eway_ecrypt_vars = ', json_encode($vars), '; ';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/ecrypt$min.js");
+		echo '</script>';
 	}
 
 	/**
@@ -601,7 +642,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			$creds = array(
 				'api_key'		=> $this->eway_sandbox_api_key,
 				'password'		=> $this->eway_sandbox_password,
-				'ecrypt_key'	=> $this->eway_sandbox_password,
+				'ecrypt_key'	=> $this->eway_sandbox_ecrypt_key,
 				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
 			);
 		}

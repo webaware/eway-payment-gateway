@@ -18,6 +18,13 @@ class EwayPaymentsFormPost {
 		if (is_null(self::$postdata)) {
 			self::$postdata = wp_unslash($_POST);
 		}
+
+		// check for Client Side Encrypted data
+		foreach (self::$postdata as $key => $value) {
+			if (strpos($key, 'cse:') === 0) {
+				self::$postdata[substr($key, 4)] = $value;
+			}
+		}
 	}
 
 	/**
