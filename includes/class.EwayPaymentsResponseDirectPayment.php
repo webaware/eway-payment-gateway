@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 * extend eWAY response for Direct Connection payment request
 * @link https://eway.io/api-v3/
 */
-class EwayPaymentsResponseDirectPayment extends GFEwayProResponse {
+class EwayPaymentsResponseDirectPayment extends EwayPaymentsResponse {
 
 	#region members
 
@@ -85,7 +85,7 @@ class EwayPaymentsResponseDirectPayment extends GFEwayProResponse {
 	* @return string
 	*/
 	protected function getMessageInvalid() {
-		return __('Invalid response from eWAY for Direct payment', 'gravityforms-eway-pro');
+		return __('Invalid response from eWAY for Direct payment', 'eway-payment-gateway');
 	}
 
 }

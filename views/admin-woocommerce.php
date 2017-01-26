@@ -27,11 +27,12 @@ if (!defined('ABSPATH')) {
 
 		function display(element, visible) {
 			if (visible)
-				element.css({display: "none"}).show(750);
+				element.show();
 			else
 				element.hide();
 		}
 
+		display($("#woocommerce_eway_payments_eway_sandbox_api_key,#woocommerce_eway_payments_eway_sandbox_password,#woocommerce_eway_payments_eway_sandbox_ecrypt_key").closest("tr"), useTest);
 		display($("#woocommerce-eway-admin-stored-test"), (useTest && useStored));
 		display($("#woocommerce-eway-admin-stored-beagle"), (useBeagle && useStored));
 	}
@@ -47,7 +48,7 @@ if (!defined('ABSPATH')) {
 		var codeRow = $("#woocommerce_eway_payments_eway_site_seal_code").closest("tr");
 
 		if (this.checked)
-			codeRow.show(750);
+			codeRow.show();
 		else
 			codeRow.hide();
 	}).trigger("change");

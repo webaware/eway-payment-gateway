@@ -367,10 +367,11 @@ class EwayPaymentsRapidAPI {
 	* @param boolean $useSandbox use eWAY sandbox
 	*/
 	public function __construct($apiKey, $apiPassword, $useSandbox = true) {
-		$this->apiKey		= $apiKey;
-		$this->apiPassword	= $apiPassword;
-		$this->useSandbox	= $useSandbox;
-		$this->capture		= true;
+		$this->apiKey			= $apiKey;
+		$this->apiPassword		= $apiPassword;
+		$this->useSandbox		= $useSandbox;
+		$this->capture			= true;
+		$this->sslVerifyPeer	= true;
 	}
 
 	/**
@@ -421,7 +422,7 @@ class EwayPaymentsRapidAPI {
 		$request->Payment				= $this->getPaymentRecord();
 		$request->TransactionType		= self::TRANS_PURCHASE;
 		$request->PartnerID				= self::PARTNER_ID;
-		$request->CustomerIP			= EwayPaymentsPlugin::getCustomerIP();
+		$request->CustomerIP			= EwayPaymentsPlugin::getCustomerIP(!$this->useSandbox);
 
 		if (!$this->capture) {
 			// just authorise the transaction;
