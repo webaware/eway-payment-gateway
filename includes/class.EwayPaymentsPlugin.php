@@ -156,14 +156,14 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
-	* send data via HTTP and return response
+	* send XML data via HTTP and return response
 	* @param string $url
 	* @param string $data
 	* @param bool $sslVerifyPeer whether to validate the SSL certificate
 	* @return string $response
 	* @throws EwayPaymentsException
 	*/
-	public static function curlSendRequest($url, $data, $sslVerifyPeer = true) {
+	public static function xmlPostRequest($url, $data, $sslVerifyPeer = true) {
 		// send data via HTTPS and receive response
 		$response = wp_remote_post($url, array(
 			'user-agent'	=> 'WordPress/eWAY Payment Gateway ' . EWAY_PAYMENTS_VERSION,
@@ -236,10 +236,13 @@ class EwayPaymentsPlugin {
 	*/
 	public static function autoload($class_name) {
 		static $classMap = array (
-			'EwayPaymentsFormPost'				=> 'includes/class.EwayPaymentsFormPost.php',
-			'EwayPaymentsFormUtils'				=> 'includes/class.EwayPaymentsFormUtils.php',
-			'EwayPaymentsPayment'				=> 'includes/class.EwayPaymentsPayment.php',
-			'EwayPaymentsStoredPayment'			=> 'includes/class.EwayPaymentsStoredPayment.php',
+			'EwayPaymentsFormPost'					=> 'includes/class.EwayPaymentsFormPost.php',
+			'EwayPaymentsFormUtils'					=> 'includes/class.EwayPaymentsFormUtils.php',
+			'EwayPaymentsPayment'					=> 'includes/class.EwayPaymentsPayment.php',
+			'EwayPaymentsRapidAPI'					=> 'includes/class.EwayPaymentsRapidAPI.php',
+			'EwayPaymentsResponse'					=> 'includes/class.EwayPaymentsResponse.php',
+			'EwayPaymentsResponseDirectPayment'		=> 'includes/class.EwayPaymentsResponseDirectPayment.php',
+			'EwayPaymentsStoredPayment'				=> 'includes/class.EwayPaymentsStoredPayment.php',
 		);
 
 		if (isset($classMap[$class_name])) {

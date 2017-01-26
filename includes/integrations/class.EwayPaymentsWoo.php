@@ -378,31 +378,26 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$eway->cardExpiryMonth			= $ccfields['expiry_month'];
 		$eway->cardExpiryYear			= $ccfields['expiry_year'];
 		$eway->cardVerificationNumber	= $ccfields['cvn'];
+		$eway->amount					= $order->order_total;
 		$eway->firstName				= $order->billing_first_name;
 		$eway->lastName					= $order->billing_last_name;
 		$eway->emailAddress				= $order->billing_email;
+		$eway->address1					= $order->billing_address_1;
+		$eway->address2					= $order->billing_address_2;
+		$eway->suburb					= $order->billing_city;
+		$eway->state					= $order->billing_state;
+		$eway->countryName				= $order->billing_country;
 		$eway->postcode					= $order->billing_postcode;
 
 		// for Beagle (free) security
 		if ($this->eway_beagle == 'yes') {
-			$eway->customerCountryCode = $order->billing_country;
+			$eway->country = $order->billing_country;
 		}
 
 		// convert WooCommerce country code into country name
-		$billing_country = $order->billing_country;
-		if (isset($woocommerce->countries->countries[$billing_country])) {
-			$billing_country = $woocommerce->countries->countries[$billing_country];
+		if (isset($woocommerce->countries->countries[$order->billing_country])) {
+			$eway->countryName = $woocommerce->countries->countries[$order->billing_country];
 		}
-
-		// aggregate street, city, state, country into a single string
-		$parts = array (
-			$order->billing_address_1,
-			$order->billing_address_2,
-			$order->billing_city,
-			$order->billing_state,
-			$billing_country,
-		);
-		$eway->address = implode(', ', array_filter($parts, 'strlen'));
 
 		// use cardholder name for last name if no customer name entered
 		if (empty($eway->firstName) && empty($eway->lastName)) {
@@ -412,17 +407,11 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription		= apply_filters('woocommerce_eway_invoice_desc', $eway->invoiceDescription, $order_id);
 		$eway->invoiceReference			= apply_filters('woocommerce_eway_invoice_ref', $eway->invoiceReference, $order_id);
-		$eway->option1					= apply_filters('woocommerce_eway_option1', '', $order_id);
-		$eway->option2					= apply_filters('woocommerce_eway_option2', '', $order_id);
-		$eway->option3					= apply_filters('woocommerce_eway_option3', '', $order_id);
-
-		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
-		$total = $order->order_total;
-		$eway->amount					= $isLiveSite ? $total : ceil($total);
-		if ($eway->amount != $total) {
-			$this->logger->log('info', sprintf('amount rounded up from %1$s to %2$s, to pass test gateway',
-				number_format($total, 2), number_format($eway->amount, 2)));
-		}
+		$eway->options					= array_filter(array(
+												apply_filters('woocommerce_eway_option1', '', $order_id),
+												apply_filters('woocommerce_eway_option2', '', $order_id),
+												apply_filters('woocommerce_eway_option3', '', $order_id),
+											), 'strlen');
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
 			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
@@ -430,17 +419,17 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		try {
 			$response = $eway->processPayment();
 
-			if ($response->status) {
+			if ($response->TransactionStatus) {
 				// transaction was successful, so record details and complete payment
-				update_post_meta($order_id, 'Transaction ID', $response->transactionNumber);
-				if (!empty($response->authCode)) {
-					update_post_meta($order_id, 'Authcode', $response->authCode);
+				update_post_meta($order_id, 'Transaction ID', $response->TransactionID);
+				if (!empty($response->AuthorisationCode)) {
+					update_post_meta($order_id, 'Authcode', $response->AuthorisationCode);
 				}
-				if (!empty($response->beagleScore)) {
-					update_post_meta($order_id, 'Beagle score', $response->beagleScore);
+				if ($response->BeagleScore >= 0) {
+					update_post_meta($order_id, 'Beagle score', $response->BeagleScore);
 				}
 
-				if ($this->eway_stored == 'yes') {
+				if ($this->eway_stored === 'yes') {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
 					$order->reduce_order_stock();
 					$order->update_status('on-hold', __('Awaiting stored payment', 'eway-payment-gateway'));
@@ -452,21 +441,25 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 				$woocommerce->cart->empty_cart();
 
 				$result = array(
-					'result' => 'success',
-					'redirect' => $this->get_return_url($order),
+					'result'	=> 'success',
+					'redirect'	=> $this->get_return_url($order),
 				);
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$eway->invoiceReference, $response->transactionNumber, $this->eway_stored == 'yes' ? 'on-hold' : 'completed',
-					$response->amount, $response->authCode, $response->beagleScore));
+					$eway->invoiceReference, $response->TransactionID, $this->eway_stored === 'yes' ? 'on-hold' : 'completed',
+					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
-				$order->update_status('failed', nl2br(esc_html($response->error)));
-				wc_add_notice(nl2br(esc_html($response->error)), 'error');
+				$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
+				$order->update_status('failed', $error_msg);
+				wc_add_notice($error_msg, 'error');
 				$result = array('result' => 'failure');
 
-				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->error));
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->getErrorsForLog()));
+				if ($response->BeagleScore > 0) {
+					$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
+				}
 			}
 		}
 		catch (EwayPaymentsException $e) {

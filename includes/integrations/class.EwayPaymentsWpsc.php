@@ -147,6 +147,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
 		$eway->transactionNumber		= $transactionID;
+		$eway->amount					= $purchase_logs->get('totalprice');
 		$eway->cardHoldersName			= $this->collected_gateway_data['card_name'];
 		$eway->cardNumber				= $this->collected_gateway_data['card_number'];
 		$eway->cardExpiryMonth			= $this->collected_gateway_data['expiry_month'];
@@ -155,24 +156,22 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$eway->firstName				= $this->collected_gateway_data['first_name'];
 		$eway->lastName					= $this->collected_gateway_data['last_name'];
 		$eway->emailAddress				= $this->collected_gateway_data['email'];
+		$eway->address1					= $this->collected_gateway_data['address'];
+		$eway->address2					= '';
+		$eway->suburb					= $this->collected_gateway_data['city'];
+		$eway->state					= $this->collected_gateway_data['state'];
+		$eway->countryName				= $this->collected_gateway_data['country'];
 		$eway->postcode					= $this->collected_gateway_data['post_code'];
 
 		// for Beagle (free) security
 		if (get_option('wpsc_merchant_eway_beagle')) {
-			$eway->customerCountryCode	= $this->collected_gateway_data['country'];
+			$eway->country	= $this->collected_gateway_data['country'];
 		}
 
 		// convert wp-e-commerce country code into country name
-		$country = $this->collected_gateway_data['country'] ? wpsc_get_country($this->collected_gateway_data['country']) : '';
-
-		// aggregate street, city, state, country into a single string
-		$parts = array (
-			$this->collected_gateway_data['address'],
-			$this->collected_gateway_data['city'],
-			$this->collected_gateway_data['state'],
-			$country,
-		);
-		$eway->address					= implode(', ', array_filter($parts, 'strlen'));
+		if ($this->collected_gateway_data['country']) {
+			$eway->countryName = wpsc_get_country($this->collected_gateway_data['country']);
+		}
 
 		// use cardholder name for last name if no customer name entered
 		if (empty($eway->firstName) && empty($eway->lastName)) {
@@ -182,17 +181,11 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription		= apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription, $this->purchase_id);
 		$eway->invoiceReference			= apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference, $this->purchase_id);
-		$eway->option1					= apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id);
-		$eway->option2					= apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id);
-		$eway->option3					= apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id);
-
-		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
-		$total = $purchase_logs->get('totalprice');
-		$eway->amount					= $isLiveSite ? $total : ceil($total);
-		if ($eway->amount != $total) {
-			$this->logger->log('info', sprintf('amount rounded up from %1$s to %2$s, to pass test gateway',
-				number_format($total, 2), number_format($eway->amount, 2)));
-		}
+		$eway->options					= array_filter(array(
+												apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id),
+												apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id),
+												apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id),
+											), 'strlen');
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
 			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
@@ -200,7 +193,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		try {
 			$response = $eway->processPayment();
 
-			if ($response->status) {
+			if ($response->TransactionStatus) {
 				// transaction was successful, so record transaction number and continue
 				if ($useStored) {
 					$status = 2; // WPSC_Purchase_Log::ORDER_RECEIVED
@@ -210,34 +203,38 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 				}
 				$log_details = array(
 					'processed'			=> $status,
-					'transactid'		=> $response->transactionNumber,
-					'authcode'			=> $response->authCode,
+					'transactid'		=> $response->TransactionID,
+					'authcode'			=> $response->AuthorisationCode,
 				);
 
-				if (!empty($response->beagleScore)) {
-					$log_details['notes'] = sprintf(__('Beagle score: %s', 'eway-payment-gateway'), $response->beagleScore);
+				if ($response->BeagleScore > 0) {
+					$log_details['notes'] = sprintf(__('Beagle score: %s', 'eway-payment-gateway'), $response->BeagleScore);
 				}
 
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$eway->invoiceReference, $response->transactionNumber, $useStored == 'yes' ? 'order received' : 'accepted payment',
-					$response->amount, $response->authCode, $response->beagleScore));
+					$eway->invoiceReference, $response->TransactionID, $useStored === 'yes' ? 'order received' : 'accepted payment',
+					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 
 				$this->go_to_transaction_results($this->cart_data['session_id']);
 			}
 			else {
 				// transaction was unsuccessful, so record transaction number and the error
 				$status = 6; // WPSC_Purchase_Log::PAYMENT_DECLINED
-				$this->set_error_message(nl2br(esc_html($response->error)));
+				$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
+				$this->set_error_message($error_msg);
 
 				$log_details = array(
 					'processed'			=> $status,
-					'notes'				=> $response->error,
+					'notes'				=> __('Transaction failed', 'eway-payment-gateway') . '; ' . $response->getErrorsForLog(),
 				);
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
-				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->error));
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->getErrorsForLog()));
+				if ($response->BeagleScore > 0) {
+					$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
+				}
 
 				return;
 			}

@@ -246,33 +246,38 @@ class EwayPaymentsAWPCP {
 			try {
 				$response = $this->processTransaction($transaction);
 
-				if ($response->status) {
+				if ($response->TransactionStatus) {
 					// transaction was successful, so record details and complete payment
-					$transaction->set('txn-id', $response->transactionNumber);
+					$transaction->set('txn-id', $response->TransactionID);
 
-					if (!empty($response->authCode)) {
-						$transaction->set('eway_authcode', $response->authCode);
+					if (!empty($response->AuthorisationCode)) {
+						$transaction->set('eway_authcode', $response->AuthorisationCode);
 					}
 
-					//~ if (!empty($response->beagleScore)) {
-						//~ $transaction->set('eway_beagle_score', $response->beagleScore);
-					//~ }
+					if ($response->BeagleScore > 0) {
+						$transaction->set('eway_beagle_score', $response->BeagleScore);
+					}
 
 					$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_COMPLETED);
 
 					$valid = true;
 
-					$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s',
-						$transaction->id, $response->transactionNumber, 'completed', $response->amount, $response->authCode));
+					$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, beagle = %6$s',
+						$transaction->id, $response->TransactionID, 'completed',
+						$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 				}
 				else {
 					// transaction was unsuccessful, so record transaction number and the error
-					$transaction->set('txn-id', $response->transactionNumber);
+					$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
+					$transaction->set('txn-id', $response->TransactionID);
 					$transaction->set('payment-status', AWPCP_Payment_Transaction::$PAYMENT_STATUS_FAILED);
-					$transaction->errors[] = nl2br(esc_html($response->error . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway')));
+					$transaction->errors[] = $error_msg;
 					$valid = false;
 
-					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->error));
+					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->getErrorsForLog()));
+					if ($response->BeagleScore > 0) {
+						$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
+					}
 				}
 			}
 			catch (EwayPaymentsException $e) {
@@ -322,7 +327,7 @@ class EwayPaymentsAWPCP {
 
 		$eway->invoiceDescription			= $item->name;
 		$eway->invoiceReference				= $transaction->id;									// customer invoice reference
-		//~ $eway->transactionNumber		= $transaction->id;									// transaction reference
+		$eway->transactionNumber			= $transaction->id;									// transaction reference
 		$eway->cardHoldersName				= $postdata->getValue('eway_card_name');
 		$eway->cardNumber					= $postdata->cleanCardnumber($postdata->getValue('eway_card_number'));
 		$eway->cardExpiryMonth				= $postdata->getValue('eway_expiry_month');
@@ -331,21 +336,22 @@ class EwayPaymentsAWPCP {
 
 		list($eway->firstName, $eway->lastName) = self::getContactNames($ad, $user, $eway->cardHoldersName);
 
-		$eway->emailAddress					= $ad->ad_contact_email ? $ad->ad_contact_email : ($user ? $user->user_email : '');
-		$eway->address						= self::getContactAddress($ad, $user);
+		self::setTxContactDetails($eway, $ad, $user);
 
 		// TODO: add Beagle if new version supports taking country info before billing
 		// for Beagle (free) security
 		//~ if ($this->eway_beagle == 'yes') {
-			//~ $eway->customerCountryCode = $order->billing_country;
+			//~ $eway->country = $order->billing_country;
 		//~ }
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription			= apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
 		$eway->invoiceReference				= apply_filters('awpcp_eway_invoice_ref', $eway->invoiceReference, $transaction);
-		$eway->option1						= apply_filters('awpcp_eway_option1', '', $transaction);
-		$eway->option2						= apply_filters('awpcp_eway_option2', '', $transaction);
-		$eway->option3						= apply_filters('awpcp_eway_option3', '', $transaction);
+		$eway->options						= array_filter(array(
+													apply_filters('awpcp_eway_option1', '', $transaction),
+													apply_filters('awpcp_eway_option2', '', $transaction),
+													apply_filters('awpcp_eway_option3', '', $transaction),
+												), 'strlen');
 
 		// if live, pass through amount exactly, but if using test site, round up to whole dollars or eWAY will fail
 		if (method_exists($transaction, 'get_totals')) {
@@ -357,11 +363,7 @@ class EwayPaymentsAWPCP {
 			// AWPCP v < 3.0
 			$total = $transaction->get('amount');
 		}
-		$eway->amount = $isLiveSite ? $total : ceil($total);
-		if ($eway->amount != $total) {
-			$this->logger->log('info', sprintf('amount rounded up from %1$s to %2$s, to pass test gateway',
-				number_format($total, 2), number_format($eway->amount, 2)));
-		}
+		$eway->amount = $total;
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
 			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
@@ -411,44 +413,54 @@ class EwayPaymentsAWPCP {
 	}
 
 	/**
-	* attempt to get a meaningful address field from available data
+	* attempt to get meaningful contact details from available data
+	* @param object $eway
 	* @param AWPCP_Ad $ad
 	* @param WP_User $user
 	* @return string
 	*/
-	protected static function getContactAddress($ad, $user) {
-		$address = '';
+	protected static function setTxContactDetails($eway, $ad, $user) {
+		$profile = $user ? get_user_meta($user->ID, 'awpcp-profile', true) : false;
+
+		$eway->emailAddress			= '';
+		$eway->address1				= '';
+		$eway->address2				= '';
+		$eway->suburb				= '';
+		$eway->state				= '';
+		$eway->countryName			= '';
+		$eway->postcode				= '';
+
+		if ($ad->ad_contact_email) {
+			$eway->emailAddress		= $ad->ad_contact_email;
+		}
+		elseif ($user) {
+			$eway->emailAddress		= $user->user_email;
+		}
 
 		if ($ad->ad_city || $ad->ad_state || $ad->ad_country) {
-			$parts = array (
-				$ad->ad_city,
-				$ad->ad_state,
-				$ad->ad_country,
-			);
-			$address = implode(', ', array_filter($parts, 'strlen'));
+			$eway->suburb			= $ad->ad_city;
+			$eway->state			= $ad->ad_state;
+			$eway->countryName		= $ad->ad_country;
 		}
 		elseif (method_exists('AWPCP_Ad', 'get_ad_regions')) {
 			$regions = AWPCP_Ad::get_ad_regions($ad->ad_id);
 			if (!empty($regions[0])) {
-				$parts = array (
-					$regions[0]['city'],
-					$regions[0]['state'],
-					$regions[0]['country'],
-				);
-				$address = implode(', ', array_filter($parts, 'strlen'));
+				$eway->suburb		= $regions[0]['city'];
+				$eway->state		= $regions[0]['state'];
+				$eway->countryName	= $regions[0]['country'];
 			}
 		}
-		elseif ($user) {
-			$profile = get_user_meta($user->ID, 'awpcp-profile', true);
-			$parts = array (
-				isset($profile['address']) ? $profile['address'] : '',
-				isset($profile['city'])    ? $profile['city']    : '',
-				isset($profile['state'])   ? $profile['state']   : '',
-			);
-			$address = implode(', ', array_filter($parts, 'strlen'));
+		elseif ($profile) {
+			if (isset($profile['address'])) {
+				$eway->address1		= $profile['address'];
+			}
+			if (isset($profile['city'])) {
+				$eway->suburb		= $profile['city'];
+			}
+			if (isset($profile['state'])) {
+				$eway->state		= $profile['state'];
+			}
 		}
-
-		return $address;
 	}
 
 }

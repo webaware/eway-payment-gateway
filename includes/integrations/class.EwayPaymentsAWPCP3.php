@@ -71,18 +71,18 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 			try {
 				$response = $this->integration->processTransaction($transaction);
 
-				if ($response->status) {
+				if ($response->TransactionStatus) {
 					// transaction was successful, so record details and complete payment
-					$transaction->set('txn-id', $response->transactionNumber);
+					$transaction->set('txn-id', $response->TransactionID);
 					$transaction->completed = current_time('mysql');
 
-					if (!empty($response->authCode)) {
-						$transaction->set('eway_authcode', $response->authCode);
+					if (!empty($response->AuthorisationCode)) {
+						$transaction->set('eway_authcode', $response->AuthorisationCode);
 					}
 
-					//~ if (!empty($response->beagleScore)) {
-						//~ $transaction->set('eway_beagle_score', $response->beagleScore);
-					//~ }
+					if ($response->BeagleScore > 0) {
+						$transaction->set('eway_beagle_score', $response->BeagleScore);
+					}
 
 					/* TODO: stored payments in AWPCP, when plugin workflow supports it
 					if ($eway_stored) {
@@ -98,17 +98,22 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 
 					$success = true;
 
-					$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s',
-						$transaction->id, $response->transactionNumber, 'completed', $response->amount, $response->authCode));
+					$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, beagle = %6$s',
+						$transaction->id, $response->TransactionID, 'completed',
+						$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 				}
 				else {
 					// transaction was unsuccessful, so record transaction number and the error
-					$transaction->set('txn-id', $response->transactionNumber);
+					$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
+					$transaction->set('txn-id', $response->TransactionID);
 					$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
-					$transaction->errors['validation'] = nl2br(esc_html($response->error . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway')));
+					$transaction->errors['validation'] = $error_msg;
 					$success = false;
 
-					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->error));
+					$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $transaction->id, $response->getErrorsForLog()));
+					if ($response->BeagleScore > 0) {
+						$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
+					}
 				}
 			}
 			catch (EwayPaymentsException $e) {
