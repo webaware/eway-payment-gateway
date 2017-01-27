@@ -47,7 +47,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$this->eway_sandbox_password	= $this->settings['eway_sandbox_password'];
 		$this->eway_sandbox_ecrypt_key	= $this->settings['eway_sandbox_ecrypt_key'];
 		$this->eway_stored				= $this->settings['eway_stored'];
-		$this->eway_beagle				= $this->settings['eway_beagle'];
 		$this->eway_card_form			= $this->settings['eway_card_form'];
 		$this->eway_card_msg			= $this->settings['eway_card_msg'];
 		$this->eway_site_seal			= $this->settings['eway_site_seal'];
@@ -198,17 +197,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'default' 		=> 'no',
 						),
 
-			'eway_beagle' => array(
-							'title' 		=> _x('Beagle (anti-fraud)', 'WooCommerce settings field', 'eway-payment-gateway'),
-							'label' 		=> __('enable Beagle (free) anti-fraud', 'eway-payment-gateway'),
-							'type' 			=> 'checkbox',
-							'description' 	=> sprintf('%s <em id="woocommerce-eway-admin-stored-beagle" style="color:#c00"><br />%s</em>',
-													sprintf(__('<a href="%s" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle.', 'eway-payment-gateway'),
-														'https://www.eway.com.au/developers/api/beagle-lite'),
-													__('Beagle is not available for Stored Payments.', 'eway-payment-gateway')),
-							'default' 		=> 'no',
-						),
-
 			'eway_logging' => array(
 							'title' 		=> _x('Logging', 'WooCommerce settings field', 'eway-payment-gateway'),
 							'label' 		=> __('enable logging to assist trouble shooting', 'eway-payment-gateway'),
@@ -290,6 +278,19 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	*/
 	public function admin_options() {
 		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-woocommerce.php';
+
+		add_action('admin_print_footer_scripts', array($this, 'adminSettingsScript'));
+	}
+
+	/**
+	* add page script for admin options
+	*/
+	public function adminSettingsScript() {
+		$min	= SCRIPT_DEBUG ? '' : '.min';
+
+		echo '<script>';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-woocommerce-settings$min.js");
+		echo '</script>';
 	}
 
 	/**
@@ -486,20 +487,32 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$eway->currencyCode				= $order->order_currency;
 		$eway->firstName				= $order->billing_first_name;
 		$eway->lastName					= $order->billing_last_name;
+		$eway->companyName				= $order->billing_company;
 		$eway->emailAddress				= $order->billing_email;
+		$eway->phone					= $order->billing_phone;
 		$eway->address1					= $order->billing_address_1;
 		$eway->address2					= $order->billing_address_2;
 		$eway->suburb					= $order->billing_city;
 		$eway->state					= $order->billing_state;
-		$eway->countryName				= $order->billing_country;
 		$eway->postcode					= $order->billing_postcode;
+		$eway->country					= $order->billing_country;
+		$eway->countryName				= $order->billing_country;							// for eWAY legacy API
+		$eway->comments					= $order->customer_note;
 
-		// for Beagle (free) security
-		if ($this->eway_beagle == 'yes') {
-			$eway->country = $order->billing_country;
+		// maybe send shipping details
+		if ($order->shipping_address_1 || $order->shipping_address_2) {
+			$eway->hasShipping			= true;
+			$eway->shipFirstName		= $order->shipping_first_name;
+			$eway->shipLastName			= $order->shipping_last_name;
+			$eway->shipAddress1			= $order->shipping_address_1;
+			$eway->shipAddress2			= $order->shipping_address_2;
+			$eway->shipSuburb			= $order->shipping_city;
+			$eway->shipState			= $order->shipping_state;
+			$eway->shipCountry			= $order->shipping_country;
+			$eway->shipPostcode			= $order->shipping_postcode;
 		}
 
-		// convert WooCommerce country code into country name
+		// convert WooCommerce country code into country name (for eWAY legacy API)
 		if (isset($woocommerce->countries->countries[$order->billing_country])) {
 			$eway->countryName = $woocommerce->countries->countries[$order->billing_country];
 		}

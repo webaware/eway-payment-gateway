@@ -28,6 +28,18 @@ class EwayPaymentsRapidAPI {
 	const TRANS_RECURRING					= 'Recurring';
 	const TRANS_MOTO						= 'MOTO';
 
+	// valid shipping methods
+	const SHIP_METHOD_UNKNOWN				= 'Unknown';
+	const SHIP_METHOD_LOWCOST				= 'LowCost';
+	const SHIP_METHOD_CUSTOMER				= 'DesignatedByCustomer';
+	const SHIP_METHOD_INTERNATIONAL			= 'International';
+	const SHIP_METHOD_MILITARY				= 'Military';
+	const SHIP_METHOD_NEXTDAY				= 'NextDay';
+	const SHIP_METHOD_PICKUP				= 'StorePickup';
+	const SHIP_METHOD_2DAY					= 'TwoDayService';
+	const SHIP_METHOD_3DAY					= 'ThreeDayService';
+	const SHIP_METHOD_OTHER					= 'Other';
+
 	const PARTNER_ID						= '4577fd8eb9014c7188d7be672c0e0d88';
 
 	#endregion // constants
