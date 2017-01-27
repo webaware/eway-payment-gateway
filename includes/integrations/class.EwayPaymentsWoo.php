@@ -483,6 +483,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$eway->cardExpiryYear			= $ccfields['expiry_year'];
 		$eway->cardVerificationNumber	= $ccfields['cvn'];
 		$eway->amount					= $order->order_total;
+		$eway->currencyCode				= $order->order_currency;
 		$eway->firstName				= $order->billing_first_name;
 		$eway->lastName					= $order->billing_last_name;
 		$eway->emailAddress				= $order->billing_email;
