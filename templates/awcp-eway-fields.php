@@ -15,6 +15,10 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
+<?php if (!empty($checkout_message)): ?>
+<p><?php echo $checkout_message; ?></p>
+<?php endif; ?>
+
 <form action="<?php echo esc_url($checkoutURL); ?>" method="post" id="awpcp-eway-checkout">
 
 <fieldset>
@@ -70,30 +74,3 @@ if (!defined('ABSPATH')) {
 </fieldset>
 
 </form>
-
-<script>
-(function($) {
-
-	$("#awpcp-eway-checkout").submit(function(event) {
-		var errors = [];
-
-		if ($("input[name='eway_card_number']").val().trim() === "")
-			errors.push("<?php echo esc_js(__('Credit Card Number is missing', 'eway-payment-gateway')); ?>");
-
-		if ($("input[name='eway_card_name']").val().trim() === "")
-			errors.push("<?php echo esc_js(__("Card Holder's Name is missing", 'eway-payment-gateway')); ?>");
-
-		if ($("select[name='eway_expiry_month']").val() === "" || $("select[name='eway_expiry_year']").val() === "")
-			errors.push("<?php echo esc_js(__('Credit Card Expiry is missing', 'eway-payment-gateway')); ?>");
-
-		if ($("input[name='eway_cvn']").val().trim() === "")
-			errors.push("<?php echo esc_js(__('CVN is missing', 'eway-payment-gateway')); ?>");
-
-		if (errors.length > 0) {
-			event.preventDefault();
-			alert(errors.join("\n"));
-		}
-	});
-
-})(jQuery);
-</script>

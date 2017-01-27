@@ -4,6 +4,7 @@
 
 ### 3.7.1, soon...
 
+* changed: AWPCP minimum version now 3.0
 * added: capture and report HTTP errors communicating with the gateway
 
 ### 3.7.0, 2016-11-18

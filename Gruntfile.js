@@ -40,6 +40,25 @@ module.exports = function (grunt) {
 				jshintrc: ".jshintrc",
 				force: true
 			}
+		},
+
+		uglify: {
+			build: {
+				options: {
+					ASCIIOnly: true,
+					banner: "// <%= pkg.name %>\n// <%= pkg.homepage %>\n"
+				},
+				files: [{
+					expand: true,
+					cwd: "js",
+					dest: "js",
+					src: [
+						"*.js",
+						"!*.min.js"
+					],
+					ext: '.min.js'
+				}]
+			}
 		}
 
 	});
@@ -48,6 +67,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-compress");
 	grunt.loadNpmTasks("grunt-contrib-copy");
 	grunt.loadNpmTasks("grunt-contrib-jshint");
+	grunt.loadNpmTasks("grunt-contrib-uglify");
 
 	grunt.registerTask("release", ["clean","copy","compress"]);
 	grunt.registerTask("default", [ "jshint" ]);

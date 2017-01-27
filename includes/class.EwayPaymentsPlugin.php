@@ -54,9 +54,9 @@ class EwayPaymentsPlugin {
 		}
 
 		// register with Another WordPress Classifieds Plugin
-		if (isset($GLOBALS['awpcp'])) {
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP.php';
-			new EwayPaymentsAWPCP();
+		if (function_exists('awpcp')) {
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP3.php';
+			EwayPaymentsAWPCP3::setup();
 		}
 	}
 
