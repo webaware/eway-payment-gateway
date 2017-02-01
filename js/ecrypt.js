@@ -40,4 +40,11 @@
 	*/
 	checkout.on("checkout_place_order_eway_payments", processFields);
 
+	/**
+	* watch for AWPCP submit event
+	*/
+	if (eway_ecrypt_vars.form.indexOf("awpcp") !== -1) {
+		checkout.on("submit", processFields);
+	}
+
 })(jQuery);

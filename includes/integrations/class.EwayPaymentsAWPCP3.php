@@ -67,31 +67,54 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 						'checkbox', 1,
 						_x('Activate eWAY?', 'AWPCP payment settings label', 'eway-payment-gateway'));
 
+		$awpcp->settings->add_setting($section, 'eway_api_key',
+						_x('API key', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textfield', '',
+						_x('Rapid API key from your live eWAY account', 'AWPCP payment settings label', 'eway-payment-gateway'));
+
+		$awpcp->settings->add_setting($section, 'eway_password',
+						_x('API password', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textfield', '',
+						_x('Rapid API password from your live eWAY account', 'AWPCP payment settings label', 'eway-payment-gateway'));
+
+		$awpcp->settings->add_setting($section, 'eway_ecrypt_key',
+						_x('Client Side Encryption key', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textarea', '',
+						_x('Client Side Encryption key from your live eWAY account', 'AWPCP payment settings label', 'eway-payment-gateway'));
+
 		$awpcp->settings->add_setting($section, 'eway_customerid',
 						_x('eWAY customer ID', 'AWPCP payment settings', 'eway-payment-gateway'),
-						'textfield', EWAY_PAYMENTS_TEST_CUSTOMER,
-						'<br />' . _x('your eWAY customer ID', 'AWPCP payment settings label', 'eway-payment-gateway'));
+						'textfield', '',
+						__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_test_force',
-						_x('Force test ID for sandbox?', 'AWPCP payment settings', 'eway-payment-gateway'),
-						'checkbox', 1,
-						_x('Force special test ID 87654321 for sandbox?', 'AWPCP payment settings label', 'eway-payment-gateway'));
+		$awpcp->settings->add_setting($section, 'eway_sandbox_api_key',
+						_x('Sandbox API key', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textfield', '',
+						_x('Rapid API key from your sandbox account', 'AWPCP payment settings label', 'eway-payment-gateway'));
+
+		$awpcp->settings->add_setting($section, 'eway_sandbox_password',
+						_x('Sandbox API password', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textfield', '',
+						_x('Rapid API password from your sandbox account', 'AWPCP payment settings label', 'eway-payment-gateway'));
+
+		$awpcp->settings->add_setting($section, 'eway_sandbox_ecrypt_key',
+						_x('Sandbox Client Side Encryption key', 'AWPCP payment settings', 'eway-payment-gateway'),
+						'textarea', '',
+						_x('Client Side Encryption key from your sandbox account', 'AWPCP payment settings label', 'eway-payment-gateway'));
 
 		$awpcp->settings->add_setting($section, 'eway_stored',
 						_x('Stored payments', 'AWPCP payment settings', 'eway-payment-gateway'),
 						'checkbox', 0,
-						__("Stored payments records payment details but doesn't bill immediately. Useful when ads must be approved by admin, allowing you to reject payments for rejected ads.", 'eway-payment-gateway'));
-
-		// TODO: add Beagle if new version supports taking country info before billing
-		//~ $awpcp->settings->add_setting($section, 'eway_beagle', 'Beagle (anti-fraud)', 'checkbox', 0,
-			//~ "<a href='https://www.eway.com.au/developers/api/beagle-lite' target='_blank'>Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle");
+						__("Stored payments records payment details but doesn't bill immediately.", 'eway-payment-gateway')
+						. '<br/>'
+						. __('Useful when ads must be approved by an admin, allowing you to reject payments for rejected ads.', 'eway-payment-gateway'));
 
 		$log_options = array(
 			'off' 		=> _x('Off', 'logging settings', 'eway-payment-gateway'),
 			'info'	 	=> _x('All messages', 'logging settings', 'eway-payment-gateway'),
 			'error' 	=> _x('Errors only', 'logging settings', 'eway-payment-gateway'),
 		);
-		$log_descripton = sprintf('<br />%s<br />%s<br />%s',
+		$log_descripton = sprintf('%s<br />%s<br />%s',
 							__('enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							__('the log file can be found in this folder:', 'eway-payment-gateway'),
 							EwayPaymentsLogging::getLogFolderRelative());
@@ -102,18 +125,18 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$awpcp->settings->add_setting($section, 'eway_card_message',
 						_x('Credit card message', 'AWPCP payment settings', 'eway-payment-gateway'),
 						'textfield', '',
-						'<br />' . _x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'AWPCP payment settings label', 'eway-payment-gateway'));
+						_x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'AWPCP payment settings label', 'eway-payment-gateway'));
 
 		$awpcp->settings->add_setting($section, 'eway_site_seal_code',
 						_x('eWAY Site Seal', 'AWPCP payment settings', 'eway-payment-gateway'),
 						'textarea', '',
-						sprintf('<br /><a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
+						sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
 							__('generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')));
 
 		$awpcp->settings->add_setting($section, 'eway_icon',
 						_x('Payment Method Icon', 'AWPCP payment settings', 'eway-payment-gateway'),
 						'textfield', '',
-						'<br />' . _x('URL to a custom icon to show for the payment method.', 'AWPCP payment settings label', 'eway-payment-gateway'));
+						_x('URL to a custom icon to show for the payment method.', 'AWPCP payment settings label', 'eway-payment-gateway'));
 	}
 
 	/**
@@ -159,6 +182,12 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$min = SCRIPT_DEBUG ? ''     : '.min';
 		$ver = SCRIPT_DEBUG ? time() : EWAY_PAYMENTS_VERSION;
 
+		$creds = $this->getApiCredentials();
+		if (!empty($creds['ecrypt_key'])) {
+			add_action('wp_enqueue_scripts', array($this, 'ecryptEnqueue'), 20);	// can't enqueue yet, so wait until plugin has enqueued script
+			add_action('wp_print_footer_scripts', array($this, 'ecryptScript'));
+		}
+
 		wp_enqueue_script('eway-awpcp-checkout-form', plugins_url("js/awpcp-checkout-form$min.js", EWAY_PAYMENTS_PLUGIN_FILE), array('jquery'), $ver, true);
 		wp_localize_script('eway-awpcp-checkout-form', 'eway_awpcp_checkout', array(
 			'errors' => array(
@@ -170,6 +199,35 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		));
 
 		return $form;
+	}
+
+	/**
+	* enqueue the eWAY ecrypt script for client-side encryption
+	*/
+	public function ecryptEnqueue() {
+		wp_enqueue_script('eway-ecrypt');
+	}
+
+	/**
+	* inline scripts for client-side encryption
+	*/
+	public function ecryptScript() {
+		$creds	= $this->getApiCredentials();
+		$min	= SCRIPT_DEBUG ? '' : '.min';
+
+		$vars = array(
+			'key'		=> $creds['ecrypt_key'],
+			'form'		=> '#awpcp-eway-checkout',
+			'fields'	=> array(
+							'#eway_card_number'			=> 'cse:eway_card_number',
+							'#eway_cvn'					=> 'cse:eway_cvn',
+						),
+		);
+
+		echo '<script>';
+		echo 'var eway_ecrypt_vars = ', json_encode($vars), '; ';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/ecrypt$min.js");
+		echo '</script>';
 	}
 
 	/**
@@ -266,29 +324,23 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 
 	/**
 	* process transaction against eWAY
+	* @param AWPCP_Payment_Transaction $transaction
 	* @return $response
+	* @throws EwayPaymentsException
 	*/
 	protected function processTransaction($transaction) {
-		$isLiveSite = !get_awpcp_option('paylivetestmode');
-		$eway_stored = get_awpcp_option('eway_stored');
+		$item		= $transaction->get_item(0); // no support for multiple items
+		$ad			= AWPCP_Ad::find_by_id($transaction->get('ad-id'));
+		$user		= wp_get_current_user();
 
-		if (!$isLiveSite && get_awpcp_option('eway_test_force')) {
-			$eway_customerid = EWAY_PAYMENTS_TEST_CUSTOMER;
-		}
-		else {
-			$eway_customerid = get_awpcp_option('eway_customerid');
-		}
-		$eway_customerid = apply_filters('awpcp_eway_customer_id', $eway_customerid, $isLiveSite, $transaction);
+		$capture	= !get_awpcp_option('eway_stored');
+		$useSandbox	= (bool) get_awpcp_option('paylivetestmode');
+		$creds		= apply_filters('awpcp_eway_credentials', $this->getApiCredentials(), $useSandbox, $transaction);
+		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
 
-		$item = $transaction->get_item(0); // no support for multiple items
-		$ad = AWPCP_Ad::find_by_id($transaction->get('ad-id'));
-		$user = wp_get_current_user();
-
-		if ($eway_stored) {
-			$eway = new EwayPaymentsStoredPayment($eway_customerid, $isLiveSite);
-		}
-		else {
-			$eway = new EwayPaymentsPayment($eway_customerid, $isLiveSite);
+		if (!$eway) {
+			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
+			throw new EwayPaymentsException(__('eWAY payments is not configured for payments yet', 'eway-payment-gateway'));
 		}
 
 		$postdata = new EwayPaymentsFormPost();
@@ -296,6 +348,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$eway->invoiceDescription			= $item->name;
 		$eway->invoiceReference				= $transaction->id;									// customer invoice reference
 		$eway->transactionNumber			= $transaction->id;									// transaction reference
+		$eway->currencyCode					= awpcp_get_currency_code();
 		$eway->cardHoldersName				= $postdata->getValue('eway_card_name');
 		$eway->cardNumber					= $postdata->cleanCardnumber($postdata->getValue('eway_card_number'));
 		$eway->cardExpiryMonth				= $postdata->getValue('eway_expiry_month');
@@ -305,12 +358,6 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		list($eway->firstName, $eway->lastName) = self::getContactNames($ad, $user, $eway->cardHoldersName);
 
 		self::setTxContactDetails($eway, $ad, $user);
-
-		// TODO: add Beagle if new version supports taking country info before billing
-		// for Beagle (free) security
-		//~ if ($this->eway_beagle == 'yes') {
-			//~ $eway->country = $order->billing_country;
-		//~ }
 
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription			= apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
@@ -325,7 +372,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$eway->amount = $totals['money'];
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		$response = $eway->processPayment();
 
@@ -338,6 +385,33 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	*/
 	public function process_payment_canceled($transaction) {
 		// TODO: process_payment_canceled
+	}
+
+	/**
+	* get API credentials based on settings
+	* @return array
+	*/
+	protected function getApiCredentials() {
+		$useSandbox	= (bool) get_awpcp_option('paylivetestmode');
+
+		if (!$useSandbox) {
+			$creds = array(
+				'api_key'		=> get_awpcp_option('eway_api_key'),
+				'password'		=> get_awpcp_option('eway_password'),
+				'ecrypt_key'	=> get_awpcp_option('eway_ecrypt_key'),
+				'customerid'	=> get_awpcp_option('eway_customerid'),
+			);
+		}
+		else {
+			$creds = array(
+				'api_key'		=> get_awpcp_option('eway_sandbox_api_key'),
+				'password'		=> get_awpcp_option('eway_sandbox_password'),
+				'ecrypt_key'	=> get_awpcp_option('eway_sandbox_ecrypt_key'),
+				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
+			);
+		}
+
+		return $creds;
 	}
 
 	/**
