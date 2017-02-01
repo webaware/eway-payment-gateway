@@ -52,8 +52,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$this->eway_site_seal			= $this->settings['eway_site_seal'];
 		$this->eway_site_seal_code		= $this->settings['eway_site_seal_code'];
 
-		add_action('wp_enqueue_scripts', array($this, 'registerScripts'));
-
 		// handle support for standard WooCommerce credit card form instead of our custom template
 		if ($this->eway_card_form === 'yes') {
 			$this->supports[]			= 'default_credit_card_form';
@@ -73,14 +71,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		add_action('woocommerce_update_options_payment_gateways', array($this, 'process_admin_options'));
 		// v2.0+
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-	}
-
-	/**
-	* register and enqueue required scripts
-	*/
-	public function registerScripts() {
-		$min = SCRIPT_DEBUG ? '' : '.min';
-		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", array('jquery'), null, true);
 	}
 
 	/**
@@ -452,28 +442,22 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	public function process_payment($order_id) {
 		global $woocommerce;
 
-		$order = new WC_Order($order_id);
-		$ccfields = $this->getCardFields();
+		$order		= new WC_Order($order_id);
+		$ccfields	= $this->getCardFields();
 
-		$isLiveSite = ($this->eway_sandbox != 'yes');
+		$capture	= ($this->eway_stored  !== 'yes');
+		$useSandbox	= ($this->eway_sandbox === 'yes');
+		$creds		= apply_filters('woocommerce_eway_credentials', $this->getApiCredentials(), $useSandbox, $order);
+		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
 
-		$customerID = $this->eway_customerid;
-		$customerID = apply_filters('woocommerce_eway_customer_id', $customerID, $isLiveSite, $order_id);
-
-		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
-		$transactionID = apply_filters('woocommerce_eway_trans_number', $order_id);
-
-		if ($this->eway_stored == 'yes')
-			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
-		else
-			$eway = new EwayPaymentsPayment($customerID, $isLiveSite);
-
-		$eway = $this->getApiWrapper();
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
 			wc_add_notice(esc_html__('eWAY payments is not configured for payments yet', 'eway-payment-gateway'), 'error');
 			return array('result' => 'failure');
 		}
+
+		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+		$transactionID = apply_filters('woocommerce_eway_trans_number', $order_id);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $order->get_order_number();						// customer invoice reference
@@ -532,7 +516,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 											), 'strlen');
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		try {
 			$response = $eway->processPayment();
@@ -612,39 +596,13 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* get API wrapper, based on available credentials and settings
-	* @return EwayPaymentsRapidAPI|EwayPaymentsPayment|EwayPaymentsStoredPayment
-	*/
-	protected function getApiWrapper() {
-		$useSandbox = ($this->eway_sandbox === 'yes');
-
-		$creds = $this->getApiCredentials();
-
-		if (!empty($creds['api_key']) && !empty($creds['password'])) {
-			$eway = new EwayPaymentsRapidAPI($creds['api_key'], $creds['password'], $useSandbox);
-			$eway->capture = ($this->eway_stored !== 'yes');
-		}
-		elseif (!empty($creds['customerid'])) {
-			if ($this->eway_stored === 'yes') {
-				$eway = new EwayPaymentsStoredPayment($creds['customerid'], !$useSandbox);
-			}
-			else {
-				$eway = new EwayPaymentsPayment($creds['customerid'], !$useSandbox);
-			}
-		}
-		else {
-			$eway = false;
-		}
-
-		return $eway;
-	}
-
-	/**
 	* get API credentials based on settings
 	* @return array
 	*/
 	protected function getApiCredentials() {
-		if ($this->eway_sandbox !== 'yes') {
+		$useSandbox	= ($this->eway_sandbox === 'yes');
+
+		if (!$useSandbox) {
 			$creds = array(
 				'api_key'		=> $this->eway_api_key,
 				'password'		=> $this->eway_password,

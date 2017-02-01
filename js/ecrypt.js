@@ -4,6 +4,11 @@
 
 	var checkout = $(eway_ecrypt_vars.form);
 
+	/**
+	* if form field has a value, add encrypted hidden field and remove plain-text value from form
+	* @param {String} selector
+	* @param {String} encrypted field name
+	*/
 	function maybeEncryptField(selector, fieldname) {
 		var field = checkout.find(selector);
 
@@ -19,15 +24,20 @@
 	}
 
 	/**
-	* watch for WooCommerce submit event
+	* process all form fields that might require encryption
 	*/
-	checkout.on("checkout_place_order_eway_payments", function() {
+	function processFields() {
 		var fields = eway_ecrypt_vars.fields;
 		for (var i in fields) {
 			maybeEncryptField(i, fields[i]);
 		}
 
 		return true;
-	});
+	}
+
+	/**
+	* watch for WooCommerce submit event
+	*/
+	checkout.on("checkout_place_order_eway_payments", processFields);
 
 })(jQuery);

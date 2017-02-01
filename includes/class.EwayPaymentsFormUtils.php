@@ -40,4 +40,31 @@ class EwayPaymentsFormUtils {
 		return ob_get_clean();
 	}
 
+	/**
+	* get API wrapper, based on available credentials and settings
+	* @param array $creds
+	* @param bool $capture
+	* @param bool $useSandbox
+	* @return EwayPaymentsRapidAPI|EwayPaymentsPayment|EwayPaymentsStoredPayment
+	*/
+	public static function getApiWrapper($creds, $capture, $useSandbox) {
+		if (!empty($creds['api_key']) && !empty($creds['password'])) {
+			$eway = new EwayPaymentsRapidAPI($creds['api_key'], $creds['password'], $useSandbox);
+			$eway->capture = $capture;
+		}
+		elseif (!empty($creds['customerid'])) {
+			if ($capture) {
+				$eway = new EwayPaymentsPayment($creds['customerid'], !$useSandbox);
+			}
+			else {
+				$eway = new EwayPaymentsStoredPayment($creds['customerid'], !$useSandbox);
+			}
+		}
+		else {
+			$eway = false;
+		}
+
+		return $eway;
+	}
+
 }

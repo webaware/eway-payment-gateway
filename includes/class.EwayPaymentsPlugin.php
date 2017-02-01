@@ -33,6 +33,7 @@ class EwayPaymentsPlugin {
 		add_action('init', array($this, 'loadTextDomain'));
 		add_filter('plugin_row_meta', array($this, 'addPluginDetailsLinks'), 10, 2);
 		add_action('admin_notices', array($this, 'checkPrerequisites'));
+		add_action('wp_enqueue_scripts', array($this, 'registerScripts'));
 
 		// register with WP eCommerce
 		add_filter('wpsc_merchants_modules', array($this, 'wpscRegister'));
@@ -88,6 +89,14 @@ class EwayPaymentsPlugin {
 		if (!empty($missing)) {
 			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-extensions.php';
 		}
+	}
+
+	/**
+	* register and enqueue required scripts
+	*/
+	public function registerScripts() {
+		$min = SCRIPT_DEBUG ? '' : '.min';
+		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", array('jquery'), null, true);
 	}
 
 	/**
