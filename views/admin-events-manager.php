@@ -50,12 +50,12 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_cust_id"><?php esc_html_e('eWAY customer ID', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="em_eway_cust_id"><?php echo esc_html_x('Customer ID', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td><input type="text" name="em_eway_cust_id" id="em_eway_cust_id" value="<?php echo esc_attr(get_option('em_eway_cust_id')); ?>" /></td>
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_card_msg"><?php esc_html_e('Credit card message', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="em_eway_card_msg"><?php echo esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<input type="text" name="em_eway_card_msg" id="em_eway_card_msg" value="<?php echo esc_attr(get_option('em_eway_card_msg')); ?>" class="large-text" />
 			<em>Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;</em>
@@ -74,7 +74,7 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_ssl_force"><?php esc_html_e('Force SSL for bookings form', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="em_eway_ssl_force"><?php echo esc_html_x('Force SSL for bookings form', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="em_eway_ssl_force" id="em_eway_ssl_force">
 				<?php $selected = get_option('em_eway_ssl_force'); ?>
@@ -85,7 +85,7 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_logging"><?php esc_html_e('Logging', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="em_eway_logging"><?php echo esc_html_x('Logging', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="em_eway_logging" id="em_eway_logging">
 				<?php $selected = get_option('em_eway_logging'); ?>
@@ -101,7 +101,7 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_stored"><?php esc_html_e('Stored payments', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="em_eway_stored"><?php echo esc_html_x('Stored payments', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="em_eway_stored" id="em_eway_stored">
 				<?php $selected = get_option('em_eway_stored'); ?>
@@ -114,7 +114,7 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_beagle"><?php esc_html_e('Beagle (free)', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="em_eway_beagle"><?php echo esc_html_x('Beagle (free)', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="em_eway_beagle" id="em_eway_beagle">
 				<?php $selected = get_option('em_eway_beagle'); ?>

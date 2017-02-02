@@ -14,14 +14,14 @@ $eway_logging	= get_option('eway_logging', 'off');
 ?>
 
 	<tr valign="top">
-		<th scope="row"><label for="ewayCustomerID_id"><?php esc_html_e('eWAY Customer ID', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="ewayCustomerID_id"><?php echo esc_html_x('Customer ID', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<input type="text" size="10" value="<?php echo esc_attr(get_option('ewayCustomerID_id')); ?>" name="ewayCustomerID_id" id="ewayCustomerID_id" />
 		</td>
 	</tr>
 
 	<tr valign="top">
-		<th scope="row" id="eway_stored_label"><?php esc_html_e('Use Stored Payments', 'eway-payment-gateway'); ?></th>
+		<th scope="row" id="eway_stored_label"><?php echo esc_html_x('Stored payments', 'settings field', 'eway-payment-gateway'); ?></th>
 		<td>
 			<input type="radio" value="1" name="eway_stored" id="eway_stored_1" <?php checked($eway_stored, '1'); ?> aria-labelledby="eway_stored_label eway_stored_label_1" />
 			<label for="eway_stored_1" id="eway_stored_label_1"><?php echo TXT_WPSC_YES; ?></label> &nbsp;
@@ -38,7 +38,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row" id="eway_test_label"><?php esc_html_e('Use Testing Enviroment', 'eway-payment-gateway'); ?></th>
+		<th scope="row" id="eway_test_label"><?php echo esc_html_x('Sandbox mode', 'settings field', 'eway-payment-gateway'); ?></th>
 		<td>
 			<input type="radio" value="1" name="eway_test" id="eway_test_1" <?php checked($eway_test, '1'); ?> aria-labelledby="eway_test_label eway_test_label_1" />
 			<label for="eway_test_1" id="eway_test_label_1"><?php echo TXT_WPSC_YES; ?></label> &nbsp;
@@ -48,7 +48,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row" id="eway_logging_label"><?php esc_html_e('Logging', 'eway-payment-gateway'); ?></th>
+		<th scope="row" id="eway_logging_label"><?php echo esc_html_x('Logging', 'settings field', 'eway-payment-gateway'); ?></th>
 		<td>
 			<input type="radio" value="off" name="eway_logging" id="eway_logging_off" <?php checked($eway_logging, 'off'); ?> aria-labelledby="eway_logging_label eway_logging_label_off" />
 			<label for="eway_logging_off" id="eway_logging_label_off"><?php echo esc_html_x('Off', 'logging settings', 'eway-payment-gateway'); ?></label> &nbsp;
@@ -65,7 +65,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row" id="eway_th_label"><?php esc_html_e('Use TH for field labels', 'eway-payment-gateway'); ?></th>
+		<th scope="row" id="eway_th_label"><?php echo esc_html_x('Use TH for field labels', 'settings field', 'eway-payment-gateway'); ?></th>
 		<td>
 			<input type="radio" value="1" name="eway_th" id="eway_th_1" <?php checked($eway_th, '1'); ?> aria-labelledby="eway_th_label eway_th_label_1" />
 			<label for="eway_th_1" id="eway_th_label_1"><?php echo TXT_WPSC_YES; ?></label> &nbsp;
@@ -75,7 +75,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row" id="eway_beagle_label"><a href="https://www.eway.com.au/developers/api/beagle-lite" target="_blank"><?php esc_html_e('Use Beagle', 'eway-payment-gateway'); ?></a></th>
+		<th scope="row" id="eway_beagle_label"><a href="https://www.eway.com.au/developers/api/beagle-lite" target="_blank"><?php echo esc_html_x('Use Beagle', 'settings field', 'eway-payment-gateway'); ?></a></th>
 		<td>
 			<input type="radio" value="1" name="eway_beagle" id="eway_beagle_1" <?php checked($eway_beagle, '1'); ?> aria-labelledby="eway_beagle_label eway_beagle_label_1" />
 			<label for="eway_beagle_1" id="eway_beagle_label_1"><?php echo TXT_WPSC_YES; ?></label> &nbsp;
@@ -94,14 +94,14 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_card_msg"><?php esc_html_e('Credit card message', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_card_msg"><?php echo esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<input type="text" style="width:100%" value="<?php echo esc_attr(get_option('wpsc_merchant_eway_card_msg')); ?>" name="eway_card_msg" id="eway_card_msg" />
 		</td>
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_first_name"><?php esc_html_e('First Name', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_first_name"><?php echo esc_html_x('First name', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[first_name]" id="eway_form_first_name">
 				<?php EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_first_name')); ?>
@@ -110,7 +110,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_last_name"><?php esc_html_e('Last Name', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_last_name"><?php echo esc_html_x('Last name', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[last_name]" id="eway_form_last_name">
 				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_last_name')); ?>
@@ -119,7 +119,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_address"><?php esc_html_e('Address Field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_address"><?php echo esc_html_x('Address', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[address]" id="eway_form_address">
 				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_address')); ?>
@@ -128,7 +128,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_city"><?php esc_html_e('City Field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_city"><?php echo esc_html_x('City', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[city]" id="eway_form_city">
 				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_city')); ?>
@@ -137,7 +137,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_state"><?php esc_html_e('State Field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_state"><?php echo esc_html_x('State', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[state]" id="eway_form_state">
 				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_state')); ?>
@@ -146,7 +146,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_post_code"><?php esc_html_e('Postal code/Zip code Field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_post_code"><?php echo esc_html_x('Postal/Zip code', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[post_code]" id="eway_form_post_code">
 				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_post_code')); ?>
@@ -155,7 +155,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_country"><?php esc_html_e('Country Field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_country"><?php echo esc_html_x('Country', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[country]" id="eway_form_country">
 				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_country')); ?>
@@ -164,7 +164,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="eway_form_email"><?php esc_html_e('Email Field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row"><label for="eway_form_email"><?php echo esc_html_x('Email address', 'settings field', 'eway-payment-gateway'); ?></label></th>
 		<td>
 			<select name="eway_form[email]" id="eway_form_email">
 				<?php echo EwayPaymentsWpsc::showCheckoutFormFields(get_option('eway_form_email')); ?>

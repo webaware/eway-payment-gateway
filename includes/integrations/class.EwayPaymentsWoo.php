@@ -87,7 +87,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'enabled' => array(
 							'title' 		=> translate('Enable/Disable', 'woocommerce'),
 							'type' 			=> 'checkbox',
-							'label' 		=> __('Enable eWAY credit card payment', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('Enable eWAY credit card payment', 'eway-payment-gateway'),
 							'default' 		=> 'no',
 						),
 
@@ -128,103 +128,103 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 						),
 
 			'eway_api_key' => array(
-							'title' 		=> _x('API key', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('API key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width: 100%',
 						),
 
 			'eway_password' => array(
-							'title' 		=> _x('API password', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('API password', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 						),
 
 			'eway_ecrypt_key' => array(
-							'title' 		=> _x('Client Side Encryption key', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'textarea',
 							'css'			=> 'height: 6em',
 						),
 
 			'eway_customerid' => array(
-							'title' 		=> _x('Customer ID', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('Customer ID', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
-							'description' 	=> __('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'),
+							'description' 	=> esc_html__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 						),
 
 			'eway_sandbox' => array(
-							'title' 		=> _x('Sandbox mode', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('Sandbox mode', 'settings field', 'eway-payment-gateway'),
 							'label' 		=> __('enable sandbox (testing) mode', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> __('Use the sandbox testing environment, no live payments are accepted; use test card number 4444333322221111', 'eway-payment-gateway'),
+							'description' 	=> esc_html__('Use the sandbox testing environment, no live payments are accepted; use test card number 4444333322221111', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'yes',
 						),
 
 			'eway_sandbox_api_key' => array(
-							'title' 		=> _x('Sandbox API key', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('Sandbox API key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width: 100%',
 						),
 
 			'eway_sandbox_password' => array(
-							'title' 		=> _x('Sandbox API password', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 						),
 
 			'eway_sandbox_ecrypt_key' => array(
-							'title' 		=> _x('Sandbox Client Side Encryption key', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'textarea',
 							'css'			=> 'height: 6em',
 						),
 
 			'eway_stored' => array(
-							'title' 		=> _x('Stored payments', 'WooCommerce settings field', 'eway-payment-gateway'),
-							'label' 		=> __('enable stored payments', 'eway-payment-gateway'),
+							'title' 		=> _x('Stored payments', 'settings field', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('enable stored payments', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
 							'description' 	=> sprintf('%s <em id="woocommerce-eway-admin-stored-test" style="color:#c00"><br />%s</em>',
-													__("Stored payments records payment details but doesn't bill immediately. Useful for drop-shipping merchants.", 'eway-payment-gateway'),
-													__('NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.', 'eway-payment-gateway')),
+													esc_html__("Stored payments records payment details but doesn't bill immediately. Useful for drop-shipping merchants.", 'eway-payment-gateway'),
+													esc_html__('NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.', 'eway-payment-gateway')),
 							'default' 		=> 'no',
 						),
 
 			'eway_logging' => array(
-							'title' 		=> _x('Logging', 'WooCommerce settings field', 'eway-payment-gateway'),
-							'label' 		=> __('enable logging to assist trouble shooting', 'eway-payment-gateway'),
+							'title' 		=> _x('Logging', 'settings field', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							'type' 			=> 'select',
 							'description'	=>	sprintf('%s<br/>%s',
-													__('the log file can be found in this folder:', 'eway-payment-gateway'),
-													EwayPaymentsLogging::getLogFolderRelative()),
+													esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
+													esc_html(EwayPaymentsLogging::getLogFolderRelative())),
 							'default' 		=> 'off',
 							'options'		=> array(
-								'off' 		=> _x('Off', 'logging settings', 'eway-payment-gateway'),
-								'info'	 	=> _x('All messages', 'logging settings', 'eway-payment-gateway'),
-								'error' 	=> _x('Errors only', 'logging settings', 'eway-payment-gateway'),
+								'off' 		=> esc_html_x('Off', 'logging settings', 'eway-payment-gateway'),
+								'info'	 	=> esc_html_x('All messages', 'logging settings', 'eway-payment-gateway'),
+								'error' 	=> esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'),
 							),
 						),
 
 			'eway_card_form' => array(
-							'title' 		=> _x('Credit card fields', 'WooCommerce settings field', 'eway-payment-gateway'),
-							'label' 		=> __('use WooCommerce standard credit card fields', 'eway-payment-gateway'),
+							'title' 		=> _x('Credit card fields', 'settings field', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('use WooCommerce standard credit card fields', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> __('Ticked, the standard WooCommerce credit card fields will be used. Unticked, a custom template will be used for the credit card fields.', 'eway-payment-gateway'),
+							'description' 	=> esc_html__('Ticked, the standard WooCommerce credit card fields will be used. Unticked, a custom template will be used for the credit card fields.', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> (is_array($settings) ? 'no' : 'yes'),
 						),
 
 			'eway_card_msg' => array(
-							'title' 		=> _x('Credit card message', 'WooCommerce settings field', 'eway-payment-gateway'),
+							'title' 		=> _x('Credit card message', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width:100%',
-							'description' 	=> __('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'eway-payment-gateway'),
+							'description' 	=> esc_html__('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default'		=> '',
 						),
 
 			'eway_site_seal' => array(
-							'title' 		=> _x('Show eWAY Site Seal', 'WooCommerce settings field', 'eway-payment-gateway'),
-							'label' 		=> __('show the eWAY site seal after the credit card fields', 'eway-payment-gateway'),
+							'title' 		=> _x('Show eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('show the eWAY site seal after the credit card fields', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> __('Add the verified eWAY Site Seal to your checkout', 'eway-payment-gateway'),
+							'description' 	=> esc_html__('Add the verified eWAY Site Seal to your checkout', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
 						),
@@ -232,7 +232,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'eway_site_seal_code' => array(
 							'type' 			=> 'textarea',
 							'description' 	=> sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
-													__('generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
+													esc_html__('generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
 							'default'		=> '',
 							'css'			=> 'height:14em',
 						),
