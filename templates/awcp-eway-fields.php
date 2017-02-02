@@ -35,7 +35,7 @@ if (!defined('ABSPATH')) {
 
 	<p class="form-row form-row-last">
 		<label for="eway_card_name"><?php esc_html_e("Card Holder's Name", 'eway-payment-gateway'); ?> <span class="required">*</span></label>
-		<input type="text" value="" name="eway_card_name" id="eway_card_name" autocomplete="off" />
+		<input type="text" value="" name="eway_card_name" id="eway_card_name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 	</p>
 
 	<div class="clear"></div>

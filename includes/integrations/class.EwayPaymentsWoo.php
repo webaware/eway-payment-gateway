@@ -131,17 +131,32 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'title' 		=> _x('API key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width: 100%',
+							'custom_attributes'	=> array(
+														'autocorrect'		=> 'off',
+														'autocapitalize'	=> 'off',
+														'spellcheck'		=> 'false',
+													),
 						),
 
 			'eway_password' => array(
 							'title' 		=> _x('API password', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
+							'custom_attributes'	=> array(
+														'autocorrect'		=> 'off',
+														'autocapitalize'	=> 'off',
+														'spellcheck'		=> 'false',
+													),
 						),
 
 			'eway_ecrypt_key' => array(
 							'title' 		=> _x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'textarea',
 							'css'			=> 'height: 6em',
+							'custom_attributes'	=> array(
+														'autocorrect'		=> 'off',
+														'autocapitalize'	=> 'off',
+														'spellcheck'		=> 'false',
+													),
 						),
 
 			'eway_customerid' => array(
@@ -164,17 +179,32 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'title' 		=> _x('Sandbox API key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width: 100%',
+							'custom_attributes'	=> array(
+														'autocorrect'		=> 'off',
+														'autocapitalize'	=> 'off',
+														'spellcheck'		=> 'false',
+													),
 						),
 
 			'eway_sandbox_password' => array(
 							'title' 		=> _x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
+							'custom_attributes'	=> array(
+														'autocorrect'		=> 'off',
+														'autocapitalize'	=> 'off',
+														'spellcheck'		=> 'false',
+													),
 						),
 
 			'eway_sandbox_ecrypt_key' => array(
 							'title' 		=> _x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'textarea',
 							'css'			=> 'height: 6em',
+							'custom_attributes'	=> array(
+														'autocorrect'		=> 'off',
+														'autocapitalize'	=> 'off',
+														'spellcheck'		=> 'false',
+													),
 						),
 
 			'eway_stored' => array(

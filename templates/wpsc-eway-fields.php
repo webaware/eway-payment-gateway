@@ -31,7 +31,7 @@ if (!defined('ABSPATH')) {
 <tr class="wpsc-merch-eway-row">
 	<<?php echo $th; ?> scope="row"><label for="eway_card_name"><?php esc_html_e("Card Holder's Name", 'eway-payment-gateway'); ?> <span class="asterix">*</span></label></<?php echo $th; ?>>
 	<td>
-		<input type="text" value="" name="card_name" id="eway_card_name" autocomplete="off" />
+		<input type="text" value="" name="card_name" id="eway_card_name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 	</td>
 </tr>
 

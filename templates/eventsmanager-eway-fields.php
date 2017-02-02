@@ -29,7 +29,8 @@ if (!defined('ABSPATH')) {
 
 <p class="em-bookings-form-gateway-cardname">
 	<label for="eway_card_name"><?php esc_html_e("Card Holder's Name", 'eway-payment-gateway'); ?></label>
-	<input type="text" size="15" name="x_card_name" id="eway_card_name" value="<?php echo $card_name; ?>" class="input" autocomplete="off" />
+	<input type="text" size="15" name="x_card_name" id="eway_card_name" value="<?php echo $card_name; ?>" class="input"
+		autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 </p>
 
 <p class="em-bookings-form-gateway-expiry">
