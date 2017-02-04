@@ -1,0 +1,11 @@
+
+input[name="awpcp-options[eway_customerid]"] {
+	width: 10em;
+}
+
+input[name="awpcp-options[eway_api_key]"],
+input[name="awpcp-options[eway_sandbox_api_key]"],
+input[name="awpcp-options[eway_card_message]"],
+input[name="awpcp-options[eway_icon]"] {
+	width: 100%;
+}

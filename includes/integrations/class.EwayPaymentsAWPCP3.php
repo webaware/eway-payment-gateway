@@ -20,6 +20,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	public static function setup() {
 		add_filter('awpcp-register-payment-methods', array(__CLASS__, 'awpcpRegisterPaymentMethods'), 20);
 		add_action('awpcp_register_settings', array(__CLASS__, 'awpcpRegisterSettings'));
+		add_action('admin_print_styles-classifieds_page_awpcp-admin-settings', array(__CLASS__, 'settingsStyles'));
 	}
 
 	/**
@@ -39,6 +40,15 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 			/* description */	esc_html_x('Credit card payment via eWAY', 'AWPCP payment method description', 'eway-payment-gateway'),
 			/* icon */			apply_filters('awpcp_eway_icon', $icon)
 		);
+	}
+
+	/**
+	* customise styles for settings page
+	*/
+	public static function settingsStyles() {
+		echo '<style>';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'css/admin-awpcp-settings.css');
+		echo '</style>';
 	}
 
 	/**
