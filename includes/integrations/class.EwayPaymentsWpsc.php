@@ -46,6 +46,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		// also register admin hooks if required
 		if (is_admin()) {
 			add_action('wpsc_billing_details_bottom', array(__CLASS__, 'actionBillingDetailsBottom'));
+			add_action('admin_print_footer_scripts-settings_page_wpsc-settings', array(__CLASS__, 'adminSettingsScript'));
 		}
 
 		return $gateways;
@@ -291,6 +292,17 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		}
 
 		return count($errors);
+	}
+
+	/**
+	* add page script for admin options
+	*/
+	public static function adminSettingsScript() {
+		$min	= SCRIPT_DEBUG ? '' : '.min';
+
+		echo '<script>';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-wpsc-settings$min.js");
+		echo '</script>';
 	}
 
 	/**

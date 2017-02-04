@@ -172,34 +172,3 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</td>
 	</tr>
 
-<script>
-(function($) {
-
-	/**
-	* check whether both the sandbox (test) mode and Stored Payments are selected,
-	* show warning message if they are
-	*/
-	function setVisibility() {
-		var	useTest = ($("input[name='eway_test']:checked").val() === "1"),
-			useBeagle = ($("input[name='eway_beagle']:checked").val() === "1"),
-			useStored = ($("input[name='eway_stored']:checked").val() === "1");
-
-		function display(element, visible) {
-			if (visible)
-				element.css({display: "none"}).show(750);
-			else
-				element.hide();
-		}
-
-		display($("#wpsc-eway-admin-stored-test"), (useTest && useStored));
-		display($("#wpsc-eway-admin-stored-beagle"), (useBeagle && useStored));
-		display($("#wpsc-eway-admin-beagle-address"), useBeagle);
-	}
-
-	$("#gateway_settings_wpsc_merchant_eway_form").on("change", "input[name='eway_test'],input[name='eway_beagle'],input[name='eway_stored']", setVisibility);
-
-	setVisibility();
-
-})(jQuery);
-</script>
-
