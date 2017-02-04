@@ -42,7 +42,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$this->eway_ecrypt_key			= $this->settings['eway_ecrypt_key'];
 		$this->eway_customerid			= $this->settings['eway_customerid'];
 		$this->eway_sandbox				= $this->settings['eway_sandbox'];
-		$this->eway_sandbox				= $this->settings['eway_sandbox'];
 		$this->eway_sandbox_api_key		= $this->settings['eway_sandbox_api_key'];
 		$this->eway_sandbox_password	= $this->settings['eway_sandbox_password'];
 		$this->eway_sandbox_ecrypt_key	= $this->settings['eway_sandbox_ecrypt_key'];
