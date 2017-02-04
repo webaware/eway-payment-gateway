@@ -357,6 +357,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		$vars = array(
+			'mode'		=> 'woocommerce',
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> 'form.checkout',
 			'fields'	=> array(

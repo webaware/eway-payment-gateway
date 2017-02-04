@@ -12,6 +12,7 @@
 		"eway_ecrypt_vars": false,
 		"eway_awpcp_checkout": false,
 		"eCrypt": false,
+		"WPSC_Settings_Page": false,
 		"module": false,
 		"require": false
 	}

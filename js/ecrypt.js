@@ -35,16 +35,25 @@
 		return true;
 	}
 
-	/**
-	* watch for WooCommerce submit event
-	*/
-	checkout.on("checkout_place_order_eway_payments", processFields);
 
-	/**
-	* watch for AWPCP submit event
-	*/
-	if (eway_ecrypt_vars.form.indexOf("awpcp") !== -1) {
-		checkout.on("submit", processFields);
+	switch (eway_ecrypt_vars.mode) {
+
+		case "woocommerce":
+			checkout.on("checkout_place_order_eway_payments", processFields);
+			break;
+
+		case "wp-e-commerce":
+			checkout.on("submit", function() {
+				if (checkout.find("input[name='custom_gateway']:checked").val() === "wpsc_merchant_eway") {
+					processFields();
+				}
+			});
+			break;
+
+		case "awpcp":
+			checkout.on("submit", processFields);
+			break;
+
 	}
 
 })(jQuery);

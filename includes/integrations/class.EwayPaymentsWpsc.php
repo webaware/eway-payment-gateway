@@ -32,16 +32,18 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			'has_recurring_billing'		=> false,
 			'wp_admin_cannot_cancel'	=> true,
 			'display_name'				=> _x('eWAY Credit Card Payment', 'WP eCommerce payment method display name', 'eway-payment-gateway'),
-			'form'						=> 'EwayPaymentsWpsc_configForm',		// called as variable function name, wp-e-commerce is _doing_it_wrong(), again!
+			'form'						=> array(__CLASS__, 'configForm'),
 			'submit_function'			=> array(__CLASS__, 'saveConfig'),
 			'payment_type'				=> 'credit_card',
 			'requirements'				=> array(
-												'php_version' => 5.2,
+												'php_version' => 5.3,
 											),
 		);
 
 		// register extra fields we require on the checkout form
 		self::setCheckoutFields();
+
+		add_action('wpsc_before_shopping_cart_page', array(__CLASS__, 'enqueueCheckoutScript'));
 
 		// also register admin hooks if required
 		if (is_admin()) {
@@ -72,7 +74,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		$country_field = get_option('eway_form_country');
 		if ($country_field) {
-			$country = $postdata->getSubkey('collected_data', get_option('eway_form_first_name'));
+			$country = $postdata->getSubkey('collected_data', get_option('eway_form_country'));
 			$country = empty($country[0]) ? '' : $country[0];
 		}
 		else {
@@ -128,22 +130,13 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			return;
 		}
 
-		// process the payment
-		$isLiveSite = !get_option('eway_test');
-		$useStored = get_option('wpsc_merchant_eway_stored');
-
-		$customerID = get_option('ewayCustomerID_id');
-		$customerID = apply_filters('wpsc_merchant_eway_customer_id', $customerID, $isLiveSite, $this->purchase_id);
-
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
 		$transactionID = apply_filters('wpsc_merchant_eway_trans_number', $this->purchase_id);
 
-		if ($useStored) {
-			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
-		}
-		else {
-			$eway = new EwayPaymentsPayment($customerID, $isLiveSite);
-		}
+		$capture	= !get_option('wpsc_merchant_eway_stored');
+		$useSandbox	= (bool) get_option('eway_test');
+		$creds		= apply_filters('woocommerce_eway_credentials', self::getApiCredentials(), $useSandbox, $this->purchase_id);
+		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
@@ -161,13 +154,9 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$eway->address2					= '';
 		$eway->suburb					= $this->collected_gateway_data['city'];
 		$eway->state					= $this->collected_gateway_data['state'];
-		$eway->countryName				= $this->collected_gateway_data['country'];
 		$eway->postcode					= $this->collected_gateway_data['post_code'];
-
-		// for Beagle (free) security
-		if (get_option('wpsc_merchant_eway_beagle')) {
-			$eway->country	= $this->collected_gateway_data['country'];
-		}
+		$eway->country					= $this->collected_gateway_data['country'];
+		$eway->countryName				= $this->collected_gateway_data['country'];
 
 		// convert wp-e-commerce country code into country name
 		if ($this->collected_gateway_data['country']) {
@@ -189,18 +178,18 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 											), 'strlen');
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		try {
 			$response = $eway->processPayment();
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record transaction number and continue
-				if ($useStored) {
-					$status = 2; // WPSC_Purchase_Log::ORDER_RECEIVED
+				if ($capture) {
+					$status = 3; // WPSC_Purchase_Log::ACCEPTED_PAYMENT
 				}
 				else {
-					$status = 3; // WPSC_Purchase_Log::ACCEPTED_PAYMENT
+					$status = 2; // WPSC_Purchase_Log::ORDER_RECEIVED
 				}
 				$log_details = array(
 					'processed'			=> $status,
@@ -215,7 +204,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$eway->invoiceReference, $response->TransactionID, $useStored === 'yes' ? 'order received' : 'accepted payment',
+					$eway->invoiceReference, $response->TransactionID, $capture ? 'accepted payment' : 'order received',
 					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 
 				$this->go_to_transaction_results($this->cart_data['session_id']);
@@ -343,33 +332,24 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* save config details from payment gateway admin
 	*/
 	public static function saveConfig() {
-		if (isset($_POST['ewayCustomerID_id'])) {
-			update_option('ewayCustomerID_id', sanitize_text_field(wp_unslash($_POST['ewayCustomerID_id'])));
+		if (empty($_POST['wpsc_merchant_eway_settings'])) {
+			return true;
 		}
 
-		if (isset($_POST['eway_stored'])) {
-			update_option('wpsc_merchant_eway_stored', $_POST['eway_stored'] ? '1' : '0');
-		}
+		$postdata = new EwayPaymentsFormPost();
 
-		if (isset($_POST['eway_test'])) {
-			update_option('eway_test', $_POST['eway_test'] ? '1' : '0');
-		}
-
-		if (isset($_POST['eway_logging'])) {
-			update_option('eway_logging', sanitize_text_field(wp_unslash($_POST['eway_logging'])));
-		}
-
-		if (isset($_POST['eway_th'])) {
-			update_option('wpsc_merchant_eway_th', $_POST['eway_th'] ? '1' : '0');
-		}
-
-		if (isset($_POST['eway_beagle'])) {
-			update_option('wpsc_merchant_eway_beagle', $_POST['eway_beagle'] ? '1' : '0');
-		}
-
-		if (isset($_POST['eway_card_msg'])) {
-			update_option('wpsc_merchant_eway_card_msg', sanitize_text_field(wp_unslash($_POST['eway_card_msg'])));
-		}
+		update_option('eway_api_key',					strip_tags($postdata->getValue('eway_api_key')));
+		update_option('eway_password',					strip_tags($postdata->getValue('eway_password')));
+		update_option('eway_ecrypt_key',				strip_tags($postdata->getValue('eway_ecrypt_key')));
+		update_option('ewayCustomerID_id',				sanitize_text_field($postdata->getValue('ewayCustomerID_id')));
+		update_option('eway_sandbox_api_key',			strip_tags($postdata->getValue('eway_sandbox_api_key')));
+		update_option('eway_sandbox_password',			strip_tags($postdata->getValue('eway_sandbox_password')));
+		update_option('eway_sandbox_ecrypt_key',		strip_tags($postdata->getValue('eway_sandbox_ecrypt_key')));
+		update_option('wpsc_merchant_eway_stored',		$postdata->getValue('eway_stored') ? '1' : '0');
+		update_option('eway_test',						$postdata->getValue('eway_test') ? '1' : '0');
+		update_option('eway_logging',					sanitize_text_field($postdata->getValue('eway_logging')));
+		update_option('wpsc_merchant_eway_th',			$postdata->getValue('eway_th') ? '1' : '0');
+		update_option('wpsc_merchant_eway_card_msg',	sanitize_text_field($postdata->getValue('eway_card_msg')));
 
 		if (isset($_POST['eway_form'])) {
 			foreach ((array)$_POST['eway_form'] as $form => $value) {
@@ -413,12 +393,65 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		}
 	}
 
-}
+	/**
+	* maybe enqueue client side encryption for the checkout form
+	*/
+	public static function enqueueCheckoutScript($gateway) {
+		$creds = self::getApiCredentials();
+		if (!empty($creds['ecrypt_key'])) {
+			wp_enqueue_script('eway-ecrypt');
+			add_action('wp_print_footer_scripts', array(__CLASS__, 'ecryptScript'));
+		}
+	}
 
-/**
-* proxy function for calling class method, because wp-e-commerce is _doing_it_wrong(), again!
-* @return string
-*/
-function EwayPaymentsWpsc_configForm() {
-	return EwayPaymentsWpsc::configForm();
+	/**
+	* inline scripts for client-side encryption
+	*/
+	public static function ecryptScript() {
+		$creds	= self::getApiCredentials();
+		$min	= SCRIPT_DEBUG ? '' : '.min';
+
+		$vars = array(
+			'mode'		=> 'wp-e-commerce',
+			'key'		=> $creds['ecrypt_key'],
+			'form'		=> 'form.wpsc_checkout_forms',
+			'fields'	=> array(
+							'#eway_card_number'			=> 'cse:card_number',
+							'#eway_cvn'					=> 'cse:cvn',
+						),
+		);
+
+		echo '<script>';
+		echo 'var eway_ecrypt_vars = ', json_encode($vars), '; ';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/ecrypt$min.js");
+		echo '</script>';
+	}
+
+	/**
+	* get API credentials based on settings
+	* @return array
+	*/
+	protected static function getApiCredentials() {
+		$useSandbox	= (bool) get_option('eway_test');
+
+		if (!$useSandbox) {
+			$creds = array(
+				'api_key'		=> get_option('eway_api_key'),
+				'password'		=> get_option('eway_password'),
+				'ecrypt_key'	=> get_option('eway_ecrypt_key'),
+				'customerid'	=> get_option('ewayCustomerID_id'),
+			);
+		}
+		else {
+			$creds = array(
+				'api_key'		=> get_option('eway_sandbox_api_key'),
+				'password'		=> get_option('eway_sandbox_password'),
+				'ecrypt_key'	=> get_option('eway_sandbox_ecrypt_key'),
+				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
+			);
+		}
+
+		return $creds;
+	}
+
 }

@@ -226,6 +226,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		$vars = array(
+			'mode'		=> 'awcp',
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> '#awpcp-eway-checkout',
 			'fields'	=> array(
