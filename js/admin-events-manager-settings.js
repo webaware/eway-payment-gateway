@@ -6,8 +6,7 @@
 	* show warning message if they are
 	*/
 	function setVisibility() {
-		var	useTest   = ($("select[name='em_eway_mode']").val() === "sandbox"),
-			useStored = ($("select[name='em_eway_stored']").val() === "1");
+		var	useTest   = ($("select[name='em_eway_mode']").val() === "sandbox");
 
 		function display(element, visible) {
 			if (visible)
@@ -16,10 +15,10 @@
 				element.hide();
 		}
 
-		display($("#em-eway-admin-stored-test"), (useTest && useStored));
+		display($(".em_eway_sandbox_row"), useTest);
 	}
 
-	$("form[name='gatewaysettingsform']").on("change", "select[name='em_eway_mode'],select[name='em_eway_stored']", setVisibility);
+	$("form[name='gatewaysettingsform']").on("change", "select[name='em_eway_mode']", setVisibility);
 
 	setVisibility();
 

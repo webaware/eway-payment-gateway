@@ -207,13 +207,16 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 						),
 
 			'eway_stored' => array(
-							'title' 		=> _x('Stored payments', 'settings field', 'eway-payment-gateway'),
-							'label' 		=> esc_html__('enable stored payments', 'eway-payment-gateway'),
-							'type' 			=> 'checkbox',
-							'description' 	=> sprintf('%s <em id="woocommerce-eway-admin-stored-test" style="color:#c00"><br />%s</em>',
-													esc_html__("Stored payments records payment details but doesn't bill immediately. Useful for drop-shipping merchants.", 'eway-payment-gateway'),
-													esc_html__('NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.', 'eway-payment-gateway')),
+							'title' 		=> _x('Payment Method', 'settings field', 'eway-payment-gateway'),
+							'type' 			=> 'select',
+							'description' 	=> esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway'),
+							'desc_tip'		=> true,
 							'default' 		=> 'no',
+							'options'		=> array(
+								// for backwards-compatibility, Capture = "not stored", Authorize = "stored / Pre-Auth"
+								'no' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
+								'yes'	 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
+							),
 						),
 
 			'eway_logging' => array(
@@ -564,8 +567,10 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 				if ($this->eway_stored === 'yes') {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
 					$order->reduce_order_stock();
-					$order->update_status('on-hold', __('Awaiting stored payment', 'eway-payment-gateway'));
-					unset($_SESSION['order_awaiting_payment']);
+					$order->update_status('on-hold', __('Payment authorized', 'eway-payment-gateway'));
+					if (isset($_SESSION)) {
+						unset($_SESSION['order_awaiting_payment']);
+					}
 				}
 				else {
 					$order->payment_complete();

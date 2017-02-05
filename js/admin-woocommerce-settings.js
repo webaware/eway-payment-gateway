@@ -5,8 +5,7 @@
 	* show warning message if they are
 	*/
 	function setVisibility() {
-		var	useTest   = ($("#woocommerce_eway_payments_eway_sandbox:checked").val() === "1"),
-			useStored = ($("#woocommerce_eway_payments_eway_stored:checked").val()  === "1");
+		var	useTest   = ($("#woocommerce_eway_payments_eway_sandbox:checked").val() === "1");
 
 		function display(element, visible) {
 			if (visible)
@@ -16,12 +15,11 @@
 		}
 
 		display($("#woocommerce_eway_payments_eway_sandbox_api_key,#woocommerce_eway_payments_eway_sandbox_password,#woocommerce_eway_payments_eway_sandbox_ecrypt_key").closest("tr"), useTest);
-		display($("#woocommerce-eway-admin-stored-test"), (useTest && useStored));
 	}
 
 	setVisibility();
 
-	$("#mainform").on("change", "#woocommerce_eway_payments_eway_sandbox,#woocommerce_eway_payments_eway_stored", setVisibility);
+	$("#mainform").on("change", "#woocommerce_eway_payments_eway_sandbox", setVisibility);
 
 	/**
 	* enable the eWAY site seal code input

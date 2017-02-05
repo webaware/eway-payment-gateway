@@ -66,7 +66,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" class="eway_sandbox_field_row">
 		<th scope="row">
 			<label for="eway_sandbox_api_key"><?php echo esc_html_x('Sandbox API key', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
@@ -76,7 +76,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" class="eway_sandbox_field_row">
 		<th scope="row">
 			<label for="eway_sandbox_password"><?php echo esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
@@ -86,7 +86,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" class="eway_sandbox_field_row">
 		<th scope="row">
 			<label for="eway_sandbox_ecrypt_key"><?php echo esc_html_x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
@@ -97,14 +97,14 @@ $eway_logging	= get_option('eway_logging', 'off');
 	</tr>
 
 	<tr valign="top">
-		<th scope="row" id="eway_stored_label"><?php echo esc_html_x('Stored payments', 'settings field', 'eway-payment-gateway'); ?></th>
+		<th scope="row" id="eway_stored_label"><?php echo esc_html_x('Payment Method', 'settings field', 'eway-payment-gateway'); ?></th>
 		<td>
-			<input type="radio" value="1" name="eway_stored" id="eway_stored_1" <?php checked($eway_stored, '1'); ?> aria-labelledby="eway_stored_label eway_stored_label_1" />
-			<label for="eway_stored_1" id="eway_stored_label_1"><?php echo TXT_WPSC_YES; ?></label> &nbsp;
 			<input type="radio" value="0" name="eway_stored" id="eway_stored_0" <?php checked($eway_stored, '0'); ?> aria-labelledby="eway_stored_label eway_stored_label_0" />
-			<label for="eway_stored_0" id="eway_stored_label_0"><?php echo TXT_WPSC_NO; ?></label>
-			<p id="wpsc-eway-admin-stored-test" style="color:#c00">
-				<?php esc_html_e('NB: Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.', 'eway-payment-gateway'); ?>
+			<label for="eway_stored_0" id="eway_stored_label_0"><?php echo esc_html_x('Capture', 'payment method', 'eway-payment-gateway'); ?></label> &nbsp;
+			<input type="radio" value="1" name="eway_stored" id="eway_stored_1" <?php checked($eway_stored, '1'); ?> aria-labelledby="eway_stored_label eway_stored_label_1" />
+			<label for="eway_stored_1" id="eway_stored_label_1"><?php echo esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'); ?></label>
+			<p class="description">
+				<?php esc_html_e("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway'); ?>
 			</p>
 		</td>
 	</tr>

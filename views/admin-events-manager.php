@@ -83,7 +83,7 @@ if (!defined('ABSPATH')) {
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" class="em_eway_sandbox_row">
 		<th scope="row">
 			<label for="em_eway_sandbox_api_key"><?php echo esc_html_x('Sandbox API key', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
@@ -93,7 +93,7 @@ if (!defined('ABSPATH')) {
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" class="em_eway_sandbox_row">
 		<th scope="row">
 			<label for="em_eway_sandbox_password"><?php echo esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
@@ -103,7 +103,7 @@ if (!defined('ABSPATH')) {
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" class="em_eway_sandbox_row">
 		<th scope="row">
 			<label for="em_eway_sandbox_ecrypt_key"><?php echo esc_html_x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
@@ -156,16 +156,15 @@ if (!defined('ABSPATH')) {
 
 	<tr valign="top">
 		<th scope="row">
-			<label for="em_eway_stored"><?php echo esc_html_x('Stored payments', 'settings field', 'eway-payment-gateway'); ?></label>
+			<label for="em_eway_stored"><?php echo esc_html_x('Payment Method', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
 		<td>
 			<select name="em_eway_stored" id="em_eway_stored">
 				<?php $selected = get_option('em_eway_stored'); ?>
-				<option value="1" <?php selected($selected, '1'); ?>><?php echo translate('Yes', 'events-manager'); ?></option>
-				<option value="0" <?php selected($selected, '0'); ?>><?php echo translate('No', 'events-manager'); ?></option>
+				<option value="0"<?php selected($selected, '0'); ?>><?php echo esc_html_x('Capture', 'payment method', 'eway-payment-gateway'); ?></option>
+				<option value="1"<?php selected($selected, '1'); ?>><?php echo esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'); ?></option>
 			</select>
-			<em><?php esc_html_e("Stored payments records payment details but doesn't bill immediately.", 'eway-payment-gateway'); ?></em>
-			<em id="em-eway-admin-stored-test" style='color:#c00'><?php esc_html_e('Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.', 'eway-payment-gateway'); ?></em>
+			<em><?php esc_html_e("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway'); ?></em>
 		</td>
 	</tr>
 

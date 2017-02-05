@@ -440,7 +440,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 				$result = true;
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$eway->invoiceReference, $response->TransactionID, get_option("em_{$this->gateway}_stored") ? 'on-hold' : 'completed',
+					$eway->invoiceReference, $response->TransactionID, get_option("em_{$this->gateway}_stored") ? 'pending' : 'completed',
 					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 			}
 			else {

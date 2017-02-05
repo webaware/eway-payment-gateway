@@ -112,12 +112,17 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 						'textarea', '',
 						esc_html_x('Client Side Encryption key from your sandbox account', 'settings label', 'eway-payment-gateway'));
 
+		$methods = array(
+			'0' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
+			'1'		 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
+		);
 		$awpcp->settings->add_setting($section, 'eway_stored',
-						esc_html_x('Stored payments', 'settings field', 'eway-payment-gateway'),
-						'checkbox', 0,
-						esc_html__("Stored payments records payment details but doesn't bill immediately.", 'eway-payment-gateway')
+						esc_html_x('Payment Method', 'settings field', 'eway-payment-gateway'),
+						'select', 0,
+						esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway')
 						. '<br/>'
-						. esc_html__('Useful when ads must be approved by an admin, allowing you to reject payments for rejected ads.', 'eway-payment-gateway'));
+						. esc_html__('Authorize can be useful when ads must be approved by an admin, allowing you to reject payments for rejected ads.', 'eway-payment-gateway'),
+						array('options' => $methods));
 
 		$log_options = array(
 			'off' 		=> esc_html_x('Off', 'logging settings', 'eway-payment-gateway'),

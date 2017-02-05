@@ -5,8 +5,7 @@
 	* show warning message if they are
 	*/
 	function setVisibility() {
-		var	useTest   = ($("input[name='eway_test']:checked").val()   === "1"),
-			useStored = ($("input[name='eway_stored']:checked").val() === "1");
+		var	useTest   = ($("input[name='eway_test']:checked").val()   === "1");
 
 		function display(element, visible) {
 			if (visible)
@@ -15,10 +14,10 @@
 				element.hide();
 		}
 
-		display($("#wpsc-eway-admin-stored-test"), (useTest && useStored));
+		display($(".eway_sandbox_field_row"), useTest);
 	}
 
-	$("#wpsc_options_page").on("change", "#gateway_settings_wpsc_merchant_eway_form input[name='eway_test'],#gateway_settings_wpsc_merchant_eway_form input[name='eway_stored']", setVisibility);
+	$("#wpsc_options_page").on("change", "input[name='eway_test']", setVisibility);
 
 	// watch for AJAX load of our form
 	$(document).ajaxSuccess(function(event, xhr, settings) {
