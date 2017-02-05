@@ -142,6 +142,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
 		$eway->transactionNumber		= $transactionID;
 		$eway->amount					= $purchase_logs->get('totalprice');
+		$eway->currencyCode				= wpsc_get_currency_code();
 		$eway->cardHoldersName			= $this->collected_gateway_data['card_name'];
 		$eway->cardNumber				= $this->collected_gateway_data['card_number'];
 		$eway->cardExpiryMonth			= $this->collected_gateway_data['expiry_month'];
