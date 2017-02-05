@@ -50,6 +50,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<input type="text" value="<?php echo esc_attr(get_option('ewayCustomerID_id')); ?>" name="ewayCustomerID_id" id="ewayCustomerID_id" />
+			<p class="description"><?php esc_html_e('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'); ?></p>
 		</td>
 	</tr>
 
