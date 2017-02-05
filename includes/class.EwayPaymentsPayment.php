@@ -315,7 +315,7 @@ class EwayPaymentsPayment {
 		$xml->writeElement('ewayCVN', $this->cardVerificationNumber);
 
 		// Beagle data
-		if (!empty($this->country)) {
+		if (!empty($this->country) && $this->accountID !== EWAY_PAYMENTS_TEST_CUSTOMER) {
 			if (empty($this->customerIP)) {
 				$this->customerIP = EwayPaymentsPlugin::getCustomerIP($this->isLiveSite);
 			}
@@ -336,7 +336,7 @@ class EwayPaymentsPayment {
 	*/
 	private function sendPayment($xml) {
 		// select endpoint URL, use sandbox if not from live website
-		if (!empty($this->country)) {
+		if (!empty($this->country) && $this->accountID !== EWAY_PAYMENTS_TEST_CUSTOMER) {
 			// use Beagle anti-fraud endpoints
 			$url = $this->isLiveSite ? self::REALTIME_BEAGLE_API_LIVE : self::REALTIME_BEAGLE_API_SANDBOX;
 		}
