@@ -1,3 +1,4 @@
+
 // script supporting eWAY's Client Side Encryption
 
 (function($) {
@@ -35,6 +36,15 @@
 		return true;
 	}
 
+	/**
+	* get form element current value
+	* @param {String} name
+	* @return {String}
+	*/
+	function elementValue(name) {
+		return checkout.get(0).elements[name].value;
+	}
+
 
 	switch (eway_ecrypt_vars.mode) {
 
@@ -44,7 +54,15 @@
 
 		case "wp-e-commerce":
 			checkout.on("submit", function() {
-				if (checkout.find("input[name='custom_gateway']:checked").val() === "wpsc_merchant_eway") {
+				if (elementValue("custom_gateway") === "wpsc_merchant_eway") {
+					processFields();
+				}
+			});
+			break;
+
+		case "events-manager":
+			checkout.on("submit", function() {
+				if (elementValue("gateway") === "eway") {
 					processFields();
 				}
 			});

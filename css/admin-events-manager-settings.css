@@ -1,0 +1,11 @@
+
+.form-table td em {
+	clear: both;
+	display: block;
+	margin: 0.4em;
+}
+
+#em_eway_ecrypt_key,
+#em_eway_sandbox_ecrypt_key {
+	height: 6em;
+}

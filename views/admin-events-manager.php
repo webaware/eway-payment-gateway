@@ -6,14 +6,6 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
-<style>
-.form-table td em {
-	clear:both;
-	display:block;
-	margin:0.4em;
-}
-</style>
-
 <table class="form-table">
 <tbody>
   <tr valign="top">
@@ -39,7 +31,9 @@ if (!defined('ABSPATH')) {
 <tbody>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_mode"><?php echo translate('Mode', 'em-pro'); ?></label></th>
+		<th scope="row">
+			<label for="em_eway_mode"><?php echo translate('Mode', 'em-pro'); ?></label>
+		</th>
 		<td>
 			<select name="em_eway_mode" id="em_eway_mode">
 				<?php $selected = get_option('em_eway_mode'); ?>
@@ -50,12 +44,79 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_cust_id"><?php echo esc_html_x('Customer ID', 'settings field', 'eway-payment-gateway'); ?></label></th>
-		<td><input type="text" name="em_eway_cust_id" id="em_eway_cust_id" value="<?php echo esc_attr(get_option('em_eway_cust_id')); ?>" /></td>
+		<th scope="row">
+			<label for="em_eway_api_key"><?php echo esc_html_x('API key', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
+		<td>
+			<input type="text" name="em_eway_api_key" id="em_eway_api_key" value="<?php echo esc_attr(get_option('em_eway_api_key')); ?>"
+				class="large-text" autocorrect="off" autocapitalize="off" spellcheck="false" />
+		</td>
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_card_msg"><?php echo esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row">
+			<label for="em_eway_password"><?php echo esc_html_x('API password', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
+		<td>
+			<input type="text" name="em_eway_password" id="em_eway_password" value="<?php echo esc_attr(get_option('em_eway_password')); ?>"
+				autocorrect="off" autocapitalize="off" spellcheck="false" />
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">
+			<label for="em_eway_ecrypt_key"><?php echo esc_html_x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
+		<td>
+			<textarea name="em_eway_ecrypt_key" id="em_eway_ecrypt_key" class="large-text"
+				autocorrect="off" autocapitalize="off" spellcheck="false"><?php echo esc_html(get_option('em_eway_ecrypt_key')); ?></textarea>
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">
+			<label for="em_eway_cust_id"><?php echo esc_html_x('Customer ID', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
+		<td>
+			<input type="text" name="em_eway_cust_id" id="em_eway_cust_id" value="<?php echo esc_attr(get_option('em_eway_cust_id')); ?>" />
+			<em><?php esc_html_e('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'); ?></em>
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">
+			<label for="em_eway_sandbox_api_key"><?php echo esc_html_x('Sandbox API key', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
+		<td>
+			<input type="text" name="em_eway_sandbox_api_key" id="em_eway_sandbox_api_key" value="<?php echo esc_attr(get_option('em_eway_sandbox_api_key')); ?>"
+				class="large-text" autocorrect="off" autocapitalize="off" spellcheck="false" />
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">
+			<label for="em_eway_sandbox_password"><?php echo esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
+		<td>
+			<input type="text" name="em_eway_sandbox_password" id="em_eway_sandbox_password" value="<?php echo esc_attr(get_option('em_eway_sandbox_password')); ?>"
+				autocorrect="off" autocapitalize="off" spellcheck="false" />
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">
+			<label for="em_eway_sandbox_ecrypt_key"><?php echo esc_html_x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
+		<td>
+			<textarea name="em_eway_sandbox_ecrypt_key" id="em_eway_sandbox_ecrypt_key" class="large-text"
+				autocorrect="off" autocapitalize="off" spellcheck="false"><?php echo esc_html(get_option('em_eway_sandbox_ecrypt_key')); ?></textarea>
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<th scope="row">
+			<label for="em_eway_card_msg"><?php echo esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
 		<td>
 			<input type="text" name="em_eway_card_msg" id="em_eway_card_msg" value="<?php echo esc_attr(get_option('em_eway_card_msg')); ?>" class="large-text" />
 			<em>Message to show above credit card fields, e.g. &quot;Visa and Mastercard only&quot;</em>
@@ -63,18 +124,9 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_test_force"><?php esc_html_e('Force ID 87654321 for sandbox', 'eway-payment-gateway'); ?></label></th>
-		<td>
-			<select name="em_eway_test_force" id="em_eway_test_force">
-				<?php $selected = get_option('em_eway_test_force'); ?>
-				<option value="1" <?php selected($selected, '1'); ?>><?php echo translate('Yes', 'events-manager'); ?></option>
-				<option value="0" <?php selected($selected, '0'); ?>><?php echo translate('No', 'events-manager'); ?></option>
-			</select>
-		</td>
-	</tr>
-
-	<tr valign="top">
-		<th scope="row"><label for="em_eway_ssl_force"><?php echo esc_html_x('Force SSL for bookings form', 'settings field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row">
+			<label for="em_eway_ssl_force"><?php echo esc_html_x('Force SSL for bookings form', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
 		<td>
 			<select name="em_eway_ssl_force" id="em_eway_ssl_force">
 				<?php $selected = get_option('em_eway_ssl_force'); ?>
@@ -85,7 +137,9 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_logging"><?php echo esc_html_x('Logging', 'settings field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row">
+			<label for="em_eway_logging"><?php echo esc_html_x('Logging', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
 		<td>
 			<select name="em_eway_logging" id="em_eway_logging">
 				<?php $selected = get_option('em_eway_logging'); ?>
@@ -101,7 +155,9 @@ if (!defined('ABSPATH')) {
 	</tr>
 
 	<tr valign="top">
-		<th scope="row"><label for="em_eway_stored"><?php echo esc_html_x('Stored payments', 'settings field', 'eway-payment-gateway'); ?></label></th>
+		<th scope="row">
+			<label for="em_eway_stored"><?php echo esc_html_x('Stored payments', 'settings field', 'eway-payment-gateway'); ?></label>
+		</th>
 		<td>
 			<select name="em_eway_stored" id="em_eway_stored">
 				<?php $selected = get_option('em_eway_stored'); ?>
@@ -110,20 +166,6 @@ if (!defined('ABSPATH')) {
 			</select>
 			<em><?php esc_html_e("Stored payments records payment details but doesn't bill immediately.", 'eway-payment-gateway'); ?></em>
 			<em id="em-eway-admin-stored-test" style='color:#c00'><?php esc_html_e('Stored Payments uses the Direct Payments sandbox; there is no Stored Payments sandbox.', 'eway-payment-gateway'); ?></em>
-		</td>
-	</tr>
-
-	<tr valign="top">
-		<th scope="row"><label for="em_eway_beagle"><?php echo esc_html_x('Beagle (free)', 'settings field', 'eway-payment-gateway'); ?></label></th>
-		<td>
-			<select name="em_eway_beagle" id="em_eway_beagle">
-				<?php $selected = get_option('em_eway_beagle'); ?>
-				<option value="1" <?php selected($selected, '1'); ?>><?php echo translate('Yes', 'events-manager'); ?></option>
-				<option value="0" <?php selected($selected, '0'); ?>><?php echo translate('No', 'events-manager'); ?></option>
-			</select>
-			<em><?php printf(__('<a href="%s" target="_blank">Beagle</a> is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle.', 'eway-payment-gateway'), 'https://www.eway.com.au/developers/api/beagle-lite'); ?></em>
-			<em><?php esc_html_e("You will also need to add a Country field to your booking form. Beagle works by comparing the country of the address with the country where the purchaser is using the Internet; Beagle won't be used when booking without a country selected.", 'eway-payment-gateway'); ?></em>
-			<em id="em-eway-admin-stored-beagle" style='color:#c00'><?php esc_html_e('Beagle is not available for Stored Payments', 'eway-payment-gateway'); ?></em>
 		</td>
 	</tr>
 
@@ -140,33 +182,3 @@ if (!defined('ABSPATH')) {
 
 </tbody>
 </table>
-
-<script>
-(function($) {
-
-	/**
-	* check whether both the sandbox (test) mode and Stored Payments are selected,
-	* show warning message if they are
-	*/
-	function setVisibility() {
-		var	useTest = ($("select[name='em_eway_mode']").val() == "sandbox"),
-			useBeagle = ($("select[name='em_eway_beagle']").val() == "1"),
-			useStored = ($("select[name='em_eway_stored']").val() == "1");
-
-		function display(element, visible) {
-			if (visible)
-				element.css({display: "none"}).show(750);
-			else
-				element.hide();
-		}
-
-		display($("#em-eway-admin-stored-test"), (useTest && useStored));
-		display($("#em-eway-admin-stored-beagle"), (useBeagle && useStored));
-	}
-
-	$("form[name='gatewaysettingsform']").on("change", "select[name='em_eway_mode'],select[name='em_eway_stored'],select[name='em_eway_beagle']", setVisibility);
-
-	setVisibility();
-
-})(jQuery);
-</script>

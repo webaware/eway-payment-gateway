@@ -30,13 +30,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			"em_{$this->gateway}_option_name"				=> _x('Credit Card', 'Events Manager payment method name', 'eway-payment-gateway'),
 			"em_{$this->gateway}_booking_feedback"			=> _x('Booking successful.', 'Events Manager booking feedback', 'eway-payment-gateway'),
 			"em_{$this->gateway}_booking_feedback_free"		=> _x('Booking successful. You have not been charged for this booking.', 'Events Manager booking feedback free', 'eway-payment-gateway'),
-			"em_{$this->gateway}_cust_id"					=> EWAY_PAYMENTS_TEST_CUSTOMER,
-			"em_{$this->gateway}_stored"					=> '0',
-			"em_{$this->gateway}_beagle"					=> '0',
-			"em_{$this->gateway}_test_force"				=> '1',
-			"em_{$this->gateway}_ssl_force"					=> '1',
 			"em_{$this->gateway}_mode"						=> 'sandbox',
-			"em_{$this->gateway}_logging"					=> 'off',
 		);
 		foreach ($defaults as $option => $value) {
 			if (get_option($option) === false) {
@@ -45,20 +39,22 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		}
 
 		// create a logger
-		$this->logger = new EwayPaymentsLogging('events-manager', get_option("em_{$this->gateway}_logging"));
+		$this->logger = new EwayPaymentsLogging('events-manager', get_option("em_{$this->gateway}_logging", 'off'));
 
 		// initialise parent class
 		parent::__construct();
 
+		add_action('admin_print_styles-event_page_events-manager-gateways', array($this, 'adminSettingsStyles'));
+
 		if ($this->is_active()) {
 			// force SSL for booking submissions on live site, because credit card details need to be encrypted
-			if (get_option("em_{$this->gateway}_mode") == 'live') {
+			if (get_option("em_{$this->gateway}_mode") === 'live') {
 				add_filter('em_wp_localize_script', array(__CLASS__, 'forceBookingAjaxSSL'));
 				add_filter('em_booking_form_action_url', array(__CLASS__, 'force_ssl'));
 			}
 
 			// force whole bookings page to SSL if settings require
-			if (get_option("em_{$this->gateway}_ssl_force")) {
+			if (get_option("em_{$this->gateway}_ssl_force", 1)) {
 				add_action('template_redirect', array(__CLASS__, 'redirect_ssl'));
 			}
 
@@ -69,6 +65,31 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 				add_filter('em_multiple_booking_validate', array($this, 'emBookingValidate'), 10, 2);
 			}
 		}
+	}
+
+	/**
+	* load custom styles for settings page
+	*/
+	public function adminSettingsStyles() {
+		// only for eWAY settings page
+		if (empty($_GET['gateway']) || $_GET['gateway'] !== $this->gateway) {
+			return;
+		}
+
+		echo '<style>';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'css/admin-events-manager-settings.css');
+		echo '</style>';
+	}
+
+	/**
+	* add page script for admin options
+	*/
+	public function adminSettingsScript() {
+		$min	= SCRIPT_DEBUG ? '' : '.min';
+
+		echo '<script>';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-events-manager-settings$min.js");
+		echo '</script>';
 	}
 
 	/**
@@ -295,13 +316,37 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 
 		// load template with passed values, capture output and register
 		EwayPaymentsPlugin::loadTemplate('eventsmanager-eway-fields.php', compact('card_msg', 'card_num', 'card_name', 'card_code', 'optMonths', 'optYears'));
+
+		// maybe set up Client Side Encryption
+		$creds = $this->getApiCredentials();
+		if (!empty($creds['ecrypt_key'])) {
+			wp_enqueue_script('eway-ecrypt');
+			add_action('wp_print_footer_scripts', array($this, 'ecryptScript'));
+		}
 	}
 
-	/*
-	 * --------------------------------------------------
-	 * functions specific to eway payments
-	 * --------------------------------------------------
-	 */
+	/**
+	* inline scripts for client-side encryption
+	*/
+	public function ecryptScript() {
+		$creds	= $this->getApiCredentials();
+		$min	= SCRIPT_DEBUG ? '' : '.min';
+
+		$vars = array(
+			'mode'		=> 'events-manager',
+			'key'		=> $creds['ecrypt_key'],
+			'form'		=> 'form.em-booking-form',
+			'fields'	=> array(
+							'#eway_card_num'	=> 'cse:x_card_num',
+							'#eway_card_code'	=> 'cse:x_card_code',
+						),
+		);
+
+		echo '<script>';
+		echo 'var eway_ecrypt_vars = ', json_encode($vars), '; ';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/ecrypt$min.js");
+		echo '</script>';
+	}
 
 	/**
 	* attempt to process payment
@@ -309,33 +354,21 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	* @return boolean
 	*/
 	public function processPayment($EM_Booking){
-		// process the payment
-		$isLiveSite = !(get_option("em_{$this->gateway}_mode") == 'sandbox');
-		if (!$isLiveSite && get_option("em_{$this->gateway}_test_force")) {
-			$customerID = EWAY_PAYMENTS_TEST_CUSTOMER;
-		}
-		else {
-			$customerID = get_option("em_{$this->gateway}_cust_id");
-		}
-		$customerID = apply_filters('em_eway_customer_id', $customerID, $isLiveSite, $EM_Booking);
-
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
 		$transactionID = apply_filters('em_eway_trans_number', $EM_Booking->booking_id);
 
-		if (get_option("em_{$this->gateway}_stored")) {
-			$eway = new EwayPaymentsStoredPayment($customerID, $isLiveSite);
-		}
-		else {
-			$eway = new EwayPaymentsPayment($customerID, $isLiveSite);
-		}
+		$capture	= !get_option("em_{$this->gateway}_stored");
+		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
+		$creds		= apply_filters('em_eway_credentials', $this->getApiCredentials(), $useSandbox, $EM_Booking);
+		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
 
 		$postdata = new EwayPaymentsFormPost();
 
 		$eway->invoiceDescription			= $EM_Booking->get_event()->event_name;
-		//~ $eway->invoiceDescription		= $EM_Booking->output('#_BOOKINGTICKETDESCRIPTION');
 		$eway->invoiceReference				= $EM_Booking->booking_id;						// customer invoice reference
 		$eway->transactionNumber			= $transactionID;
 		$eway->amount						= $EM_Booking->get_price(false, false, true);
+		$eway->currencyCode					= get_option('dbem_bookings_currency', 'AUD');
 		$eway->cardHoldersName				= $postdata->getValue('x_card_name');
 		$eway->cardNumber					= $postdata->cleanCardnumber($postdata->getValue('x_card_num'));
 		$eway->cardExpiryMonth				= $postdata->getValue('x_exp_date_month');
@@ -346,17 +379,13 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$eway->address2						= EM_Gateways::get_customer_field('address_2', $EM_Booking);
 		$eway->suburb						= EM_Gateways::get_customer_field('city', $EM_Booking);
 		$eway->state						= EM_Gateways::get_customer_field('state', $EM_Booking);
-		$eway->countryName					= EM_Gateways::get_customer_field('country', $EM_Booking);
 		$eway->postcode						= $postdata->getValue('zip');
-
-		// for Beagle (free) security
-		if (get_option("em_{$this->gateway}_beagle")) {
-			$eway->country					= EM_Gateways::get_customer_field('country', $EM_Booking);
-		}
+		$eway->country						= EM_Gateways::get_customer_field('country', $EM_Booking);
+		$eway->countryName					= $eway->country;
 
 		// convert Events Manager country code into country name
-		if ($eway->countryName) {
-			$eway->countryName = self::getCountryName($eway->countryName);
+		if ($eway->country) {
+			$eway->countryName = self::getCountryName($eway->country);
 		}
 
 		// attempt to split name into parts, and hope to not offend anyone!
@@ -382,7 +411,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 												), 'strlen');
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$isLiveSite ? 'live' : 'test', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
 
 		// Get Payment
 		try {
@@ -407,7 +436,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 				$note = implode("\n", $notes);
 
 				$status = get_option("em_{$this->gateway}_stored") ? 'Pending' : 'Completed';
-				$this->record_transaction($EM_Booking, $response->Payment->TotalAmount, 'AUD', date('Y-m-d H:i:s', current_time('timestamp')), $response->TransactionID, $status, $note);
+				$this->record_transaction($EM_Booking, $response->Payment->TotalAmount, $eway->currencyCode, date('Y-m-d H:i:s', current_time('timestamp')), $response->TransactionID, $status, $note);
 				$result = true;
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
@@ -446,6 +475,8 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	* Outputs custom fields in the settings page
 	*/
 	public function mysettings() {
+		add_action('admin_print_footer_scripts', array($this, 'adminSettingsScript'));
+
 		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-events-manager.php';
 	}
 
@@ -456,10 +487,14 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	public function update() {
 		$options = array (
 			"em_{$this->gateway}_mode",
+			"em_{$this->gateway}_api_key",
+			"em_{$this->gateway}_password",
+			"em_{$this->gateway}_ecrypt_key",
 			"em_{$this->gateway}_cust_id",
+			"em_{$this->gateway}_sandbox_api_key",
+			"em_{$this->gateway}_sandbox_password",
+			"em_{$this->gateway}_sandbox_ecrypt_key",
 			"em_{$this->gateway}_stored",
-			"em_{$this->gateway}_beagle",
-			"em_{$this->gateway}_test_force",
 			"em_{$this->gateway}_ssl_force",
 			"em_{$this->gateway}_logging",
 			"em_{$this->gateway}_card_msg",
@@ -474,16 +509,48 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		add_filter("gateway_update_em_{$this->gateway}_card_msg", 'sanitize_text_field');
 		add_filter("gateway_update_em_{$this->gateway}_logging", 'sanitize_text_field');
 
+		add_filter("gateway_update_em_{$this->gateway}_api_key", 'strip_tags');
+		add_filter("gateway_update_em_{$this->gateway}_password", 'strip_tags');
+		add_filter("gateway_update_em_{$this->gateway}_ecrypt_key", 'strip_tags');
+		add_filter("gateway_update_em_{$this->gateway}_sandbox_api_key", 'strip_tags');
+		add_filter("gateway_update_em_{$this->gateway}_sandbox_password", 'strip_tags');
+		add_filter("gateway_update_em_{$this->gateway}_sandbox_ecrypt_key", 'strip_tags');
+
 		add_filter("gateway_update_em_{$this->gateway}_booking_feedback", 'wp_kses_data');
 		add_filter("gateway_update_em_{$this->gateway}_booking_feedback_free", 'wp_kses_data');
 
 		add_filter("gateway_update_em_{$this->gateway}_stored", 'intval');
-		add_filter("gateway_update_em_{$this->gateway}_beagle", 'intval');
-		add_filter("gateway_update_em_{$this->gateway}_test_force", 'intval');
 		add_filter("gateway_update_em_{$this->gateway}_ssl_force", 'intval');
 		add_filter("gateway_update_em_{$this->gateway}_manual_approval", 'intval');
 
 		return parent::update($options);
+	}
+
+	/**
+	* get API credentials based on settings
+	* @return array
+	*/
+	protected function getApiCredentials() {
+		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
+
+		if (!$useSandbox) {
+			$creds = array(
+				'api_key'		=> get_option("em_{$this->gateway}_api_key"),
+				'password'		=> get_option("em_{$this->gateway}_password"),
+				'ecrypt_key'	=> get_option("em_{$this->gateway}_ecrypt_key"),
+				'customerid'	=> get_option("em_{$this->gateway}_cust_id"),
+			);
+		}
+		else {
+			$creds = array(
+				'api_key'		=> get_option("em_{$this->gateway}_sandbox_api_key"),
+				'password'		=> get_option("em_{$this->gateway}_sandbox_password"),
+				'ecrypt_key'	=> get_option("em_{$this->gateway}_sandbox_ecrypt_key"),
+				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
+			);
+		}
+
+		return $creds;
 	}
 
 }
