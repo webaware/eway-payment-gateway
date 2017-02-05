@@ -135,7 +135,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		$capture	= !get_option('wpsc_merchant_eway_stored');
 		$useSandbox	= (bool) get_option('eway_test');
-		$creds		= apply_filters('woocommerce_eway_credentials', self::getApiCredentials(), $useSandbox, $this->purchase_id);
+		$creds		= apply_filters('wpsc_eway_credentials', self::getApiCredentials(), $useSandbox, $this->purchase_id);
 		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
