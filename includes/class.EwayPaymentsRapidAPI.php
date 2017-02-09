@@ -384,6 +384,7 @@ class EwayPaymentsRapidAPI {
 		$this->useSandbox		= $useSandbox;
 		$this->capture			= true;
 		$this->sslVerifyPeer	= true;
+		$this->httpUserAgent	= 'eWAY Payment Gateway v' . EWAY_PAYMENTS_VERSION;
 	}
 
 	/**
