@@ -4,6 +4,7 @@
 
 ### 3.7.1, soon...
 
+* changed: WooCommerce 2.7 compatibility, with fallback support to previous version
 * changed: AWPCP minimum version now 3.0
 * added: capture and report HTTP errors communicating with the gateway
 

@@ -475,7 +475,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	public function process_payment($order_id) {
 		global $woocommerce;
 
-		$order		= new WC_Order($order_id);
+		$order		= $this->getOrder($order_id);
 		$ccfields	= $this->getCardFields();
 
 		$capture	= ($this->eway_stored  !== 'yes');
@@ -500,38 +500,38 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$eway->cardExpiryMonth			= $ccfields['expiry_month'];
 		$eway->cardExpiryYear			= $ccfields['expiry_year'];
 		$eway->cardVerificationNumber	= $ccfields['cvn'];
-		$eway->amount					= $order->order_total;
-		$eway->currencyCode				= $order->order_currency;
-		$eway->firstName				= $order->billing_first_name;
-		$eway->lastName					= $order->billing_last_name;
-		$eway->companyName				= $order->billing_company;
-		$eway->emailAddress				= $order->billing_email;
-		$eway->phone					= $order->billing_phone;
-		$eway->address1					= $order->billing_address_1;
-		$eway->address2					= $order->billing_address_2;
-		$eway->suburb					= $order->billing_city;
-		$eway->state					= $order->billing_state;
-		$eway->postcode					= $order->billing_postcode;
-		$eway->country					= $order->billing_country;
-		$eway->countryName				= $order->billing_country;							// for eWAY legacy API
-		$eway->comments					= $order->customer_note;
+		$eway->amount					= $order->get_total();
+		$eway->currencyCode				= $order->get_currency();
+		$eway->firstName				= $order->get_billing_first_name();
+		$eway->lastName					= $order->get_billing_last_name();
+		$eway->companyName				= $order->get_billing_company();
+		$eway->emailAddress				= $order->get_billing_email();
+		$eway->phone					= $order->get_billing_phone();
+		$eway->address1					= $order->get_billing_address_1();
+		$eway->address2					= $order->get_billing_address_2();
+		$eway->suburb					= $order->get_billing_city();
+		$eway->state					= $order->get_billing_state();
+		$eway->postcode					= $order->get_billing_postcode();
+		$eway->country					= $order->get_billing_country();
+		$eway->countryName				= $eway->country;									// for eWAY legacy API
+		$eway->comments					= $order->get_customer_note();
 
 		// maybe send shipping details
-		if ($order->shipping_address_1 || $order->shipping_address_2) {
+		if ($order->get_shipping_address_1() || $order->get_shipping_address_2()) {
 			$eway->hasShipping			= true;
-			$eway->shipFirstName		= $order->shipping_first_name;
-			$eway->shipLastName			= $order->shipping_last_name;
-			$eway->shipAddress1			= $order->shipping_address_1;
-			$eway->shipAddress2			= $order->shipping_address_2;
-			$eway->shipSuburb			= $order->shipping_city;
-			$eway->shipState			= $order->shipping_state;
-			$eway->shipCountry			= $order->shipping_country;
-			$eway->shipPostcode			= $order->shipping_postcode;
+			$eway->shipFirstName		= $order->get_shipping_first_name();
+			$eway->shipLastName			= $order->get_shipping_last_name();
+			$eway->shipAddress1			= $order->get_shipping_address_1();
+			$eway->shipAddress2			= $order->get_shipping_address_2();
+			$eway->shipSuburb			= $order->get_shipping_city();
+			$eway->shipState			= $order->get_shipping_state();
+			$eway->shipCountry			= $order->get_shipping_country();
+			$eway->shipPostcode			= $order->get_shipping_postcode();
 		}
 
 		// convert WooCommerce country code into country name (for eWAY legacy API)
-		if (isset($woocommerce->countries->countries[$order->billing_country])) {
-			$eway->countryName = $woocommerce->countries->countries[$order->billing_country];
+		if (isset($woocommerce->countries->countries[$eway->country])) {
+			$eway->countryName = $woocommerce->countries->countries[$eway->country];
 		}
 
 		// use cardholder name for last name if no customer name entered
@@ -620,10 +620,12 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	*/
 	public function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
 		if (apply_filters('woocommerce_eway_email_show_trans_number', true, $order)) {
-			$key = 'Transaction ID';
-			$keys[$key] = array(
+			$order			= $this->getOrder($order);
+			$key			= 'Transaction ID';
+
+			$keys[$key]		= array(
 				'label'		=> wptexturize($key),
-				'value'		=> wptexturize(get_post_meta($order->id, $key, true)),
+				'value'		=> wptexturize(get_post_meta($order->get_id(), $key, true)),
 			);
 		}
 
@@ -655,6 +657,24 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		}
 
 		return $creds;
+	}
+
+	/**
+	* get order object for order, maybe wrapping it up for legacy WooCommerce versions
+	* @param int|object|WC_Order $order
+	* @return WC_Order|EwayPaymentsWooOrder
+	*/
+	protected function getOrder($order) {
+		if (version_compare(WC_VERSION, '2.7', '<')) {
+			// wrap legacy order to provide accessor methods
+			$order = new EwayPaymentsWooOrder($order);
+		}
+		elseif (is_numeric($order)) {
+			// convert order number to order object
+			$order = new WC_Order($order);
+		}
+
+		return $order;
 	}
 
 	/**

@@ -252,6 +252,8 @@ class EwayPaymentsPlugin {
 			'EwayPaymentsResponse'					=> 'includes/class.EwayPaymentsResponse.php',
 			'EwayPaymentsResponseDirectPayment'		=> 'includes/class.EwayPaymentsResponseDirectPayment.php',
 			'EwayPaymentsStoredPayment'				=> 'includes/class.EwayPaymentsStoredPayment.php',
+
+			'EwayPaymentsWooOrder'					=> 'includes/integrations/class.EwayPaymentsWooOrder.php',
 		);
 
 		if (isset($classMap[$class_name])) {
