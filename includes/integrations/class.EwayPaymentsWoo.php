@@ -76,8 +76,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* initialise settings form fields
 	*/
 	public function initFormFields() {
-		global $woocommerce;
-
 		// get recorded settings, so we can determine sane defaults when upgrading
 		$settings = get_option('woocommerce_eway_payments_settings');
 
@@ -123,7 +121,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'class'			=> 'chosen_select',
 							'css'			=> 'width: 450px;',
 							'default' 		=> '',
-							'options'		=> $woocommerce->countries->countries,
+							'options'		=> WC()->countries->countries,
 						),
 
 			'eway_api_key' => array(
@@ -473,8 +471,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return array
 	*/
 	public function process_payment($order_id) {
-		global $woocommerce;
-
 		$order		= $this->getOrder($order_id);
 		$ccfields	= $this->getCardFields();
 
@@ -530,8 +526,9 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		}
 
 		// convert WooCommerce country code into country name (for eWAY legacy API)
-		if (isset($woocommerce->countries->countries[$eway->country])) {
-			$eway->countryName = $woocommerce->countries->countries[$eway->country];
+		$countries = WC()->countries->countries;
+		if (isset($countries[$eway->country])) {
+			$eway->countryName = $countries[$eway->country];
 		}
 
 		// use cardholder name for last name if no customer name entered
@@ -575,7 +572,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 				else {
 					$order->payment_complete();
 				}
-				$woocommerce->cart->empty_cart();
+				WC()->cart->empty_cart();
 
 				$result = array(
 					'result'	=> 'success',
