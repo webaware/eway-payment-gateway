@@ -564,7 +564,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 				if ($this->eway_stored === 'yes') {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
-					$order->reduce_order_stock();
+					wc_reduce_stock_levels($order_id);
 					$order->update_status('on-hold', __('Payment authorized', 'eway-payment-gateway'));
 					if (isset($_SESSION)) {
 						unset($_SESSION['order_awaiting_payment']);

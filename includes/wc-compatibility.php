@@ -17,12 +17,27 @@ if (!function_exists('wc_add_notice')) {
 		// call pre-WC2.1 equivalent
 		global $woocommerce;
 
-		if ($notice_type == 'error') {
+		if ($notice_type === 'error') {
 			$woocommerce->add_error($message);
 		}
 		else {
 			$woocommerce->add_message($message);
 		}
+	}
+
+}
+
+
+if (!function_exists('wc_reduce_stock_levels')) {
+
+	/**
+	 * Reduce stock levels for items within an order.
+	 * @since 2.7.0
+	 * @param int $order_id
+	 */
+	function wc_reduce_stock_levels( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$order->reduce_order_stock();
 	}
 
 }
