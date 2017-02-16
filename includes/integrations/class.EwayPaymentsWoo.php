@@ -553,13 +553,14 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record details and complete payment
-				update_post_meta($order_id, 'Transaction ID', $response->TransactionID);
+				$meta = array('Transaction ID' => $response->TransactionID);
 				if (!empty($response->AuthorisationCode)) {
-					update_post_meta($order_id, 'Authcode', $response->AuthorisationCode);
+					$meta['Authcode'] = $response->AuthorisationCode;
 				}
 				if ($response->BeagleScore >= 0) {
-					update_post_meta($order_id, 'Beagle score', $response->BeagleScore);
+					$meta['Beagle score'] = $response->BeagleScore;
 				}
+				$this->updateOrderMeta($order, $meta);
 
 				if ($this->eway_stored === 'yes') {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
@@ -672,6 +673,27 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		}
 
 		return $order;
+	}
+
+	/**
+	* update order meta, handling WC 2.7 as well as legacy versions
+	* @param WC_Order|EwayPaymentsWooOrder $order
+	* @param array $meta
+	*/
+	protected function updateOrderMeta($order, $meta) {
+		if (version_compare(WC_VERSION, '2.7', '<')) {
+			// legacy order object does not have meta handling, so do it the old way
+			foreach ($meta as $key => $value) {
+				update_post_meta($order->id, $key, $value);
+			}
+		}
+		else {
+			// record custom meta against order; it will be saved
+			foreach ($meta as $key => $value) {
+				$order->update_meta_data($key, $value);
+			}
+			$order->save_meta_data();
+		}
 	}
 
 	/**
