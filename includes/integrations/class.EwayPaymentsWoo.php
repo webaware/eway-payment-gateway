@@ -13,6 +13,24 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	protected $logger;
 
 	/**
+	* hook WooCommerce to register gateway integration
+	*/
+	public static function load() {
+		add_filter('woocommerce_payment_gateways', array(__CLASS__, 'register'));
+		add_filter('woocommerce_email_order_meta_fields', array(__CLASS__, 'wooEmailOrderMetaKeys'), 10, 3);
+	}
+
+	/**
+	* register new payment gateway
+	* @param array $gateways array of registered gateways
+	* @return array
+	*/
+	public static function register($gateways) {
+		$gateways[] = __CLASS__;
+		return $gateways;
+	}
+
+	/**
 	* initialise gateway with custom settings
 	*/
 	public function __construct() {
@@ -58,9 +76,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			add_action('woocommerce_credit_card_form_start', array($this, 'wooCcFormStart'));
 			add_action('woocommerce_credit_card_form_end', array($this, 'wooCcFormEnd'));
 		}
-
-		// add email fields
-		add_filter('woocommerce_email_order_meta_fields', array($this, 'wooEmailOrderMetaKeys'), 10, 3);
 
 		// create a logger
 		$this->logger = new EwayPaymentsLogging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
@@ -471,7 +486,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return array
 	*/
 	public function process_payment($order_id) {
-		$order		= $this->getOrder($order_id);
+		$order		= self::getOrder($order_id);
 		$ccfields	= $this->getCardFields();
 
 		$capture	= ($this->eway_stored  !== 'yes');
@@ -560,7 +575,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 				if ($response->BeagleScore >= 0) {
 					$meta['Beagle score'] = $response->BeagleScore;
 				}
-				$this->updateOrderMeta($order, $meta);
+				self::updateOrderMeta($order, $meta);
 
 				if ($this->eway_stored === 'yes') {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
@@ -610,27 +625,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* add the successful transaction ID to WooCommerce order emails
-	* @param array $keys
-	* @param bool $sent_to_admin
-	* @param mixed $order
-	* @return array
-	*/
-	public function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
-		if (apply_filters('woocommerce_eway_email_show_trans_number', true, $order)) {
-			$order			= $this->getOrder($order);
-			$key			= 'Transaction ID';
-
-			$keys[$key]		= array(
-				'label'		=> wptexturize($key),
-				'value'		=> wptexturize(get_post_meta($order->get_id(), $key, true)),
-			);
-		}
-
-		return $keys;
-	}
-
-	/**
 	* get API credentials based on settings
 	* @return array
 	*/
@@ -658,11 +652,32 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	}
 
 	/**
+	* add the successful transaction ID to WooCommerce order emails
+	* @param array $keys
+	* @param bool $sent_to_admin
+	* @param mixed $order
+	* @return array
+	*/
+	public static function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
+		if (apply_filters('woocommerce_eway_email_show_trans_number', true, $order)) {
+			$order			= self::getOrder($order);
+			$key			= 'Transaction ID';
+
+			$keys[$key]		= array(
+				'label'		=> wptexturize($key),
+				'value'		=> wptexturize(get_post_meta($order->get_id(), $key, true)),
+			);
+		}
+
+		return $keys;
+	}
+
+	/**
 	* get order object for order, maybe wrapping it up for legacy WooCommerce versions
 	* @param int|object|WC_Order $order
 	* @return WC_Order|EwayPaymentsWooOrder
 	*/
-	protected function getOrder($order) {
+	protected static function getOrder($order) {
 		if (version_compare(WC_VERSION, '2.7', '<')) {
 			// wrap legacy order to provide accessor methods
 			$order = new EwayPaymentsWooOrder($order);
@@ -680,7 +695,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @param WC_Order|EwayPaymentsWooOrder $order
 	* @param array $meta
 	*/
-	protected function updateOrderMeta($order, $meta) {
+	protected static function updateOrderMeta($order, $meta) {
 		if (version_compare(WC_VERSION, '2.7', '<')) {
 			// legacy order object does not have meta handling, so do it the old way
 			foreach ($meta as $key => $value) {
@@ -694,16 +709,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			}
 			$order->save_meta_data();
 		}
-	}
-
-	/**
-	* register new payment gateway
-	* @param array $gateways array of registered gateways
-	* @return array
-	*/
-	public static function register($gateways) {
-		$gateways[] = __CLASS__;
-		return $gateways;
 	}
 
 }

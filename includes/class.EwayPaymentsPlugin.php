@@ -39,7 +39,7 @@ class EwayPaymentsPlugin {
 		add_filter('wpsc_merchants_modules', array($this, 'wpscRegister'));
 
 		// register with WooCommerce
-		add_filter('woocommerce_payment_gateways', array($this, 'wooRegister'));
+		add_action('plugins_loaded', array($this, 'wooLoad'));
 
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsLogging.php';
 	}
@@ -111,15 +111,17 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
-	* register new WooCommerce payment gateway
-	* @param array $gateways array of registered gateways
-	* @return array
+	* maybe load WooCommerce payment gateway
 	*/
-	public function wooRegister($gateways) {
-		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
-		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWoo.php';
+	public function wooLoad() {
+		if (!function_exists('WC')) {
+			return;
+		}
 
-		return EwayPaymentsWoo::register($gateways);
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWoo.php';
+
+		return EwayPaymentsWoo::load();
 	}
 
 	/**
