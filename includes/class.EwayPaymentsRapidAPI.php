@@ -415,7 +415,7 @@ class EwayPaymentsRapidAPI {
 		$errors = array();
 
 		if (!is_numeric($this->amount) || $this->amount <= 0) {
-			$errors[] = __('Amount must be given as a number in dollars and cents', 'eway-payment-gateway');
+			$errors[] = __('amount must be given as a number in dollars and cents', 'eway-payment-gateway');
 		}
 		else if (!is_float($this->amount)) {
 			$this->amount = (float) $this->amount;

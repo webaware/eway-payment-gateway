@@ -99,7 +99,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'enabled' => array(
 							'title' 		=> translate('Enable/Disable', 'woocommerce'),
 							'type' 			=> 'checkbox',
-							'label' 		=> esc_html__('Enable eWAY credit card payment', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('enable eWAY credit card payment', 'eway-payment-gateway'),
 							'default' 		=> 'no',
 						),
 
@@ -234,9 +234,9 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 			'eway_logging' => array(
 							'title' 		=> _x('Logging', 'settings field', 'eway-payment-gateway'),
-							'label' 		=> esc_html__('enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							'type' 			=> 'select',
-							'description'	=>	sprintf('%s<br/>%s',
+							'description'	=>	sprintf('%s<br/>%s<br/>%s',
+													esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
 													esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
 													esc_html(EwayPaymentsLogging::getLogFolderRelative())),
 							'default' 		=> 'off',
@@ -260,7 +260,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'title' 		=> _x('Credit card message', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width:100%',
-							'description' 	=> esc_html__('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'eway-payment-gateway'),
+							'description' 	=> esc_html_x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'settings label', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default'		=> '',
 						),
@@ -277,7 +277,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'eway_site_seal_code' => array(
 							'type' 			=> 'textarea',
 							'description' 	=> sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
-													esc_html__('generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
+													esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
 							'default'		=> '',
 							'css'			=> 'height:14em',
 						),

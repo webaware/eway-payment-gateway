@@ -69,7 +69,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 
 		// create a new section
 		$section = $awpcp->settings->add_section('payment-settings',
-						esc_html_x('eWAY Payment Gateway', 'settings field', 'eway-payment-gateway'),
+						esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
 						'eway', 100, array($awpcp->settings, 'section'));
 
 		$awpcp->settings->add_setting($section, 'activateeway',
@@ -130,7 +130,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 			'error' 	=> esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'),
 		);
 		$log_descripton = sprintf('%s<br />%s<br />%s',
-							esc_html__('enable logging to assist trouble shooting', 'eway-payment-gateway'),
+							esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
 							EwayPaymentsLogging::getLogFolderRelative());
 		$awpcp->settings->add_setting($section, 'eway_logging',
@@ -146,7 +146,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 						esc_html_x('eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
 						'textarea', '',
 						sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
-							esc_html__('generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')));
+							esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')));
 
 		$awpcp->settings->add_setting($section, 'eway_icon',
 						esc_html_x('Payment Method Icon', 'settings field', 'eway-payment-gateway'),
@@ -206,10 +206,10 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		wp_enqueue_script('eway-awpcp-checkout-form', plugins_url("js/awpcp-checkout-form$min.js", EWAY_PAYMENTS_PLUGIN_FILE), array('jquery'), $ver, true);
 		wp_localize_script('eway-awpcp-checkout-form', 'eway_awpcp_checkout', array(
 			'errors' => array(
-				'card_number'	=> __('Credit Card Number is missing', 'eway-payment-gateway'),
-				'card_name'		=> __("Card Holder's Name is missing", 'eway-payment-gateway'),
-				'expiry_month'	=> __('Credit Card Expiry is missing', 'eway-payment-gateway'),
-				'cvn'			=> __('CVN is missing', 'eway-payment-gateway'),
+				'card_number'	=> __('card number cannot be empty', 'eway-payment-gateway'),
+				'card_name'		=> __('card holder name cannot be empty', 'eway-payment-gateway'),
+				'expiry_month'	=> __('credit card expiry is missing', 'eway-payment-gateway'),
+				'cvn'			=> __('cvn is missing', 'eway-payment-gateway'),
 			)
 		));
 

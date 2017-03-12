@@ -147,7 +147,7 @@ if (!defined('ABSPATH')) {
 				<option value="info" <?php selected($selected, 'info'); ?>><?php echo esc_html_x('All messages', 'logging settings', 'eway-payment-gateway'); ?></option>
 				<option value="error" <?php selected($selected, 'error'); ?>><?php echo esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'); ?></option>
 			</select>
-			<em><?php esc_html_e('Enable logging to assist trouble shooting;', 'eway-payment-gateway'); ?>
+			<em><?php esc_html_e('Enable logging to assist trouble shooting', 'eway-payment-gateway'); ?>
 				<br /><?php esc_html_e('the log file can be found in this folder:', 'eway-payment-gateway'); ?>
 				<br /><?php echo esc_html(EwayPaymentsLogging::getLogFolderRelative()); ?>
 			</em>

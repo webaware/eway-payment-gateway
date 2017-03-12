@@ -211,7 +211,7 @@ class EwayPaymentsStoredPayment {
 			$this->amount = (float) $this->amount;
 		}
 		if (strlen($this->cardHoldersName) === 0) {
-			$errors[] = __('cardholder name cannot be empty', 'eway-payment-gateway');
+			$errors[] = __('card holder name cannot be empty', 'eway-payment-gateway');
 		}
 		if (strlen($this->cardNumber) === 0) {
 			$errors[] = __('card number cannot be empty', 'eway-payment-gateway');

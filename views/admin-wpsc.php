@@ -119,7 +119,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 			<input type="radio" value="error" name="eway_logging" id="eway_logging_error" <?php checked($eway_logging, 'error'); ?> aria-labelledby="eway_logging_label eway_logging_label_error" />
 			<label for="eway_logging_error" id="eway_logging_label_error"><?php echo esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'); ?></label> &nbsp;
 			<p class="description">
-				<?php esc_html_e('Enable logging to assist trouble shooting;', 'eway-payment-gateway'); ?>
+				<?php esc_html_e('Enable logging to assist trouble shooting', 'eway-payment-gateway'); ?>
 				<br /><?php esc_html_e('the log file can be found in this folder:', 'eway-payment-gateway'); ?>
 				<br /><?php echo esc_html(EwayPaymentsLogging::getLogFolderRelative()); ?>
 			</p>
