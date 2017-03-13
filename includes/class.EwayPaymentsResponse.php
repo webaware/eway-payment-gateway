@@ -358,7 +358,7 @@ abstract class EwayPaymentsResponse {
 
 		$msg = $msg ? sprintf($msg, $code) : $code;
 
-		return apply_filters('gfeway_code_description', $msg, $code);
+		return apply_filters('eway_code_description', $msg, $code);
 	}
 
 }
