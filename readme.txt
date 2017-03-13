@@ -7,7 +7,7 @@ Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+G
 Tags: eway, payment, ecommerce, e-commerce, credit cards, wp e-commerce, woocommerce, events manager, awpcp
 Requires at least: 4.2
 Tested up to: 4.7.3
-Stable tag: 4.0.0
+Stable tag: 4.0.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
