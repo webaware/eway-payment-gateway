@@ -2,11 +2,18 @@
 
 ## Changelog
 
-### 3.7.1, soon...
+### 4.0.0, 2017-03-13
 
+* changed: uses eWAY Rapid API if API key and password are set
 * changed: WooCommerce 2.7 compatibility, with fallback support to previous version
 * changed: AWPCP minimum version now 3.0
+* changed: sandbox always uses customer ID 87654321 if no Rapid API key/password are set for the sandbox
+* changed: currency is no longer limited to AUD; currency always passed from shop settings
+* changed: always send data for Beagle Lite and Beagle Enterprise support
+* changed: improved error reporting and logging
+* removed: `*_eway_customer_id` filters; these have been replaced by `*_eway_credentials` filters that accommodate Rapid API credentials
 * added: capture and report HTTP errors communicating with the gateway
+* added: strings are localized and ready for [translation](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway)
 
 ### 3.7.0, 2016-11-18
 

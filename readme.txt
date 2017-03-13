@@ -4,10 +4,10 @@ Plugin Name: eWAY Payment Gateway
 Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
-Tags: eway, payment, ecommerce, e-commerce, credit cards, australia, wp e-commerce, woocommerce, events manager, events, booking
+Tags: eway, payment, ecommerce, e-commerce, credit cards, wp e-commerce, woocommerce, events manager, awpcp
 Requires at least: 4.2
 Tested up to: 4.7.3
-Stable tag: 3.7.0
+Stable tag: 4.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,7 +15,7 @@ Integrate some popular WordPress plugins with the eWAY credit card payment gatew
 
 == Description ==
 
-The eWAY Payment Gateway adds a credit card payment gateway integration for [eWAY in Australia](https://www.eway.com.au/) legacy Direct Payments XML API and Stored Payments API. These plugins are supported:
+The eWAY Payment Gateway adds integrations for the [eWAY credit card payment gateway](https://eway.io/) through [Rapid API Direct Payments](https://eway.io/features/api-rapid-api), with legacy XML API support. These plugins are supported:
 
 * [WP eCommerce](https://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
 * [WooCommerce](https://wordpress.org/plugins/woocommerce/) shopping cart plugin
@@ -29,56 +29,71 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://gfeway
 * card holder's name can be different to the purchaser's name
 * basic data validation performed before submitting to eWAY
 * eWAY transaction ID and bank authcode are recorded for successful payments
-* supports Stored Payments for drop-ship merchants / delayed billing
-* supports Beagle anti-fraud measures for Direct Payments (for supporting plugins)
-* drop-in compatible with eWAY payment gateway from the WP eCommerce Gold Cart plugin (except recurring billing -- see FAQ)
+* supports Authorize (PreAuth) for drop-ship merchants / delayed billing
+* supports Beagle anti-fraud measures (for supporting plugins)
 * it's free!
 
 = Requirements =
 
-* you need to install an e-commerce plugin listed above
-* you need an SSL certificate for your hosting account
+* you need to install one of the ecommerce plugins listed above
+* you need an SSL/TLS certificate for your hosting account
 * you need an account with eWAY Australia
-* this plugin uses eWAY's legacy Direct Payments XML API and Stored Payments API, but does not support eWAY's hosted payment form
+* this plugin uses eWAY's [Rapid API Direct Payments](https://eway.io/features/api-rapid-api), and does not support eWAY's Responsive Shared Page
 
-== Installation ==
+== Configuring ==
 
 After uploading and activating this plugin, you need to configure it.
 
 ### WP eCommerce
 
-1. Navigate to 'Settings->Store->Payments' on the menu
+1. Navigate to 'Settings > Store > Payments' on the menu
 2. Activate the eWAY payment gateway and click the Update button
 3. Edit the eWAY payment gateway settings by hovering your mouse over the gateway's name and clicking the hidden 'edit' link
-4. Edit the eWAY customer ID and select the appropriate settings, including which checkout fields map to eWAY fields
+4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
+5. Select the appropriate settings for your site, including which checkout fields map to eWAY fields
 
 ### WooCommerce
 
-1. Navigate to 'WooCommerce->Settings->Payment Gateways' on the menu
+1. Navigate to 'WooCommerce > Settings > Payment Gateways' on the menu
 2. Select eWAY from the Payment Gateways menu
 3. Tick the field 'Enable/Disable' to enable the gateway
-4. Edit the eWAY customer ID and select the appropriate settings
+4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
+5. Select the appropriate settings for your site
 
 ### Another WordPress Classifieds Plugin
 
-1. Navigate to 'Classified->Settings->Payment' on the menu
+1. Navigate to 'Classified > Settings > Payment' on the menu
 2. Click the Activate eWAY checkbox
-3. Edit the eWAY customer ID and select the appropriate settings
+3. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
+4. Select the appropriate settings for your site
 
 ### Events Manager
 
-1. Navigate to 'Events->Payment Gateways' on the menu
+1. Navigate to 'Events > Payment Gateways' on the menu
 2. Click the Activate link underneath the eWAY gateway name
 3. Click the Settings link underneath the eWAY gateway name
-4. Edit the eWAY customer ID and select the appropriate settings
+4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
+5. Select the appropriate settings for your site
 
-NB: you should always test your gateway first by using eWAY's test server. To do this, set your eWAY Customer ID to the special test ID 87654321 and select Use Test Environment. When you go to pay, the only card number that will be accepted by the test server is 4444333322221111. This allows you to make as many test purchases as you like, without billing a real credit card.
+NB: you should always test your payments first in the eWAY sandbox. You will need to sign up for a sandbox account, and copy your Rapid API key/password and Client Side Encryption key from the sandbox MYeWAY. When you go to pay, only use dummy card numbers like 4444333322221111. This allows you to make as many test purchases as you like, without billing a real credit card.
+
+* [What is the sandbox and how do I get it?](https://go.eway.io/s/article/ka828000000L1ZTAA0/What-is-the-Sandbox-and-how-do-I-get-it)
+* [Test Credit Card Numbers](https://go.eway.io/s/article/ka828000000L1PdAAK/Test-Credit-Card-Numbers)
+
+= Translations =
+
+If you'd like to help out by translating this plugin, please [sign up for an account and dig in](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway).
+
+== Installation ==
+
+1. Either install automatically through the WordPress admin, or download the .zip file, unzip to a folder, and upload the folder to your /wp-content/plugins/ directory. Read [Installing Plugins](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins) in the WordPress Codex for details.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
 
 == Frequently Asked Questions ==
 
 = What is eWAY? =
 
-eWAY is a leading provider of online payments solutions for Australia, New Zealand and the UK. This plugin integrates with the Australian Direct Payments and Stored Payments gateways, so that your website can safely accept credit card payments.
+eWAY is a leading provider of online payments solutions with a presence in Australia, New Zealand, and Asia. This plugin integrates with eWAY so that your website can safely accept credit card payments.
 
 = Is recurring billing supported? =
 
@@ -86,36 +101,54 @@ Not yet. I know it can be done but I haven't had a website that needs it yet, so
 
 If you just need a simple way to record recurring payments such as donations, you might want to try [Gravity Forms](https://webaware.com.au/get-gravity-forms) and [Gravity Forms eWAY](https://gfeway.webaware.net.au/) which does support recurring payments.
 
-= Can I use other eWAY gateways, outside of Australia? =
+= Do I need an SSL/TLS certificate for my website? =
 
-Not yet. There are plans to integrate eWAY's Rapid Payments API sometime in 2013, so check back in a while.
+Yes. This plugin uses the Direction Connection method to process transactions, so you must have HTTPS encryption for your website.
 
-= Can I use the eWAY hosted payment form with this plugin? =
+= What's the difference between the Capture and Authorize payment methods? =
 
-No, this plugin only supports the legacy Direct Payments XML API.
+Capture charges the customer's credit card immediately. This is the default payment method, and is the method most websites will use for credit card payments.
 
-= What is Stored Payments? =
+Authorize checks to see that the transaction would be approved, but does not process it. eWAY calls this method [PreAuth](https://eway.io/features/payments-pre-auth) (or Stored Payments in the old XML API). Once the transaction has been authorized, you can complete it manually in your MYeWAY console. You cannot complete PreAuth transactions from WordPress.
 
-Like Direct Payments, the purchase information is sent to eWAY for processing, but with Stored Payments it isn't processed right away. The merchant needs to login to their eWAY Business Centre to complete each transaction. It's useful for shops that do drop-shipping and want to delay billing. Most websites should have this option set to No.
+You need to add your eWAY API key and password to see PreAuth transactions in the sandbox, so that the Rapid API is used. The old Stored Payments XML API does not have a sandbox.
 
-= What is Beagle? =
+= Do I need to set the Client-Side Encryption Key? =
 
-[Beagle Lite](https://eway.io/features/antifraud-beagle-lite) is a service from eWAY that provides a level of fraud protection for your transactions. It uses information about the IP address of the purchaser to suggest whether there is a risk of fraud. You must configure Beagle rules in your MYeWAY console before enabling Beagle in this plugin.
+Client-Side Encryption is required for websites that are not PCI certified. It encrypts sensitive credit card details in the browser, so that only eWAY can see them. All websites are encouraged to set the Client-Side Encryption Key for improved security of credit card details.
 
-**NB**: You will also need to add a Country field to your checkout form. Beagle works by comparing the country of the address with the country where the purchaser is using the Internet; Beagle won't be used when checking out without a country selected.
+If you get the following error, you *must* add your Client-Side Encryption key:
 
-**NB**: Beagle isn't available for Another WordPress Classifieds Plugin due to the way that plugin collects billing information.
+> V6111: Unauthorized API Access, Account Not PCI Certified
+
+You will find your Client-Side Encryption key in MYeWAY where you created your API key and password. Copy it from MYeWAY and paste into the eWAY Payments settings page.
+
+= Why do I get an error "Invalid TransactionType"? =
+
+> V6010: Invalid TransactionType, account not certified for eCome only MOTO or Recurring available
+
+It probably means you need to set your Client-Side Encryption key; see above. It can also indicate that your website has JavaScript errors, which can prevent Client-Side Encryption from working. Check for errors in your browser's developer console.
+
+If your website is PCI Certified and you don't want to use Client-Side Encryption for some reason, then you will still get this error in the sandbox until you enable PCI for Direct Connections in MYeWAY:
+
+Settings > Sandbox > Direction Connection > PCI
+
+= What is Beagle Lite? =
+
+[Beagle Lite](https://eway.io/features/antifraud-beagle-lite) is a service from eWAY that provides fraud protection for your transactions. It uses information about the purchaser to suggest whether there is a risk of fraud. Configure Beagle Lite rules in your MYeWAY console.
+
+**NB**: Beagle Lite fraud detection requires an address for each transaction. Be sure to add an Address field to your forms, and make it a required field. The minimum address part required is the Country, so you can just enable that subfield if you don't need a full address.
 
 = Where do I find the eWAY transaction number? =
 
 * **WP eCommerce**: the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
 * **WooCommerce**: the eWAY transaction number and the bank authcode are shown in the Custom Fields block when you view the order in the WordPress admin.
 * **Events Manager**: from the Payment Gateways menu item or the Bookings menu item, you can view a list of transactions; the eWAY transaction ID is shown in the Transaction ID column, and the authcode in the Notes column.
-* **Another WordPress Classifieds Plugin**: not available in v2.x of the plugin.
+* **Another WordPress Classifieds Plugin**: not available yet
 
 = Can I use this plugin with the WP eCommerce Gold Cart? =
 
-Yes, if you deactivate the Gold Cart's eWAY payment gateway and activate this one. The settings from the Gold Cart payment gateway will be picked up by this gateway automatically (they are stored in the same places).
+Yes, if you deactivate the Gold Cart's eWAY payment gateway and activate this one.
 
 = I get an SSL error when my checkout attempts to connect with eWAY =
 
@@ -144,7 +177,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `wpsc_merchant_eway_option1` for setting the option1 field
 * `wpsc_merchant_eway_option2` for setting the option2 field
 * `wpsc_merchant_eway_option3` for setting the option3 field
-* `wpsc_merchant_eway_customer_id` for modifying the eWAY customer ID used in transaction
+* `wpsc_eway_credentials` for modifying the eWAY credentials used in the transaction
 
 ### WooCommerce
 
@@ -154,7 +187,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `woocommerce_eway_option2` for setting the option2 field
 * `woocommerce_eway_option3` for setting the option3 field
 * `woocommerce_eway_icon` for changing the payment gateway icon
-* `woocommerce_eway_customer_id` for modifying the eWAY customer ID used in transaction
+* `woocommerce_eway_credentials` for modifying the eWAY credentials used in the transaction
 
 ### Another WordPress Classifieds Plugin
 
@@ -165,7 +198,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `awpcp_eway_option3` for setting the option3 field
 * `awpcp_eway_icon` for changing the payment gateway icon
 * `awpcp_eway_checkout_message` for changing the message above the checkout form
-* `awpcp_eway_customer_id` for modifying the eWAY customer ID used in transaction
+* `awpcp_eway_credentials` for modifying the eWAY credentials used in the transaction
 
 ### Events Manager
 
@@ -175,7 +208,7 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `em_eway_option2` for setting the option2 field
 * `em_eway_option3` for setting the option3 field
 * `em_eway_amount` for changing the billed amount (e.g. adding fees)
-* `em_eway_customer_id` for modifying the eWAY customer ID used in transaction
+* `em_eway_credentials` for modifying the eWAY credentials used in the transaction
 
 == Sponsorships ==
 
@@ -196,16 +229,23 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Upgrade Notice ==
 
-= 3.7.0 =
+= 4.0.0 =
 
-fixed undefined index `eway_form` when saving another payment gateway's settings in WP eCommerce; added transaction number/ID filters
+use eWAY Rapid API if API key and password are set; WooCommerce 2.7 compatibility, with fallback support to previous version; AWPCP minimum version now 3.0
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 3.7.0, 2016-11-18
+### 4.0.0, 2017-03-13
 
-* added: filters for changing the transaction ID sent to eWAY; use with caution!
-* added: filter `woocommerce_eway_email_show_trans_number` for disabling display of transaction ID on new order email
-* fixed: undefined index `eway_form` when saving another payment gateway's settings in WP eCommerce
+* changed: uses eWAY Rapid API if API key and password are set
+* changed: WooCommerce 2.7 compatibility, with fallback support to previous version
+* changed: AWPCP minimum version now 3.0
+* changed: sandbox always uses customer ID 87654321 if no Rapid API key/password are set for the sandbox
+* changed: currency is no longer limited to AUD; currency always passed from shop settings
+* changed: always send data for Beagle Lite and Beagle Enterprise support
+* changed: improved error reporting and logging
+* removed: `*_eway_customer_id` filters; these have been replaced by `*_eway_credentials` filters that accommodate Rapid API credentials
+* added: capture and report HTTP errors communicating with the gateway
+* added: strings are localized and ready for [translation](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway)
