@@ -2,10 +2,14 @@
 
 ## Changelog
 
+### 4.0.1, soon...
+
+* changed: WooCommerce 3.0 support better accommodates other plugins also abstracting the Order object
+
 ### 4.0.0, 2017-03-13
 
 * changed: uses eWAY Rapid API if API key and password are set
-* changed: WooCommerce 2.7 compatibility, with fallback support to previous version
+* changed: WooCommerce 3.0 compatibility, with fallback support to previous version
 * changed: AWPCP minimum version now 3.0
 * changed: sandbox always uses customer ID 87654321 if no Rapid API key/password are set for the sandbox
 * changed: currency is no longer limited to AUD; currency always passed from shop settings

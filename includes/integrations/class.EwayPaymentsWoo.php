@@ -678,32 +678,33 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return WC_Order|EwayPaymentsWooOrder
 	*/
 	protected static function getOrder($order) {
-		if (version_compare(WC_VERSION, '2.7', '<')) {
+		if (is_numeric($order)) {
+			// convert order number to order object
+			$order = wc_get_order($order);
+		}
+
+		if (!method_exists($order, 'get_id')) {
 			// wrap legacy order to provide accessor methods
 			$order = new EwayPaymentsWooOrder($order);
-		}
-		elseif (is_numeric($order)) {
-			// convert order number to order object
-			$order = new WC_Order($order);
 		}
 
 		return $order;
 	}
 
 	/**
-	* update order meta, handling WC 2.7 as well as legacy versions
+	* update order meta, handling WC 3.0 as well as legacy versions
 	* @param WC_Order|EwayPaymentsWooOrder $order
 	* @param array $meta
 	*/
 	protected static function updateOrderMeta($order, $meta) {
-		if (version_compare(WC_VERSION, '2.7', '<')) {
+		if (!method_exists($order, 'update_meta_data')) {
 			// legacy order object does not have meta handling, so do it the old way
 			foreach ($meta as $key => $value) {
 				update_post_meta($order->id, $key, $value);
 			}
 		}
 		else {
-			// record custom meta against order; it will be saved
+			// record custom meta against order
 			foreach ($meta as $key => $value) {
 				$order->update_meta_data($key, $value);
 			}
