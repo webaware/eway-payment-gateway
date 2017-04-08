@@ -81,9 +81,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$this->logger = new EwayPaymentsLogging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
 
 		// save admin options, via WC_Settings_API
-		// v1.6.6 and under:
-		add_action('woocommerce_update_options_payment_gateways', array($this, 'process_admin_options'));
-		// v2.0+
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 	}
 
@@ -291,13 +288,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	public function init_settings() {
 		parent::init_settings();
 
-		if (method_exists($this, 'get_form_fields')) {
-			$form_fields = $this->get_form_fields();
-		}
-		else {
-			// WooCommerce 2.0.20 or earlier
-			$form_fields = $this->form_fields;
-		}
+		$form_fields = $this->get_form_fields();
 
 		if ($form_fields) {
 			foreach ($form_fields as $key => $value) {

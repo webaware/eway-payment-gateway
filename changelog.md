@@ -5,6 +5,7 @@
 ### 4.0.1, soon...
 
 * changed: WooCommerce 3.0 support better accommodates other plugins also abstracting the Order object
+* changed: dropped support for WooCommerce 2.0 and earlier
 
 ### 4.0.0, 2017-03-13
 
