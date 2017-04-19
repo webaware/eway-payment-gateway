@@ -46,11 +46,7 @@ If you'd like to help out by translating this plugin, please [sign up for an acc
 
 == Frequently Asked Questions ==
 
-= Configuring =
-
-After uploading and activating this plugin, you need to configure it.
-
-### WP eCommerce
+= Configuring for WP eCommerce =
 
 1. Navigate to 'Settings > Store > Payments' on the menu
 2. Activate the eWAY payment gateway and click the Update button
@@ -58,7 +54,7 @@ After uploading and activating this plugin, you need to configure it.
 4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
 5. Select the appropriate settings for your site, including which checkout fields map to eWAY fields
 
-### WooCommerce
+= Configuring for WooCommerce =
 
 1. Navigate to 'WooCommerce > Settings > Payment Gateways' on the menu
 2. Select eWAY from the Payment Gateways menu
@@ -66,14 +62,14 @@ After uploading and activating this plugin, you need to configure it.
 4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
 5. Select the appropriate settings for your site
 
-### Another WordPress Classifieds Plugin
+= Configuring for Another WordPress Classifieds Plugin =
 
 1. Navigate to 'Classified > Settings > Payment' on the menu
 2. Click the Activate eWAY checkbox
 3. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
 4. Select the appropriate settings for your site
 
-### Events Manager
+= Configuring for Events Manager =
 
 1. Navigate to 'Events > Payment Gateways' on the menu
 2. Click the Activate link underneath the eWAY gateway name
