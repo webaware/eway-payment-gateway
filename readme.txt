@@ -40,7 +40,13 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://gfeway
 * you need an account with eWAY Australia
 * this plugin uses eWAY's [Rapid API Direct Payments](https://eway.io/features/api-rapid-api), and does not support eWAY's Responsive Shared Page
 
-== Configuring ==
+= Translations =
+
+If you'd like to help out by translating this plugin, please [sign up for an account and dig in](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway).
+
+== Frequently Asked Questions ==
+
+= Configuring =
 
 After uploading and activating this plugin, you need to configure it.
 
@@ -75,21 +81,12 @@ After uploading and activating this plugin, you need to configure it.
 4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
 5. Select the appropriate settings for your site
 
-NB: you should always test your payments first in the eWAY sandbox. You will need to sign up for a sandbox account, and copy your Rapid API key/password and Client Side Encryption key from the sandbox MYeWAY. When you go to pay, only use dummy card numbers like 4444333322221111. This allows you to make as many test purchases as you like, without billing a real credit card.
+= How do I test payments with eWAY? =
+
+You should always test your payments first in the eWAY sandbox. You will need to sign up for a sandbox account, and copy your Rapid API key/password and Client Side Encryption key from the sandbox MYeWAY. When you go to pay, only use dummy card numbers like 4444333322221111. This allows you to make as many test purchases as you like, without billing a real credit card.
 
 * [What is the sandbox and how do I get it?](https://go.eway.io/s/article/ka828000000L1ZTAA0/What-is-the-Sandbox-and-how-do-I-get-it)
 * [Test Credit Card Numbers](https://go.eway.io/s/article/ka828000000L1PdAAK/Test-Credit-Card-Numbers)
-
-= Translations =
-
-If you'd like to help out by translating this plugin, please [sign up for an account and dig in](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway).
-
-== Installation ==
-
-1. Either install automatically through the WordPress admin, or download the .zip file, unzip to a folder, and upload the folder to your /wp-content/plugins/ directory. Read [Installing Plugins](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins) in the WordPress Codex for details.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-
-== Frequently Asked Questions ==
 
 = What is eWAY? =
 
