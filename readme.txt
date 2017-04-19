@@ -4,10 +4,10 @@ Plugin Name: eWAY Payment Gateway
 Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
-Tags: eway, payment, ecommerce, e-commerce, credit cards, wp e-commerce, woocommerce, events manager, awpcp
+Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.2
-Tested up to: 4.7.3
-Stable tag: 4.0.0.1
+Tested up to: 4.7
+Stable tag: 4.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -226,18 +226,23 @@ Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Upgrade Notice ==
 
-= 4.0.0 =
+= 4.0.1 =
 
-use eWAY Rapid API if API key and password are set; WooCommerce 2.7 compatibility, with fallback support to previous version; AWPCP minimum version now 3.0
+WooCommerce 3.0 support better accommodates other plugins and their abstractions for WooCommerce 2.6
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
+### 4.0.1, 2017-04-19
+
+* changed: WooCommerce 3.0 support better accommodates other plugins and their abstractions for WooCommerce 2.6
+* changed: dropped support for WooCommerce 2.0 and earlier
+
 ### 4.0.0, 2017-03-13
 
 * changed: uses eWAY Rapid API if API key and password are set
-* changed: WooCommerce 2.7 compatibility, with fallback support to previous version
+* changed: WooCommerce 3.0 compatibility, with fallback support to previous version
 * changed: AWPCP minimum version now 3.0
 * changed: sandbox always uses customer ID 87654321 if no Rapid API key/password are set for the sandbox
 * changed: currency is no longer limited to AUD; currency always passed from shop settings
