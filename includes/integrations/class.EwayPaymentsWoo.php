@@ -347,12 +347,18 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 				printf('<span class="eway-credit-card-message">%s</span>', esc_html($this->settings['eway_card_msg']));
 			}
 
-			// maybe set up Client Side Encryption
-			$creds = $this->getApiCredentials();
-			if (!empty($creds['ecrypt_key'])) {
-				wp_enqueue_script('eway-ecrypt');
-				add_action('wp_print_footer_scripts', array($this, 'ecryptScript'));
-			}
+			$this->maybeEnqueueCSE();
+		}
+	}
+
+	/**
+	* maybe enqueue the Client Side Encryption scripts for encrypting credit card details
+	*/
+	protected function maybeEnqueueCSE() {
+		$creds = $this->getApiCredentials();
+		if (!empty($creds['ecrypt_key'])) {
+			wp_enqueue_script('eway-ecrypt');
+			add_action('wp_print_footer_scripts', array($this, 'ecryptScript'));
 		}
 	}
 
@@ -408,6 +414,8 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			// load payment fields template with passed values
 			$settings = $this->settings;
 			EwayPaymentsPlugin::loadTemplate('woocommerce-eway-fields.php', compact('optMonths', 'optYears', 'settings'));
+
+			$this->maybeEnqueueCSE();
 		}
 	}
 

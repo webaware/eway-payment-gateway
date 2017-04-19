@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.0.2, soon...
+
+* fixed: WooCommerce custom credit card fields not using Client Side Encryption
+
 ### 4.0.1, 2017-04-19
 
 * changed: WooCommerce 3.0 support better accommodates other plugins and their abstractions for WooCommerce 2.6
