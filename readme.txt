@@ -44,6 +44,17 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://gfeway
 
 If you'd like to help out by translating this plugin, please [sign up for an account and dig in](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway).
 
+= Contributions =
+
+* [Fork me on GitHub](https://github.com/webaware/eway-payment-gateway/)
+
+= Sponsorships =
+
+* Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+* Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+
+Thanks for sponsoring new features for eWAY Payment Gateway!
+
 == Frequently Asked Questions ==
 
 = Configuring for WP eCommerce =
@@ -155,15 +166,9 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 * XMLWriter
 * SimpleXML
 
-== Contributions ==
+= WP eCommerce filter hooks =
 
-* [Fork me on GitHub](https://github.com/webaware/eway-payment-gateway/)
-
-== Filter hooks ==
-
-Developers can use these filter hooks to modify some eWAY invoice properties. Each filter receives a string for the field value.
-
-### WP eCommerce
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsWpsc.php) for filter hook parameters.
 
 * `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
 * `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
@@ -172,7 +177,9 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `wpsc_merchant_eway_option3` for setting the option3 field
 * `wpsc_eway_credentials` for modifying the eWAY credentials used in the transaction
 
-### WooCommerce
+= WooCommerce filter hooks =
+
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsWoo.php) for filter hook parameters.
 
 * `woocommerce_eway_invoice_desc` for modifying the invoice description
 * `woocommerce_eway_invoice_ref` for modifying the invoice reference
@@ -182,7 +189,9 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `woocommerce_eway_icon` for changing the payment gateway icon
 * `woocommerce_eway_credentials` for modifying the eWAY credentials used in the transaction
 
-### Another WordPress Classifieds Plugin
+= Another WordPress Classifieds Plugin filter hooks =
+
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsAWPCP3.php) for filter hook parameters.
 
 * `awpcp_eway_invoice_desc` for modifying the invoice description
 * `awpcp_eway_invoice_ref` for modifying the invoice reference
@@ -193,7 +202,9 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `awpcp_eway_checkout_message` for changing the message above the checkout form
 * `awpcp_eway_credentials` for modifying the eWAY credentials used in the transaction
 
-### Events Manager
+= Events Manager filter hooks =
+
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsEventsManager.php) for filter hook parameters.
 
 * `em_eway_invoice_desc` for modifying the invoice description
 * `em_eway_invoice_ref` for modifying the invoice reference
@@ -202,13 +213,6 @@ Developers can use these filter hooks to modify some eWAY invoice properties. Ea
 * `em_eway_option3` for setting the option3 field
 * `em_eway_amount` for changing the billed amount (e.g. adding fees)
 * `em_eway_credentials` for modifying the eWAY credentials used in the transaction
-
-== Sponsorships ==
-
-* Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
-* Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
-
-Thanks for sponsoring new features for eWAY Payment Gateway!
 
 == Screenshots ==
 
