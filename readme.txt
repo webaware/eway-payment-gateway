@@ -7,7 +7,7 @@ Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+G
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.2
 Tested up to: 4.7
-Stable tag: 4.0.1
+Stable tag: 4.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -226,13 +226,17 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 == Upgrade Notice ==
 
-= 4.0.1 =
+= 4.0.2 =
 
-WooCommerce 3.0 support better accommodates other plugins and their abstractions for WooCommerce 2.6
+fixed WooCommerce custom credit card fields not using Client Side Encryption
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
+
+### 4.0.2, 2017-05-15
+
+* fixed: WooCommerce custom credit card fields not using Client Side Encryption
 
 ### 4.0.1, 2017-04-19
 

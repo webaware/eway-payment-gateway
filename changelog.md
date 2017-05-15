@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 4.0.2, soon...
+### 4.0.2, 2017-05-15
 
 * fixed: WooCommerce custom credit card fields not using Client Side Encryption
 

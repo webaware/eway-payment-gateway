@@ -1,6 +1,6 @@
 {
   "name": "eway-payment-gateway",
-  "version": "4.0.2-dev",
+  "version": "4.0.2",
   "description": "eWAY Payment Gateway",
   "main": "Gruntfile.js",
   "devDependencies": {
