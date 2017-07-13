@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.0.3, soon...
+
+* fixed: amounts in Japanese Yen (JPY) are already in the lowest denomination; no need to shift to / from cents
+
 ### 4.0.2, 2017-05-15
 
 * fixed: WooCommerce custom credit card fields not using Client Side Encryption
