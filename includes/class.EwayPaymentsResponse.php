@@ -40,7 +40,8 @@ abstract class EwayPaymentsResponse {
 		}
 
 		// if we got an amount, convert it back into dollars.cents from just cents
-		if (isset($this->Payment) && !empty($this->Payment->TotalAmount)) {
+		// but not if it's in JPY which is already at the target format
+		if (isset($this->Payment) && !empty($this->Payment->TotalAmount) && $this->Payment->CurrencyCode !== 'JPY') {
 			$this->Payment->TotalAmount = floatval($this->Payment->TotalAmount) / 100.0;
 		}
 	}
