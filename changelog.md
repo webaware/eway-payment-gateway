@@ -5,6 +5,7 @@
 ### 4.0.3, soon...
 
 * fixed: amounts in Japanese Yen (JPY) are already in the lowest denomination; no need to shift to / from cents
+* added: plugin headers for WooCommerce supported versions
 
 ### 4.0.2, 2017-05-15
 
