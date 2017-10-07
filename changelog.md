@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 4.0.3, soon...
+### 4.1.0, soon...
 
 * fixed: amounts in Japanese Yen (JPY) are already in the lowest denomination; no need to shift to / from cents
 * fixed: appearance of dropdown settings broken in WooCommerce 3.2

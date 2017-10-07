@@ -6,8 +6,8 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.2
-Tested up to: 4.7
-Stable tag: 4.0.2
+Tested up to: 4.8
+Stable tag: 4.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -226,32 +226,17 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 == Upgrade Notice ==
 
-= 4.0.2 =
+= 4.1.0 =
 
-fixed WooCommerce custom credit card fields not using Client Side Encryption
+WooCommerce 3.2 compatible; minimum supported WooCommerce version is now 2.3; proper handling of Japanese Yen (JPY)
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.0.2, 2017-05-15
+### 4.1.0, soon...
 
-* fixed: WooCommerce custom credit card fields not using Client Side Encryption
-
-### 4.0.1, 2017-04-19
-
-* changed: WooCommerce 3.0 support better accommodates other plugins and their abstractions for WooCommerce 2.6
-* changed: dropped support for WooCommerce 2.0 and earlier
-
-### 4.0.0, 2017-03-13
-
-* changed: uses eWAY Rapid API if API key and password are set
-* changed: WooCommerce 3.0 compatibility, with fallback support to previous version
-* changed: AWPCP minimum version now 3.0
-* changed: sandbox always uses customer ID 87654321 if no Rapid API key/password are set for the sandbox
-* changed: currency is no longer limited to AUD; currency always passed from shop settings
-* changed: always send data for Beagle Lite and Beagle Enterprise support
-* changed: improved error reporting and logging
-* removed: `*_eway_customer_id` filters; these have been replaced by `*_eway_credentials` filters that accommodate Rapid API credentials
-* added: capture and report HTTP errors communicating with the gateway
-* added: strings are localized and ready for [translation](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway)
+* fixed: amounts in Japanese Yen (JPY) are already in the lowest denomination; no need to shift to / from cents
+* fixed: appearance of dropdown settings broken in WooCommerce 3.2
+* changed: minimum supported WooCommerce version is now 2.3
+* added: plugin headers for WooCommerce supported versions
