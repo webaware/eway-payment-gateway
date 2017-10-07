@@ -120,7 +120,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'title' 		=> translate('Method availability', 'woocommerce'),
 							'type' 			=> 'select',
 							'default' 		=> 'all',
-							'class'			=> 'availability',
+							'class'			=> 'availability wc-enhanced-select',
 							'options'		=> array(
 								'all' 		=> translate('All allowed countries', 'woocommerce'),
 								'specific' 	=> translate('Specific Countries', 'woocommerce'),
@@ -130,7 +130,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'countries' => array(
 							'title' 		=> translate('Specific Countries', 'woocommerce'),
 							'type' 			=> 'multiselect',
-							'class'			=> 'chosen_select',
+							'class'			=> 'wc-enhanced-select',
 							'css'			=> 'width: 450px;',
 							'default' 		=> '',
 							'options'		=> WC()->countries->countries,
@@ -219,6 +219,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'eway_stored' => array(
 							'title' 		=> _x('Payment Method', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'select',
+							'class'			=> 'wc-enhanced-select',
 							'description' 	=> esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
@@ -232,6 +233,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'eway_logging' => array(
 							'title' 		=> _x('Logging', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'select',
+							'class'			=> 'wc-enhanced-select',
 							'description'	=>	sprintf('%s<br/>%s<br/>%s',
 													esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
 													esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
