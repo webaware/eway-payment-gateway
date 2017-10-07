@@ -5,6 +5,8 @@
 ### 4.0.3, soon...
 
 * fixed: amounts in Japanese Yen (JPY) are already in the lowest denomination; no need to shift to / from cents
+* fixed: appearance of dropdown settings broken in WooCommerce 3.2
+* changed: minimum supported WooCommerce version is now 2.3
 * added: plugin headers for WooCommerce supported versions
 
 ### 4.0.2, 2017-05-15
