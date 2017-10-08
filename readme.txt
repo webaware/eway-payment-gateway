@@ -6,7 +6,7 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.2
-Tested up to: 4.8
+Tested up to: 4.9
 Stable tag: 4.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -234,7 +234,7 @@ WooCommerce 3.2 compatible; minimum supported WooCommerce version is now 2.3; pr
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.1.0, soon...
+### 4.1.0, 2017-10-09
 
 * fixed: amounts in Japanese Yen (JPY) are already in the lowest denomination; no need to shift to / from cents
 * fixed: appearance of dropdown settings broken in WooCommerce 3.2
