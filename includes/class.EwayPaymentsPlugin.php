@@ -215,15 +215,18 @@ class EwayPaymentsPlugin {
 	public static function getCustomerIP($isLiveSite) {
 		// if test mode and running on localhost, then kludge to an Aussie IP address
 		if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '127.0.0.1' && !$isLiveSite) {
-			return '210.1.199.10';
+			$ip = '210.1.199.10';
 		}
 
 		// check for remote address, ignore all other headers as they can be spoofed easily
-		if (isset($_SERVER['REMOTE_ADDR']) && self::isIpAddress($_SERVER['REMOTE_ADDR'])) {
-			return $_SERVER['REMOTE_ADDR'];
+		elseif (isset($_SERVER['REMOTE_ADDR']) && self::isIpAddress($_SERVER['REMOTE_ADDR'])) {
+			$ip = $_SERVER['REMOTE_ADDR'];
 		}
 
-		return '';
+		// allow hookers to override for network-specific fixes
+		$ip = apply_filters('eway_payment_customer_ip', $ip);
+
+		return $ip;
 	}
 
 	/**
