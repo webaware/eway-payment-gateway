@@ -213,14 +213,25 @@ class EwayPaymentsPlugin {
 	* @return string
 	*/
 	public static function getCustomerIP($isLiveSite) {
-		// if test mode and running on localhost, then kludge to an Aussie IP address
-		if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '127.0.0.1' && !$isLiveSite) {
-			$ip = '210.1.199.10';
+		$ip = '';
+
+		if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+			$ip = self::isIpAddress($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : '';
 		}
 
-		// check for remote address, ignore all other headers as they can be spoofed easily
-		elseif (isset($_SERVER['REMOTE_ADDR']) && self::isIpAddress($_SERVER['REMOTE_ADDR'])) {
-			$ip = $_SERVER['REMOTE_ADDR'];
+		elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$proxies = preg_split('/[,:]/', $_SERVER['HTTP_X_FORWARDED_FOR']);
+			$ip = trim(current($proxies));
+			$ip = self::isIpAddress($ip) ? $ip : '';
+		}
+
+		elseif (isset($_SERVER['REMOTE_ADDR'])) {
+			$ip = self::isIpAddress($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+		}
+
+		// if test mode and running on localhost, then kludge to an Aussie IP address
+		if ($ip === '127.0.0.1' && !$isLiveSite) {
+			$ip = '210.1.199.10';
 		}
 
 		// allow hookers to override for network-specific fixes
