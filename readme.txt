@@ -8,7 +8,7 @@ Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, a
 Requires at least: 4.2
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 4.1.0
+Stable tag: 4.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -227,17 +227,16 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 == Upgrade Notice ==
 
-= 4.1.0 =
+= 4.2.0 =
 
-WooCommerce 3.2 compatible; minimum supported WooCommerce version is now 2.3; proper handling of Japanese Yen (JPY)
+Tested WooCommerce 3.3 compatible; support reverse proxy headers for customer IP address sent to eWAY Beagle
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.1.0, 2017-10-09
+### 4.2.0, 2018-02-02
 
-* fixed: amounts in Japanese Yen (JPY) are already in the lowest denomination; no need to shift to / from cents
-* fixed: appearance of dropdown settings broken in WooCommerce 3.2
-* changed: minimum supported WooCommerce version is now 2.3
-* added: plugin headers for WooCommerce supported versions
+* changed: support reverse proxy headers for customer IP address sent to eWAY Beagle
+* changed: load front end CSE script from file, don't inline in the checkout footer
+* added: filter hook `eway_payment_customer_ip` so that hookers can set the customer IP address

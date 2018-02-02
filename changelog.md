@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 4.2.0, soon...
+### 4.2.0, 2018-02-02
 
 * changed: support reverse proxy headers for customer IP address sent to eWAY Beagle
 * changed: load front end CSE script from file, don't inline in the checkout footer
