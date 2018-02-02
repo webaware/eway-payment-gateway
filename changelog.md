@@ -5,6 +5,7 @@
 ### 4.2.0, soon...
 
 * changed: support reverse proxy headers for customer IP address sent to eWAY Beagle
+* changed: load front end CSE script from file, don't inline in the checkout footer
 * added: filter hook `eway_payment_customer_ip` so that hookers can set the customer IP address
 
 ### 4.1.0, 2017-10-09

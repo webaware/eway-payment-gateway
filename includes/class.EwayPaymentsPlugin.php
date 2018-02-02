@@ -92,11 +92,12 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
-	* register and enqueue required scripts
+	* register required scripts
 	*/
 	public function registerScripts() {
 		$min = SCRIPT_DEBUG ? '' : '.min';
-		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", array('jquery'), null, true);
+		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", array(), null, true);
+		wp_register_script('eway-payment-gateway-ecrypt', plugins_url("js/ecrypt$min.js", EWAY_PAYMENTS_PLUGIN_FILE), array('jquery','eway-ecrypt'), null, true);
 	}
 
 	/**

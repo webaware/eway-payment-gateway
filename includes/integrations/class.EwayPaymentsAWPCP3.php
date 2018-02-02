@@ -200,7 +200,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$creds = $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
 			add_action('wp_enqueue_scripts', array($this, 'ecryptEnqueue'), 20);	// can't enqueue yet, so wait until plugin has enqueued script
-			add_action('wp_print_footer_scripts', array($this, 'ecryptScript'));
+			add_action('wp_footer', array($this, 'ecryptScript'));
 		}
 
 		wp_enqueue_script('eway-awpcp-checkout-form', plugins_url("js/awpcp-checkout-form$min.js", EWAY_PAYMENTS_PLUGIN_FILE), array('jquery'), $ver, true);
@@ -220,15 +220,14 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* enqueue the eWAY ecrypt script for client-side encryption
 	*/
 	public function ecryptEnqueue() {
-		wp_enqueue_script('eway-ecrypt');
+		wp_enqueue_script('eway-payment-gateway-ecrypt');
 	}
 
 	/**
-	* inline scripts for client-side encryption
+	* configure the scripts for client-side encryption
 	*/
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
-		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		$vars = array(
 			'mode'		=> 'awpcp',
@@ -240,10 +239,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 						),
 		);
 
-		echo '<script>';
-		echo 'var eway_ecrypt_vars = ', json_encode($vars), '; ';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/ecrypt$min.js");
-		echo '</script>';
+		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
 	}
 
 	/**

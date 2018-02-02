@@ -359,17 +359,16 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	protected function maybeEnqueueCSE() {
 		$creds = $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
-			wp_enqueue_script('eway-ecrypt');
-			add_action('wp_print_footer_scripts', array($this, 'ecryptScript'));
+			wp_enqueue_script('eway-payment-gateway-ecrypt');
+			add_action('wp_footer', array($this, 'ecryptScript'));
 		}
 	}
 
 	/**
-	* inline scripts for client-side encryption
+	* configure the scripts for client-side encryption
 	*/
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
-		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		$vars = array(
 			'mode'		=> 'woocommerce',
@@ -383,10 +382,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 						),
 		);
 
-		echo '<script>';
-		echo 'var eway_ecrypt_vars = ', json_encode($vars), '; ';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/ecrypt$min.js");
-		echo '</script>';
+		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
 	}
 
 	/**

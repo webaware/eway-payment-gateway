@@ -400,17 +400,16 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	public static function enqueueCheckoutScript($gateway) {
 		$creds = self::getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
-			wp_enqueue_script('eway-ecrypt');
-			add_action('wp_print_footer_scripts', array(__CLASS__, 'ecryptScript'));
+			wp_enqueue_script('eway-payment-gateway-ecrypt');
+			add_action('wp_footer', array(__CLASS__, 'ecryptScript'));
 		}
 	}
 
 	/**
-	* inline scripts for client-side encryption
+	* configure the scripts for client-side encryption
 	*/
 	public static function ecryptScript() {
 		$creds	= self::getApiCredentials();
-		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		$vars = array(
 			'mode'		=> 'wp-e-commerce',
@@ -422,10 +421,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 						),
 		);
 
-		echo '<script>';
-		echo 'var eway_ecrypt_vars = ', json_encode($vars), '; ';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/ecrypt$min.js");
-		echo '</script>';
+		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
 	}
 
 	/**
