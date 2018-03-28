@@ -9,7 +9,7 @@ module.exports = function (grunt) {
 			main: {
 				files: [
 					{
-						src: ["./**", "!./node_modules/**", "!./Gruntfile.js", "!./package.json"],
+						src: ["./**", "!./node_modules/**", "!./Gruntfile.js", "!./package*.json"],
 						dest: "dist/<%= pkg.name %>/"
 					}
 				]
@@ -66,6 +66,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-eslint");
 
 	grunt.registerTask("release", ["clean","copy","compress"]);
-	grunt.registerTask("default", [ "jshint" ]);
 
 };
