@@ -145,7 +145,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$awpcp->settings->add_setting($section, 'eway_site_seal_code',
 						esc_html_x('eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
 						'textarea', '',
-						sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
+						sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" rel="noopener" target="_blank">%s</a>',
 							esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')));
 
 		$awpcp->settings->add_setting($section, 'eway_icon',
@@ -180,7 +180,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$payments    = awpcp_payments_api();
 		$checkoutURL = $payments->get_return_url($transaction);
 
-		$checkout_message = sprintf(__('Please enter your credit card details for secure payment via <a target="_blank" href="%s">eWAY</a>.', 'eway-payment-gateway'),
+		$checkout_message = sprintf(__('Please enter your credit card details for secure payment via <a rel="noopener" target="_blank" href="%s">eWAY</a>.', 'eway-payment-gateway'),
 					'https://www.eway.com.au/');
 		$checkout_message = apply_filters('awpcp_eway_checkout_message', $checkout_message, false, $transaction);
 

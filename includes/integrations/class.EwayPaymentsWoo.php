@@ -275,7 +275,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 			'eway_site_seal_code' => array(
 							'type' 			=> 'textarea',
-							'description' 	=> sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" target="_blank">%s</a>',
+							'description' 	=> sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" rel="noopener" target="_blank">%s</a>',
 													esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
 							'default'		=> '',
 							'css'			=> 'height:14em',
