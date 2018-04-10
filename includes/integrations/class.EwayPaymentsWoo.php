@@ -390,8 +390,8 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @param string $gateway
 	*/
 	public function wooCcFormEnd($gateway) {
-		if ($gateway == $this->id) {
-			if (!empty($this->settings['eway_site_seal']) && !empty($this->settings['eway_site_seal_code']) && $this->settings['eway_site_seal'] == 'yes') {
+		if ($gateway === $this->id) {
+			if (!empty($this->settings['eway_site_seal']) && !empty($this->settings['eway_site_seal_code']) && $this->settings['eway_site_seal'] === 'yes') {
 				echo $this->settings['eway_site_seal_code'];
 			}
 		}
@@ -401,7 +401,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* display payment form on checkout page
 	*/
 	public function payment_fields() {
-		if ($this->eway_card_form == 'yes') {
+		if ($this->eway_card_form === 'yes') {
 			// use standard WooCommerce credit card form
 			$this->form();
 		}
@@ -424,7 +424,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	protected function getCardFields() {
 		$postdata = new EwayPaymentsFormPost();
 
-		if ($this->eway_card_form == 'yes') {
+		if ($this->eway_card_form === 'yes') {
 			// split expiry field into month and year
 			$expiry = $postdata->getValue('eway_payments-card-expiry');
 			$expiry = array_map('trim', explode('/', $expiry, 2));

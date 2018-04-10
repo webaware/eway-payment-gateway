@@ -181,7 +181,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		global $post;
 
 		// only if we're on an event page, and not SSL
-		if (!empty($post->post_type) && $post->post_type == EM_POST_TYPE_EVENT && !is_ssl()) {
+		if (!empty($post->post_type) && $post->post_type === EM_POST_TYPE_EVENT && !is_ssl()) {
 			try {
 				// create event object, check that it has bookings
 				$event = new EM_Event($post);
@@ -210,7 +210,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		parent::booking_add($EM_Event, $EM_Booking, $post_validation);
 
 		if ($post_validation && empty($EM_Booking->booking_id)) {
-			if (get_option('dbem_multiple_bookings') && get_class($EM_Booking) == 'EM_Multiple_Booking' ) {
+			if (get_option('dbem_multiple_bookings') && get_class($EM_Booking) === 'EM_Multiple_Booking' ) {
 				add_filter('em_multiple_booking_save', array($this, 'em_booking_save'), 2, 2);
 			}
 			else {
@@ -282,7 +282,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	public function booking_form_feedback( $return, $EM_Booking = false ){
 		// Double check $EM_Booking is an EM_Booking object and that we have a booking awaiting payment.
 		if (!empty($return['result'])) {
-			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] == $this->gateway && $EM_Booking->get_price() > 0) {
+			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] === $this->gateway && $EM_Booking->get_price() > 0) {
 				$return['message'] = get_option("em_{$this->gateway}_booking_feedback");
 			}
 			else {
