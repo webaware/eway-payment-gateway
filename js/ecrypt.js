@@ -18,6 +18,7 @@
 
 			if (value.length) {
 				var encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
+				checkout.find("input[name='" + fieldname + "']").remove();
 				$("<input type='hidden'>").attr("name", fieldname).val(encrypted).appendTo(checkout);
 				field.val("");
 			}
