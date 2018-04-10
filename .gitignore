@@ -1,3 +1,4 @@
 .svn
+.vscode
 dist
 node_modules
