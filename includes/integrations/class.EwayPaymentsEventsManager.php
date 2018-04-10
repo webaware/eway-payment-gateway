@@ -336,8 +336,8 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> 'form.em-booking-form',
 			'fields'	=> array(
-							'#eway_card_num'	=> 'cse:x_card_num',
-							'#eway_card_code'	=> 'cse:x_card_code',
+							'#eway_card_num'	=> array('name' => 'cse:x_card_num', 'is_cardnum' => true),
+							'#eway_card_code'	=> array('name' => 'cse:x_card_code', 'is_cardnum' => false),
 						),
 		);
 

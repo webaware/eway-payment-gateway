@@ -39,6 +39,7 @@
 	},
 
 	"globals": {
+		"eway_ecrypt_msg": false,
 		"eway_ecrypt_vars": false,
 		"eway_awpcp_checkout": false,
 		"eCrypt": false,

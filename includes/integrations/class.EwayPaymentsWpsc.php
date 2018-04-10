@@ -416,8 +416,8 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> 'form.wpsc_checkout_forms',
 			'fields'	=> array(
-							'#eway_card_number'			=> 'cse:card_number',
-							'#eway_cvn'					=> 'cse:cvn',
+							'#eway_card_number'			=> array('name' => 'cse:card_number', 'is_cardnum' => true),
+							'#eway_cvn'					=> array('name' => 'cse:cvn', 'is_cardnum' => false),
 						),
 		);
 

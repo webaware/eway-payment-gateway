@@ -375,10 +375,10 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> 'form.checkout',
 			'fields'	=> array(
-							"#{$this->id}-card-number"	=> "cse:{$this->id}-card-number",
-							"#{$this->id}-card-cvc"		=> "cse:{$this->id}-card-cvc",
-							'#eway_card_number'			=> 'cse:eway_card_number',
-							'#eway_cvn'					=> 'cse:eway_cvn',
+							"#{$this->id}-card-number"	=> array('name' => "cse:{$this->id}-card-number", 'is_cardnum' => true),
+							"#{$this->id}-card-cvc"		=> array('name' => "cse:{$this->id}-card-cvc", 'is_cardnum' => false),
+							'#eway_card_number'			=> array('name' => 'cse:eway_card_number', 'is_cardnum' => true),
+							'#eway_cvn'					=> array('name' => 'cse:eway_cvn', 'is_cardnum' => false),
 						),
 		);
 

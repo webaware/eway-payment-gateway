@@ -234,8 +234,8 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> '#awpcp-eway-checkout',
 			'fields'	=> array(
-							'#eway_card_number'			=> 'cse:eway_card_number',
-							'#eway_cvn'					=> 'cse:eway_cvn',
+							'#eway_card_number'			=> array('name' => 'cse:eway_card_number', 'is_cardnum' => true),
+							'#eway_cvn'					=> array('name' => 'cse:eway_cvn', 'is_cardnum' => false),
 						),
 		);
 
