@@ -32,6 +32,14 @@
 		return checksum % 10 === 0;
 	}
 
+	function repeatString(character, length) {
+		var s = character;
+		for (var i = length; --i >= 1; ) {
+			s += character;
+		}
+		return s;
+	}
+
 	/**
 	* if form field has a value, add encrypted hidden field and remove plain-text value from form
 	* @param {String} selector
@@ -42,8 +50,9 @@
 
 		if (field.length) {
 			var value = field.val().replace(/[\s-]/g, "");
+			var length = value.length;
 
-			if (value.length) {
+			if (length) {
 				if (fieldspec.is_cardnum && !cardnumberValid(value)) {
 					throw {
 						name:		"Credit Card Error",
@@ -55,7 +64,7 @@
 				var encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
 				checkout.find("input[name='" + fieldspec.name + "']").remove();
 				$("<input type='hidden'>").attr("name", fieldspec.name).val(encrypted).appendTo(checkout);
-				field.val("");
+				field.val("").data("eway-old-placeholder", field.prop("placeholder")).prop("placeholder", repeatString(eway_ecrypt_msg.ecrypt_mask, length));
 			}
 		}
 	}
@@ -91,11 +100,27 @@
 		return checkout.get(0).elements[name].value;
 	}
 
+	/**
+	* reset the placeholders on WooCommerce checkout fields
+	*/
+	function wooResetPlaceholders() {
+		var fields = eway_ecrypt_vars.fields;
+		var field;
+
+		for (var i in fields) {
+			field = checkout.find(i);
+			if (field.length) {
+				field.prop("placeholder", field.data("eway-old-placeholder"));
+			}
+		}
+	}
+
 
 	switch (eway_ecrypt_vars.mode) {
 
 		case "woocommerce":
 			checkout.on("checkout_place_order_eway_payments", processFields);
+			$(document.body).on("checkout_error", wooResetPlaceholders);
 			break;
 
 		case "wp-e-commerce":

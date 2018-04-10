@@ -101,6 +101,7 @@ class EwayPaymentsPlugin {
 		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", array(), null, true);
 		wp_register_script('eway-payment-gateway-ecrypt', plugins_url("js/ecrypt$min.js", EWAY_PAYMENTS_PLUGIN_FILE), array('jquery','eway-ecrypt'), $ver, true);
 		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_msg', array(
+			'ecrypt_mask'			=> _x('•', 'encrypted field mask character', 'eway-payment-gateway'),
 			'card_number_invalid'	=> __('Card number is invalid', 'eway-payment-gateway'),
 		));
 	}
