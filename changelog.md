@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 4.2.1, soon...
+
+* fixed: prevent double-up of CSE encrypted card number / security code in validation errors
+* added: credit card number validation in the browser when using Client Side Encryption
+* added: show placeholders in the credit card number and security code fields when their values are removed during Client Side Encryption
+
 ### 4.2.0, 2018-02-02
 
 * changed: support reverse proxy headers for customer IP address sent to eWAY Beagle
