@@ -8,7 +8,7 @@ Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, a
 Requires at least: 4.2
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 4.2.0
+Stable tag: 4.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -227,16 +227,16 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 == Upgrade Notice ==
 
-= 4.2.0 =
+= 4.2.1 =
 
-Tested WooCommerce 3.3 compatible; support reverse proxy headers for customer IP address sent to eWAY Beagle
+credit card number validation in the browser before Client Side Encryption runs; prevent double-up of encrypted card number / security code
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.2.0, 2018-02-02
+### 4.2.1, 2018-04-14
 
-* changed: support reverse proxy headers for customer IP address sent to eWAY Beagle
-* changed: load front end CSE script from file, don't inline in the checkout footer
-* added: filter hook `eway_payment_customer_ip` so that hookers can set the customer IP address
+* fixed: prevent double-up of CSE encrypted card number / security code in validation errors
+* added: credit card number validation in the browser when using Client Side Encryption
+* added: show placeholders in the credit card number and security code fields when their values are removed during Client Side Encryption
