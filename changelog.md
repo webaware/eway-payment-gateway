@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.2.2, 2018-05-24
+
+* changed: marked as tested up to WooCommerce 3.4
+
 ### 4.2.1, 2018-04-14
 
 * fixed: prevent double-up of CSE encrypted card number / security code in validation errors
