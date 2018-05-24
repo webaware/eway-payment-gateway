@@ -49,7 +49,7 @@ If you'd like to help out by translating this plugin, please [sign up for an acc
 
 * [Fork me on GitHub](https://github.com/webaware/eway-payment-gateway/)
 
-= Sponsorships =
+### Sponsorships
 
 * Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
 * Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
