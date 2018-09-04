@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.2.3, soon...
+
+* added: setting to enable/disable adding the transaction ID to order emails
+
 ### 4.2.2, 2018-05-24
 
 * changed: marked as tested up to WooCommerce 3.4

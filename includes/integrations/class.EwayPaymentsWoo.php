@@ -17,7 +17,6 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	*/
 	public static function load() {
 		add_filter('woocommerce_payment_gateways', array(__CLASS__, 'register'));
-		add_filter('woocommerce_email_order_meta_fields', array(__CLASS__, 'wooEmailOrderMetaKeys'), 10, 3);
 	}
 
 	/**
@@ -68,6 +67,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$this->eway_card_msg			= $this->settings['eway_card_msg'];
 		$this->eway_site_seal			= $this->settings['eway_site_seal'];
 		$this->eway_site_seal_code		= $this->settings['eway_site_seal_code'];
+		$this->eway_emails_show_txid	= $this->settings['eway_emails_show_txid'];
 
 		// handle support for standard WooCommerce credit card form instead of our custom template
 		if ($this->eway_card_form === 'yes') {
@@ -80,7 +80,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		// create a logger
 		$this->logger = new EwayPaymentsLogging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
 
-		// save admin options, via WC_Settings_API
+		add_filter('woocommerce_email_order_meta_fields', array($this, 'wooEmailOrderMetaKeys'), 10, 3);
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 	}
 
@@ -262,6 +262,13 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'description' 	=> esc_html_x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'settings label', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default'		=> '',
+						),
+
+			'eway_emails_show_txid' => array(
+							'title' 		=> _x('Transaction ID on emails', 'settings field', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('show the eWAY transaction ID on order emails', 'eway-payment-gateway'),
+							'type' 			=> 'checkbox',
+							'default' 		=> 'yes',
 						),
 
 			'eway_site_seal' => array(
@@ -655,8 +662,8 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @param mixed $order
 	* @return array
 	*/
-	public static function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
-		if (apply_filters('woocommerce_eway_email_show_trans_number', true, $order)) {
+	public function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
+		if (apply_filters('woocommerce_eway_email_show_trans_number', $this->eway_emails_show_txid === 'yes', $order)) {
 			$order			= self::getOrder($order);
 			$key			= 'Transaction ID';
 
