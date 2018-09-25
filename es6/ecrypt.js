@@ -3,7 +3,7 @@
 
 (function($) {
 
-	var checkout = $(eway_ecrypt_vars.form);
+	const checkout = $(eway_ecrypt_vars.form);
 
 	/**
 	* basic card number validation using Luhn algorithm
@@ -11,13 +11,12 @@
 	* @return bool
 	*/
 	function cardnumberValid(card_number) {
-		var checksum	= 0;
-		var multiplier	= 1;
-		var digit;
+		let checksum	= 0;
+		let multiplier	= 1;
 
 		// process each character, starting at the right
-		for (var i = card_number.length - 1; i >= 0; i--) {
-			digit = card_number.charAt(i) * multiplier;
+		for (let i = card_number.length - 1; i >= 0; i--) {
+			let digit = card_number.charAt(i) * multiplier;
 			multiplier = (multiplier === 1) ? 2 : 1;
 
 			// digit can't be greater than 9
@@ -33,8 +32,8 @@
 	}
 
 	function repeatString(character, length) {
-		var s = character;
-		for (var i = length; --i >= 1; ) {
+		let s = character;
+		for (let i = 1; i < length; i++) {
 			s += character;
 		}
 		return s;
@@ -46,11 +45,11 @@
 	* @param {Object} fieldspec encrypted field specification
 	*/
 	function maybeEncryptField(selector, fieldspec) {
-		var field = checkout.find(selector);
+		const field = checkout.find(selector);
 
 		if (field.length) {
-			var value = field.val().replace(/[\s-]/g, "");
-			var length = value.length;
+			const value = field.val().replace(/[\s-]/g, "");
+			const length = value.length;
 
 			if (length) {
 				if (fieldspec.is_cardnum && !cardnumberValid(value)) {
@@ -61,7 +60,7 @@
 					};
 				}
 
-				var encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
+				const encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
 				checkout.find("input[name='" + fieldspec.name + "']").remove();
 				$("<input type='hidden'>").attr("name", fieldspec.name).val(encrypted).appendTo(checkout);
 				field.val("").data("eway-old-placeholder", field.prop("placeholder")).prop("placeholder", repeatString(eway_ecrypt_msg.ecrypt_mask, length));
@@ -74,10 +73,10 @@
 	* @param {jQuery.event} event
 	*/
 	function processFields(event) {
-		var fields = eway_ecrypt_vars.fields;
+		const fields = eway_ecrypt_vars.fields;
 
 		try {
-			for (var i in fields) {
+			for (let i in fields) {
 				maybeEncryptField(i, fields[i]);
 			}
 		}
@@ -104,11 +103,10 @@
 	* reset the placeholders on WooCommerce checkout fields
 	*/
 	function wooResetPlaceholders() {
-		var fields = eway_ecrypt_vars.fields;
-		var field;
+		const fields = eway_ecrypt_vars.fields;
 
-		for (var i in fields) {
-			field = checkout.find(i);
+		for (let i in fields) {
+			let field = checkout.find(i);
 			if (field.length) {
 				field.prop("placeholder", field.data("eway-old-placeholder"));
 			}
