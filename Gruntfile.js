@@ -33,15 +33,33 @@ module.exports = function (grunt) {
 		eslint: {
 			all: [
 				"Gruntfile.js",
-				"js/*.js",
-				"!js/*.min.js"
+				"es6/*.js"
 			]
+		},
+
+		babel: {
+			options: {
+				presets: [
+					'@babel/preset-env',
+				]
+			},
+			dist: {
+				files: [{
+					"expand": true,
+					"cwd": "es6",
+					"src": ["**/*.js"],
+					"dest": "js/",
+					"ext": ".js",
+				}]
+			}
 		},
 
 		uglify: {
 			build: {
 				options: {
-					ASCIIOnly: true,
+					output: {
+						ascii_only: true,
+					},
 					banner: "// <%= pkg.description %>\n// <%= pkg.homepage %>\n"
 				},
 				files: [{
@@ -59,6 +77,7 @@ module.exports = function (grunt) {
 
 	});
 
+	grunt.loadNpmTasks("grunt-babel");
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks("grunt-contrib-compress");
 	grunt.loadNpmTasks("grunt-contrib-copy");
@@ -66,5 +85,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-eslint");
 
 	grunt.registerTask("release", ["clean","copy","compress"]);
+	grunt.registerTask("es6", ["babel","uglify"]);
 
 };
