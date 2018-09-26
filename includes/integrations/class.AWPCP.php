@@ -181,8 +181,9 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		$payments    = awpcp_payments_api();
 		$checkoutURL = $payments->get_return_url($transaction);
 
-		$checkout_message = sprintf(__('Please enter your credit card details for secure payment via <a rel="noopener" target="_blank" href="%s">eWAY</a>.', 'eway-payment-gateway'),
-					'https://www.eway.com.au/');
+		$checkout_message = eway_payment_gateway_external_link(
+			__('Please enter your credit card details for secure payment via {{a}}eWAY{{/a}}.', 'eway-payment-gateway'), 'https://www.eway.com.au/'
+		);
 		$checkout_message = apply_filters('awpcp_eway_checkout_message', $checkout_message, false, $transaction);
 
 		$card_msg = esc_html(get_awpcp_option('eway_card_message'));
