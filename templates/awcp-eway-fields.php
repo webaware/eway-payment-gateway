@@ -16,15 +16,15 @@ if (!defined('ABSPATH')) {
 ?>
 
 <?php if (!empty($checkout_message)): ?>
-<p><?php echo $checkout_message; ?></p>
+<p><?= $checkout_message; ?></p>
 <?php endif; ?>
 
-<form action="<?php echo esc_url($checkoutURL); ?>" method="post" id="awpcp-eway-checkout">
+<form action="<?= esc_url($checkoutURL); ?>" method="post" id="awpcp-eway-checkout">
 
 <fieldset>
 
 	<?php if (!empty($card_msg)): ?>
-	<p class="awpcp-eway-cardmessage"><?php echo $card_msg; ?></p>
+	<p class="awpcp-eway-cardmessage"><?= $card_msg; ?></p>
 	<?php endif; ?>
 
 	<p class="form-row form-row-first">
@@ -43,17 +43,17 @@ if (!defined('ABSPATH')) {
 	<p class="form-row form-row-first">
 		<label for="eway_expiry_month"><?php esc_html_e('Credit Card Expiry', 'eway-payment-gateway'); ?> <span class="required">*</span></label>
 		<select name="eway_expiry_month" id="eway_expiry_month" title="<?php esc_html_e('credit card expiry month', 'eway-payment-gateway'); ?>">
-			<option value=""><?php echo esc_html_x('Month', 'credit card field', 'eway-payment-gateway'); ?></option>
-			<?php echo $optMonths; ?>
+			<option value=""><?= esc_html_x('Month', 'credit card field', 'eway-payment-gateway'); ?></option>
+			<?= $optMonths; ?>
 		</select>
 		<select name="eway_expiry_year" title="<?php esc_html_e('credit card expiry year', 'eway-payment-gateway'); ?>">
-			<option value=""><?php echo esc_html_x('Year', 'credit card field', 'eway-payment-gateway'); ?></option>
-			<?php echo $optYears; ?>
+			<option value=""><?= esc_html_x('Year', 'credit card field', 'eway-payment-gateway'); ?></option>
+			<?= $optYears; ?>
 		</select>
 	</p>
 
 	<p class="form-row form-row-last">
-		<label for="eway_cvn"><?php echo esc_html_e('CVN/CVV', 'eway-payment-gateway'); ?> <span class="required">*</span></label>
+		<label for="eway_cvn"><?= esc_html_e('CVN/CVV', 'eway-payment-gateway'); ?> <span class="required">*</span></label>
 		<input type="text" size="4" maxlength="4" value="" pattern="[0-9]*" name="eway_cvn" id="eway_cvn"
 			title="<?php esc_html_e('only digits 0-9 are accepted', 'eway-payment-gateway'); ?>" autocomplete="off" />
 	</p>
@@ -63,10 +63,10 @@ if (!defined('ABSPATH')) {
 	<p>
 		<input type="submit" value="Make payment" />
 		<?php if (get_awpcp_option('eway_site_seal_code')): ?>
-		<?php echo wp_kses_post(get_awpcp_option('eway_site_seal_code')); ?>
+		<?= wp_kses_post(get_awpcp_option('eway_site_seal_code')); ?>
 		<?php else: ?>
 		<a href="https://www.eway.com.au/" rel="noopener" target="_blank">
-			<img src="<?php echo esc_url(plugins_url('images/eway-siteseal-tagline.png', EWAY_PAYMENTS_PLUGIN_FILE)); ?>" />
+			<img src="<?= esc_url(plugins_url('images/eway-siteseal-tagline.png', EWAY_PAYMENTS_PLUGIN_FILE)); ?>" />
 		</a>
 		<?php endif; ?>
 	</p>
