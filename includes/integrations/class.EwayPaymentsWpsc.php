@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -8,7 +9,7 @@ if (!defined('ABSPATH')) {
 * payment gateway integration for WP eCommerce
 * @link http://docs.wpecommerce.org/category/payment-gateways/
 */
-class EwayPaymentsWpsc extends wpsc_merchant {
+class MethodWPeCommerce extends \wpsc_merchant {
 
 	public $name = 'eway';
 
@@ -21,7 +22,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* @param array $gateways array of registered gateways
 	* @return array
 	*/
-	public static function register($gateways) {
+	public static function register_eway($gateways) {
 		// register the gateway class and additional functions
 		$gateways[] = array (
 			'name'						=> _x('eWAY payment gateway', 'WP eCommerce payment method name', 'eway-payment-gateway'),
@@ -61,7 +62,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	*/
 	public function __construct($purchase_id = null, $is_receiving = false) {
 		// create logger
-		$this->logger = new EwayPaymentsLogging('wp-ecommerce', get_option('eway_logging', 'off'));
+		$this->logger = new Logging('wp-ecommerce', get_option('eway_logging', 'off'));
 
 		parent::__construct($purchase_id, $is_receiving);
 	}
@@ -70,7 +71,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* grab the gateway-specific data from the checkout form post
 	*/
 	public function construct_value_array() {
-		$postdata = new EwayPaymentsFormPost();
+		$postdata = new FormPost();
 
 		$country_field = get_option('eway_form_country');
 		if ($country_field) {
@@ -118,10 +119,10 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		// get purchase logs
 		if ($this->purchase_id > 0) {
-			$purchase_logs = new WPSC_Purchase_Log($this->purchase_id);
+			$purchase_logs = new \WPSC_Purchase_Log($this->purchase_id);
 		}
 		elseif (!empty($this->session_id)) {
-			$purchase_logs = new WPSC_Purchase_Log($this->session_id, 'sessionid');
+			$purchase_logs = new \WPSC_Purchase_Log($this->session_id, 'sessionid');
 
 			$this->purchase_id = $purchase_logs->get('id');
 		}
@@ -136,7 +137,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 		$capture	= !get_option('wpsc_merchant_eway_stored');
 		$useSandbox	= (bool) get_option('eway_test');
 		$creds		= apply_filters('wpsc_eway_credentials', self::getApiCredentials(), $useSandbox, $this->purchase_id);
-		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
+		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
@@ -263,7 +264,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 	* @return int number of errors found
 	*/
 	protected function validateData() {
-		$postdata		= new EwayPaymentsFormPost();
+		$postdata		= new FormPost();
 
 		$fields			= array(
 			'card_number'	=> $postdata->getValue('card_number'),
@@ -303,8 +304,8 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 		// check if this gateway is selected for checkout payments
 		if (in_array(self::WPSC_GATEWAY_NAME, (array) get_option('custom_gateway_options'))) {
-			$optMonths = EwayPaymentsFormUtils::getMonthOptions();
-			$optYears  = EwayPaymentsFormUtils::getYearOptions();
+			$optMonths = forms\get_month_options();
+			$optYears  = forms\get_year_options();
 
 			// use TH for field label cells if selected, otherwise use TD (default wp-e-commerce behaviour)
 			$th = get_option('wpsc_merchant_eway_th') ? 'th' : 'td';
@@ -314,7 +315,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 
 			// load template with passed values, capture output and register
 			ob_start();
-			EwayPaymentsPlugin::loadTemplate('wpsc-eway-fields.php', compact('th', 'card_msg', 'optMonths', 'optYears'));
+			eway_load_template('wpsc-eway-fields.php', compact('th', 'card_msg', 'optMonths', 'optYears'));
 			$gateway_checkout_form_fields[self::WPSC_GATEWAY_NAME] = ob_get_clean();
 		}
 	}
@@ -337,7 +338,7 @@ class EwayPaymentsWpsc extends wpsc_merchant {
 			return true;
 		}
 
-		$postdata = new EwayPaymentsFormPost();
+		$postdata = new FormPost();
 
 		update_option('eway_api_key',					strip_tags($postdata->getValue('eway_api_key')));
 		update_option('eway_password',					strip_tags($postdata->getValue('eway_password')));

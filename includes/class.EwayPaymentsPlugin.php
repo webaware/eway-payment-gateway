@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -7,11 +8,11 @@ if (!defined('ABSPATH')) {
 /**
 * plugin controller class
 */
-class EwayPaymentsPlugin {
+class Plugin {
 
 	/**
 	* static method for getting the instance of this singleton object
-	* @return EwayPaymentsPlugin
+	* @return self
 	*/
 	public static function getInstance() {
 		static $instance = null;
@@ -24,61 +25,35 @@ class EwayPaymentsPlugin {
 	}
 
 	/**
+	* hide constructor
+	*/
+	private function __construct() { }
+
+	/**
 	* initialise plugin
 	*/
-	private function __construct() {
-		spl_autoload_register(array(__CLASS__, 'autoload'));
-
-		add_action('init', array($this, 'init'));
-		add_action('init', array($this, 'loadTextDomain'));
+	public function pluginStart() {
+		add_action('init', 'eway_payment_gateway_load_text_domain');
 		add_filter('plugin_row_meta', array($this, 'addPluginDetailsLinks'), 10, 2);
 		add_action('admin_notices', array($this, 'checkPrerequisites'));
 		add_action('wp_enqueue_scripts', array($this, 'registerScripts'));
 
-		// register with WP eCommerce
-		add_filter('wpsc_merchants_modules', array($this, 'wpscRegister'));
-
-		// register with WooCommerce
-		add_action('plugins_loaded', array($this, 'wooLoad'));
-
-		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsLogging.php';
-	}
-
-	/**
-	* handle init action
-	*/
-	public function init() {
-		// register with Events Manager
-		if (class_exists('EM_Gateways')) {
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsEventsManager.php';
-			EM_Gateways::register_gateway('eway', 'EwayPaymentsEventsManager');
-		}
-
-		// register with Another WordPress Classifieds Plugin
-		if (function_exists('awpcp')) {
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP3.php';
-			EwayPaymentsAWPCP3::setup();
-		}
-	}
-
-	/**
-	* load text translations
-	*/
-	public function loadTextDomain() {
-		load_plugin_textdomain('eway-payment-gateway');
+		// register integrations
+		add_filter('wpsc_merchants_modules', array($this, 'registerWPeCommerce'));
+		add_action('init', array($this, 'maybeRegisterAWPCP'));
+		add_action('init', array($this, 'maybeRegisterEventsManager'));
+		$this->maybeRegisterWooCommerce();		// hooked on plugins_loaded
 	}
 
 	/**
 	* check for required PHP extensions, tell admin if any are missing
 	*/
 	public function checkPrerequisites() {
-		// need at least PHP 5.2.11 for libxml_disable_entity_loader()
-		$php_min = '5.2.11';
-		if (version_compare(PHP_VERSION, $php_min, '<')) {
-			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-php.php';
+		if (!eway_payment_gateway_can_show_admin_notices()) {
+			return;
 		}
 
-		// need these PHP extensions too
+		// need these PHP extensions
 		$prereqs = array('json', 'libxml', 'pcre', 'SimpleXML', 'xmlwriter');
 		$missing = array();
 		foreach ($prereqs as $ext) {
@@ -111,24 +86,56 @@ class EwayPaymentsPlugin {
 	* @param array $gateways array of registered gateways
 	* @return array
 	*/
-	public function wpscRegister($gateways) {
+	public function registerWPeCommerce($gateways) {
+		$this->loadRequired();
 		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWpsc.php';
 
-		return EwayPaymentsWpsc::register($gateways);
+		return MethodWPeCommerce::register_eway($gateways);
 	}
 
 	/**
 	* maybe load WooCommerce payment gateway
 	*/
-	public function wooLoad() {
+	public function maybeRegisterWooCommerce() {
 		if (!function_exists('WC')) {
 			return;
 		}
 
+		$this->loadRequired();
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWoo.php';
 
-		return EwayPaymentsWoo::load();
+		return MethodWooCommerce::register_eway();
+	}
+
+	/**
+	* maybe register with Events Manager
+	*/
+	public function maybeRegisterEventsManager() {
+		if (class_exists('EM_Gateways')) {
+			$this->loadRequired();
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsEventsManager.php';
+			return MethodEventsManager::register_eway();
+		}
+	}
+
+	/**
+	* maybe register with Another WordPress Classifieds Plugin (AWPCP)
+	*/
+	public function maybeRegisterAWPCP() {
+		if (function_exists('awpcp')) {
+			$this->loadRequired();
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP3.php';
+			MethodAWPCP::register_eway();
+		}
+	}
+
+	/**
+	* load some functions and classes required for all integrations
+	*/
+	protected function loadRequired() {
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/functions-form-utils.php';
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsLogging.php';
 	}
 
 	/**
@@ -143,145 +150,6 @@ class EwayPaymentsPlugin {
 		}
 
 		return $links;
-	}
-
-	/**
-	* load template from theme or plugin
-	* @param string $template name of template file
-	* @param array $variables an array of variables that should be accessible by the template
-	*/
-	public static function loadTemplate($template, $variables) {
-		global $posts, $post, $wp_did_header, $wp_query, $wp_rewrite, $wpdb, $wp_version, $wp, $id, $comment, $user_ID;
-
-		// make variables available to the template
-		extract($variables);
-
-		// can't use locate_template() because WP eCommerce is _doing_it_wrong() again!
-		// (STYLESHEETPATH and TEMPLATEPATH are both undefined when this function called for wpsc)
-
-		// check in theme / child theme folder
-		$templatePath = get_stylesheet_directory() . "/$template";
-		if (!file_exists($templatePath)) {
-			// check in parent theme folder
-			$templatePath = get_template_directory() . "/$template";
-			if (!file_exists($templatePath)) {
-				// not found in theme, use plugin's template
-				$templatePath = EWAY_PAYMENTS_PLUGIN_ROOT . "templates/$template";
-			}
-		}
-
-		require $templatePath;
-	}
-
-	/**
-	* send XML data via HTTP and return response
-	* @param string $url
-	* @param string $data
-	* @param bool $sslVerifyPeer whether to validate the SSL certificate
-	* @return string $response
-	* @throws EwayPaymentsException
-	*/
-	public static function xmlPostRequest($url, $data, $sslVerifyPeer = true) {
-		// send data via HTTPS and receive response
-		$response = wp_remote_post($url, array(
-			'user-agent'	=> 'WordPress/eWAY Payment Gateway ' . EWAY_PAYMENTS_VERSION,
-			'sslverify'		=> $sslVerifyPeer,
-			'timeout'		=> 60,
-			'headers'		=> array('Content-Type' => 'text/xml; charset=utf-8'),
-			'body'			=> $data,
-		));
-
-		if (is_wp_error($response)) {
-			throw new EwayPaymentsException($response->get_error_message());
-		}
-
-		// error code returned by request
-		$code = wp_remote_retrieve_response_code($response);
-		if ($code !== 200) {
-			$msg = wp_remote_retrieve_response_message($response);
-
-			if (empty($msg)) {
-				/* translators: %s = the error code */
-				$msg = sprintf(__('Error posting eWAY request: %s', 'eway-payment-gateway'), $code);
-			}
-			else {
-				/* translators: 1. the error code; 2. the error message */
-				$msg = sprintf(__('Error posting eWAY request: %1$s, %2$s', 'eway-payment-gateway'), $code, $msg);
-			}
-			throw new EwayPaymentsException($msg);
-		}
-
-		return wp_remote_retrieve_body($response);
-	}
-
-	/**
-	* get the customer's IP address dynamically from server variables
-	* @param bool $isLiveSite
-	* @return string
-	*/
-	public static function getCustomerIP($isLiveSite) {
-		$ip = '';
-
-		if (isset($_SERVER['HTTP_X_REAL_IP'])) {
-			$ip = self::isIpAddress($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : '';
-		}
-
-		elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-			$proxies = preg_split('/[,:]/', $_SERVER['HTTP_X_FORWARDED_FOR']);
-			$ip = trim(current($proxies));
-			$ip = self::isIpAddress($ip) ? $ip : '';
-		}
-
-		elseif (isset($_SERVER['REMOTE_ADDR'])) {
-			$ip = self::isIpAddress($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
-		}
-
-		// if test mode and running on localhost, then kludge to an Aussie IP address
-		if ($ip === '127.0.0.1' && !$isLiveSite) {
-			$ip = '210.1.199.10';
-		}
-
-		// allow hookers to override for network-specific fixes
-		$ip = apply_filters('eway_payment_customer_ip', $ip);
-
-		return $ip;
-	}
-
-	/**
-	* check whether a given string is an IP address
-	* @param string $maybeIP
-	* @return bool
-	*/
-	protected static function isIpAddress($maybeIP) {
-		if (function_exists('inet_pton')) {
-			// check for IPv4 and IPv6 addresses
-			return !!inet_pton($maybeIP);
-		}
-
-		// just check for IPv4 addresses
-		return !!ip2long($maybeIP);
-	}
-
-	/**
-	* autoload classes as/when needed
-	* @param string $class_name name of class to attempt to load
-	*/
-	public static function autoload($class_name) {
-		static $classMap = array (
-			'EwayPaymentsFormPost'					=> 'includes/class.EwayPaymentsFormPost.php',
-			'EwayPaymentsFormUtils'					=> 'includes/class.EwayPaymentsFormUtils.php',
-			'EwayPaymentsPayment'					=> 'includes/class.EwayPaymentsPayment.php',
-			'EwayPaymentsRapidAPI'					=> 'includes/class.EwayPaymentsRapidAPI.php',
-			'EwayPaymentsResponse'					=> 'includes/class.EwayPaymentsResponse.php',
-			'EwayPaymentsResponseDirectPayment'		=> 'includes/class.EwayPaymentsResponseDirectPayment.php',
-			'EwayPaymentsStoredPayment'				=> 'includes/class.EwayPaymentsStoredPayment.php',
-
-			'EwayPaymentsWooOrder'					=> 'includes/integrations/class.EwayPaymentsWooOrder.php',
-		);
-
-		if (isset($classMap[$class_name])) {
-			require EWAY_PAYMENTS_PLUGIN_ROOT . $classMap[$class_name];
-		}
 	}
 
 }

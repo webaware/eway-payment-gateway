@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -8,7 +9,7 @@ if (!defined('ABSPATH')) {
 * payment gateway integration for Another WordPress Classifieds Plugin since v3.0
 * @link http://awpcp.com/
 */
-class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
+class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 	protected $logger;
 
@@ -17,7 +18,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	/**
 	* set up hooks for the integration
 	*/
-	public static function setup() {
+	public static function register_eway() {
 		add_filter('awpcp-register-payment-methods', array(__CLASS__, 'awpcpRegisterPaymentMethods'), 20);
 		add_action('awpcp_register_settings', array(__CLASS__, 'awpcpRegisterSettings'));
 		add_action('admin_print_styles-classifieds_page_awpcp-admin-settings', array(__CLASS__, 'settingsStyles'));
@@ -27,7 +28,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* initialise payment gateway
 	*/
 	public function __construct() {
-		$this->logger		= new EwayPaymentsLogging('awpcp', get_awpcp_option('eway_logging', 'off'));
+		$this->logger		= new Logging('awpcp', get_awpcp_option('eway_logging', 'off'));
 
 		$icon = get_awpcp_option('eway_icon');
 		if (empty($icon)) {
@@ -132,7 +133,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 		$log_descripton = sprintf('%s<br />%s<br />%s',
 							esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
-							EwayPaymentsLogging::getLogFolderRelative());
+							Logging::getLogFolderRelative());
 		$awpcp->settings->add_setting($section, 'eway_logging',
 						esc_html_x('Logging', 'settings field', 'eway-payment-gateway'),
 						'select', 'off', $log_descripton, array('options' => $log_options));
@@ -186,12 +187,12 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 
 		$card_msg = esc_html(get_awpcp_option('eway_card_message'));
 
-		$optMonths = EwayPaymentsFormUtils::getMonthOptions();
-		$optYears  = EwayPaymentsFormUtils::getYearOptions();
+		$optMonths = forms\get_month_options();
+		$optYears  = forms\get_year_options();
 
 		// load template with passed values
 		ob_start();
-		EwayPaymentsPlugin::loadTemplate('awcp-eway-fields.php', compact('checkoutURL', 'checkout_message', 'card_msg', 'optMonths', 'optYears'));
+		eway_load_template('awcp-eway-fields.php', compact('checkoutURL', 'checkout_message', 'card_msg', 'optMonths', 'optYears'));
 		$form = ob_get_clean();
 
 		$min = SCRIPT_DEBUG ? ''     : '.min';
@@ -255,7 +256,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
 	public function process_payment_completed($transaction) {
-		$postdata		= new EwayPaymentsFormPost();
+		$postdata		= new FormPost();
 
 		$fields			= array(
 			'card_number'	=> $postdata->getValue('eway_card_number'),
@@ -292,11 +293,11 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 					/* TODO: stored payments in AWPCP, when plugin workflow supports it
 					if ($eway_stored) {
 						// payment hasn't happened yet, so record status as 'on-hold' in anticipation
-						$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_PENDING;
+						$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_PENDING;
 					}
 					else {
 					*/
-						$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_COMPLETED;
+						$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_COMPLETED;
 					/*
 					}
 					*/
@@ -311,7 +312,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 					// transaction was unsuccessful, so record transaction number and the error
 					$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
 					$transaction->set('txn-id', $response->TransactionID);
-					$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
+					$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
 					$transaction->errors['validation'] = $error_msg;
 					$success = false;
 
@@ -323,7 +324,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 			}
 			catch (EwayPaymentsException $e) {
 				// an exception occured, so record the error
-				$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
+				$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
 				$transaction->errors['validation'] = nl2br(esc_html($e->getMessage()) . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway'));
 				$success = false;
 
@@ -342,20 +343,20 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 	*/
 	protected function processTransaction($transaction) {
 		$item		= $transaction->get_item(0); // no support for multiple items
-		$ad			= AWPCP_Ad::find_by_id($transaction->get('ad-id'));
+		$ad			= \AWPCP_Ad::find_by_id($transaction->get('ad-id'));
 		$user		= wp_get_current_user();
 
 		$capture	= !get_awpcp_option('eway_stored');
 		$useSandbox	= (bool) get_awpcp_option('paylivetestmode');
 		$creds		= apply_filters('awpcp_eway_credentials', $this->getApiCredentials(), $useSandbox, $transaction);
-		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
+		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
 
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
 			throw new EwayPaymentsException(__('eWAY payments is not configured for payments yet', 'eway-payment-gateway'));
 		}
 
-		$postdata = new EwayPaymentsFormPost();
+		$postdata = new FormPost();
 
 		$eway->invoiceDescription			= $item->name;
 		$eway->invoiceReference				= $transaction->id;									// customer invoice reference
@@ -496,7 +497,7 @@ class EwayPaymentsAWPCP3 extends AWPCP_PaymentGateway {
 			$eway->countryName		= $ad->ad_country;
 		}
 		elseif (method_exists('AWPCP_Ad', 'get_ad_regions')) {
-			$regions = AWPCP_Ad::get_ad_regions($ad->ad_id);
+			$regions = \AWPCP_Ad::get_ad_regions($ad->ad_id);
 			if (!empty($regions[0])) {
 				$eway->suburb		= $regions[0]['city'];
 				$eway->state		= $regions[0]['state'];

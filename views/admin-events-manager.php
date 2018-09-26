@@ -1,4 +1,6 @@
 <?php
+namespace webaware\eway_payment_gateway;
+
 // custom fields for Events Manager admin page
 
 if (!defined('ABSPATH')) {
@@ -149,7 +151,7 @@ if (!defined('ABSPATH')) {
 			</select>
 			<em><?php esc_html_e('Enable logging to assist trouble shooting', 'eway-payment-gateway'); ?>
 				<br /><?php esc_html_e('the log file can be found in this folder:', 'eway-payment-gateway'); ?>
-				<br /><?php echo esc_html(EwayPaymentsLogging::getLogFolderRelative()); ?>
+				<br /><?php echo esc_html(Logging::getLogFolderRelative()); ?>
 			</em>
 		</td>
 	</tr>

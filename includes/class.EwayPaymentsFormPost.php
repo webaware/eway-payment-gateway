@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -7,7 +8,7 @@ if (!defined('ABSPATH')) {
 /**
 * wrapper for form post data
 */
-class EwayPaymentsFormPost {
+class FormPost {
 
 	protected static $postdata = null;
 

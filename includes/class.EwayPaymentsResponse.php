@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -8,7 +9,7 @@ if (!defined('ABSPATH')) {
 * Class for dealing with an eWAY Rapid API response
 * @link https://eway.io/api-v3/
 */
-abstract class EwayPaymentsResponse {
+abstract class EwayResponse {
 
 	/**
 	* load eWAY response data as JSON string

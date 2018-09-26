@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -16,7 +17,7 @@ if (!defined('ABSPATH')) {
 /**
 * Class for dealing with an eWAY payment
 */
-class EwayPaymentsPayment {
+class EwayLegacyAPI {
 
 	#region members
 
@@ -154,7 +155,7 @@ class EwayPaymentsPayment {
 	* You can pass a unique transaction number from your site. You can update and track the status of a transaction when eWAY
 	* returns to your site.
 	*
-	* NB. This number is returned as 'ewayTrxnReference', member transactionReference of EwayPaymentsResponse.
+	* NB. This number is returned as 'ewayTrxnReference', member transactionReference of EwayResponse.
 	*
 	* @var string max. 16 characters
 	*/
@@ -290,7 +291,7 @@ class EwayPaymentsPayment {
 		$parts = array($this->address1, $this->address2, $this->suburb, $this->state, $this->countryName);
 		$address = implode(', ', array_filter($parts, 'strlen'));
 
-		$xml = new XMLWriter();
+		$xml = new \XMLWriter();
 		$xml->openMemory();
 		$xml->startDocument('1.0', 'UTF-8');
 		$xml->startElement('ewaygateway');
@@ -317,7 +318,7 @@ class EwayPaymentsPayment {
 		// Beagle data
 		if (!empty($this->country) && $this->accountID !== EWAY_PAYMENTS_TEST_CUSTOMER) {
 			if (empty($this->customerIP)) {
-				$this->customerIP = EwayPaymentsPlugin::getCustomerIP($this->isLiveSite);
+				$this->customerIP = get_customer_IP($this->isLiveSite);
 			}
 			$xml->writeElement('ewayCustomerIPAddress', $this->customerIP);
 			$xml->writeElement('ewayCustomerBillingCountry', $this->country);
@@ -331,7 +332,7 @@ class EwayPaymentsPayment {
 	/**
 	* send the eWAY payment request and retrieve and parse the response
 	*
-	* @return EwayPaymentsResponse
+	* @return EwayResponse
 	* @param string $xml eWAY payment request as an XML document, per eWAY specifications
 	*/
 	private function sendPayment($xml) {
@@ -347,15 +348,56 @@ class EwayPaymentsPayment {
 
 		// execute the cURL request, and retrieve the response
 		try {
-			$responseXML = EwayPaymentsPlugin::xmlPostRequest($url, $xml, $this->sslVerifyPeer);
+			$responseXML = self::xmlPostRequest($url, $xml, $this->sslVerifyPeer);
 		}
 		catch (EwayPaymentsException $e) {
 			throw new EwayPaymentsException("Error posting eWAY payment to $url: " . $e->getMessage());
 		}
 
-		$response = new EwayPaymentsResponseLegacyDirect();
+		$response = new EwayResponseLegacyDirect();
 		$response->loadResponseXML($responseXML);
 		return $response;
+	}
+
+	/**
+	* send XML data via HTTP and return response
+	* @param string $url
+	* @param string $data
+	* @param bool $sslVerifyPeer whether to validate the SSL certificate
+	* @return string $response
+	* @throws EwayPaymentsException
+	*/
+	protected static function xmlPostRequest($url, $data, $sslVerifyPeer = true) {
+		// send data via HTTPS and receive response
+		$response = wp_remote_post($url, array(
+			'user-agent'	=> 'WordPress/eWAY Payment Gateway ' . EWAY_PAYMENTS_VERSION,
+			'sslverify'		=> $sslVerifyPeer,
+			'timeout'		=> 60,
+			'headers'		=> array('Content-Type' => 'text/xml; charset=utf-8'),
+			'body'			=> $data,
+		));
+
+		if (is_wp_error($response)) {
+			throw new EwayPaymentsException($response->get_error_message());
+		}
+
+		// error code returned by request
+		$code = wp_remote_retrieve_response_code($response);
+		if ($code !== 200) {
+			$msg = wp_remote_retrieve_response_message($response);
+
+			if (empty($msg)) {
+				/* translators: %s = the error code */
+				$msg = sprintf(__('Error posting eWAY request: %s', 'eway-payment-gateway'), $code);
+			}
+			else {
+				/* translators: 1. the error code; 2. the error message */
+				$msg = sprintf(__('Error posting eWAY request: %1$s, %2$s', 'eway-payment-gateway'), $code, $msg);
+			}
+			throw new EwayPaymentsException($msg);
+		}
+
+		return wp_remote_retrieve_body($response);
 	}
 
 }
@@ -363,7 +405,7 @@ class EwayPaymentsPayment {
 /**
 * Class for dealing with an eWAY payment response
 */
-class EwayPaymentsResponseLegacyDirect extends EwayPaymentsResponse {
+class EwayResponseLegacyDirect extends EwayResponse {
 
 	#region members
 
@@ -444,7 +486,7 @@ class EwayPaymentsResponseLegacyDirect extends EwayPaymentsResponse {
 			$this->Errors						= array('ERROR' => (string) $xml->ewayTrxnError);
 
 			// if we got an amount, convert it back into dollars.cents from just cents
-			$this->Payment						= new stdClass;
+			$this->Payment						= new \stdClass;
 			$this->Payment->TotalAmount			= empty($xml->ewayReturnAmount) ? null : floatval($xml->ewayReturnAmount) / 100.0;
 			$this->Payment->InvoiceReference	= (string) $xml->ewayTrxnReference;
 

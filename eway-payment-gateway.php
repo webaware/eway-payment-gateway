@@ -34,18 +34,16 @@ if (!defined('ABSPATH')) {
 }
 
 define('EWAY_PAYMENTS_PLUGIN_FILE', __FILE__);
-define('EWAY_PAYMENTS_PLUGIN_ROOT', dirname(__FILE__) . '/');
-define('EWAY_PAYMENTS_PLUGIN_NAME', basename(dirname(__FILE__)) . '/' . basename(__FILE__));
+define('EWAY_PAYMENTS_PLUGIN_ROOT', __DIR__ . '/');
+define('EWAY_PAYMENTS_PLUGIN_NAME', basename(__DIR__) . '/' . basename(__FILE__));
+define('EWAY_PAYMENTS_MIN_PHP', '5.4');
 define('EWAY_PAYMENTS_VERSION', '4.2.3-dev');
 
-// special test customer ID for sandbox
-define('EWAY_PAYMENTS_TEST_CUSTOMER', '87654321');
+require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/functions-global.php';
 
-/**
-* custom exceptons
-*/
-class EwayPaymentsException extends Exception {}
+if (version_compare(PHP_VERSION, EWAY_PAYMENTS_MIN_PHP, '<')) {
+	add_action('admin_notices', 'eway_payment_gateway_fail_php_version');
+	return;
+}
 
-// initialise plugin
-require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsPlugin.php';
-EwayPaymentsPlugin::getInstance();
+require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/bootstrap.php';

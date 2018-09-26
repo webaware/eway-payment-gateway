@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -8,7 +9,7 @@ if (!defined('ABSPATH')) {
 * extend eWAY response for Direct Connection payment request
 * @link https://eway.io/api-v3/
 */
-class EwayPaymentsResponseDirectPayment extends EwayPaymentsResponse {
+class EwayResponseDirectPayment extends EwayResponse {
 
 	#region members
 

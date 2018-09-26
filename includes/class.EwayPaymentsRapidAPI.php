@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -8,7 +9,7 @@ if (!defined('ABSPATH')) {
 * Class for dealing with an eWAY Rapid API payment
 * @link https://eway.io/api-v3/
 */
-class EwayPaymentsRapidAPI {
+class EwayRapidAPI {
 
 	#region "constants"
 
@@ -401,7 +402,7 @@ class EwayPaymentsRapidAPI {
 		$request = $this->getPaymentDirect();
 		$responseJSON = $this->apiPostRequest(self::API_DIRECT_PAYMENT, $request);
 
-		$response = new EwayPaymentsResponseDirectPayment();
+		$response = new EwayResponseDirectPayment();
 		$response->loadResponse($responseJSON);
 
 		return $response;
@@ -429,13 +430,13 @@ class EwayPaymentsRapidAPI {
 	* @return string
 	*/
 	public function getPaymentDirect() {
-		$request = new stdClass();
+		$request = new \stdClass();
 
 		$request->Customer				= $this->getCustomerRecord(true);
 		$request->Payment				= $this->getPaymentRecord();
 		$request->TransactionType		= self::TRANS_PURCHASE;
 		$request->PartnerID				= self::PARTNER_ID;
-		$request->CustomerIP			= EwayPaymentsPlugin::getCustomerIP(!$this->useSandbox);
+		$request->CustomerIP			= get_customer_IP(!$this->useSandbox);
 
 		if (!$this->capture) {
 			// just authorise the transaction;
@@ -466,7 +467,7 @@ class EwayPaymentsRapidAPI {
 	* @return stdClass
 	*/
 	protected function getCustomerRecord() {
-		$record = new stdClass;
+		$record = new \stdClass;
 
 		//~ $record->Reference		= '';		// TODO: customer reference?
 		$record->Title				= $this->title				? self::sanitiseTitle($this->title) : '';
@@ -517,7 +518,7 @@ class EwayPaymentsRapidAPI {
 	* @return stdClass
 	*/
 	protected function getShippingAddressRecord() {
-		$record = new stdClass;
+		$record = new \stdClass;
 
 		if ($this->shipMethod) {
 			$record->ShippingMethod	= $this->shipMethod;
@@ -555,7 +556,7 @@ class EwayPaymentsRapidAPI {
 	* @return stdClass
 	*/
 	protected function getCardDetailsRecord() {
-		$record = new stdClass;
+		$record = new \stdClass;
 
 		if (!empty($this->cardHoldersName)) {
 			$record->Name				= substr($this->cardHoldersName, 0, 50);
@@ -585,7 +586,7 @@ class EwayPaymentsRapidAPI {
 	* @return stdClass
 	*/
 	protected function getPaymentRecord() {
-		$record = new stdClass;
+		$record = new \stdClass;
 
 		if ($this->amount > 0) {
 			$record->TotalAmount		= self::formatCurrency($this->amount, $this->currencyCode);

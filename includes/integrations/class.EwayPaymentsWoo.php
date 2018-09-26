@@ -1,4 +1,7 @@
 <?php
+namespace webaware\eway_payment_gateway;
+
+use webaware\eway_payment_gateway\woocommerce\CompatibleOrder;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -8,14 +11,14 @@ if (!defined('ABSPATH')) {
 * payment gateway integration for WooCommerce
 * @link https://docs.woothemes.com/document/payment-gateway-api/
 */
-class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
+class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 
 	protected $logger;
 
 	/**
 	* hook WooCommerce to register gateway integration
 	*/
-	public static function load() {
+	public static function register_eway() {
 		add_filter('woocommerce_payment_gateways', array(__CLASS__, 'register'));
 	}
 
@@ -79,7 +82,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		}
 
 		// create a logger
-		$this->logger = new EwayPaymentsLogging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
+		$this->logger = new Logging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
 
 		add_filter('woocommerce_email_order_meta_fields', array($this, 'wooEmailOrderMetaKeys'), 10, 3);
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
@@ -238,7 +241,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 							'description'	=>	sprintf('%s<br/>%s<br/>%s',
 													esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
 													esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
-													esc_html(EwayPaymentsLogging::getLogFolderRelative())),
+													esc_html(Logging::getLogFolderRelative())),
 							'default' 		=> 'off',
 							'options'		=> array(
 								'off' 		=> esc_html_x('Off', 'logging settings', 'eway-payment-gateway'),
@@ -414,12 +417,12 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 			$this->form();
 		}
 		else {
-			$optMonths = EwayPaymentsFormUtils::getMonthOptions();
-			$optYears  = EwayPaymentsFormUtils::getYearOptions();
+			$optMonths = forms\get_month_options();
+			$optYears  = forms\get_year_options();
 
 			// load payment fields template with passed values
 			$settings = $this->settings;
-			EwayPaymentsPlugin::loadTemplate('woocommerce-eway-fields.php', compact('optMonths', 'optYears', 'settings'));
+			eway_load_template('woocommerce-eway-fields.php', compact('optMonths', 'optYears', 'settings'));
 
 			$this->maybeEnqueueCSE();
 		}
@@ -430,7 +433,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return array
 	*/
 	protected function getCardFields() {
-		$postdata = new EwayPaymentsFormPost();
+		$postdata = new FormPost();
 
 		if ($this->eway_card_form === 'yes') {
 			// split expiry field into month and year
@@ -472,7 +475,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	* @return bool
 	*/
 	public function validate_fields() {
-		$postdata		= new EwayPaymentsFormPost();
+		$postdata		= new FormPost();
 		$fields			= $this->getCardFields();
 		$errors			= $postdata->verifyCardDetails($fields);
 
@@ -497,7 +500,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 		$capture	= ($this->eway_stored  !== 'yes');
 		$useSandbox	= ($this->eway_sandbox === 'yes');
 		$creds		= apply_filters('woocommerce_eway_credentials', $this->getApiCredentials(), $useSandbox, $order);
-		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
+		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
 
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
@@ -680,7 +683,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 	/**
 	* get order object for order, maybe wrapping it up for legacy WooCommerce versions
 	* @param int|object|WC_Order $order
-	* @return WC_Order|EwayPaymentsWooOrder
+	* @return WC_Order|CompatibleOrder
 	*/
 	protected static function getOrder($order) {
 		if (is_numeric($order)) {
@@ -690,7 +693,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 		if (!method_exists($order, 'get_id')) {
 			// wrap legacy order to provide accessor methods
-			$order = new EwayPaymentsWooOrder($order);
+			$order = new CompatibleOrder($order);
 		}
 
 		return $order;
@@ -698,7 +701,7 @@ class EwayPaymentsWoo extends WC_Payment_Gateway_CC {
 
 	/**
 	* update order meta, handling WC 3.0 as well as legacy versions
-	* @param WC_Order|EwayPaymentsWooOrder $order
+	* @param WC_Order|CompatibleOrder $order
 	* @param array $meta
 	*/
 	protected static function updateOrderMeta($order, $meta) {

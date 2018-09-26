@@ -1,4 +1,5 @@
 <?php
+namespace webaware\eway_payment_gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -8,11 +9,18 @@ if (!defined('ABSPATH')) {
 * payment gateway integration for Events Manager
 * with thanks to EM_Gateway_Authorize_AIM for showing the way...
 */
-class EwayPaymentsEventsManager extends EM_Gateway {
+class MethodEventsManager extends \EM_Gateway {
 
 	protected $logger;
 
 	private $registered_timer = 0;
+
+	/**
+	* register gateway integration
+	*/
+	public static function register_eway() {
+		\EM_Gateways::register_gateway('eway', __CLASS__);
+	}
 
 	/**
 	* Set up gateaway and add relevant actions/filters
@@ -39,7 +47,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		}
 
 		// create a logger
-		$this->logger = new EwayPaymentsLogging('events-manager', get_option("em_{$this->gateway}_logging", 'off'));
+		$this->logger = new Logging('events-manager', get_option("em_{$this->gateway}_logging", 'off'));
 
 		// initialise parent class
 		parent::__construct();
@@ -127,7 +135,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	public function emBookingValidate($result, $EM_Booking) {
 		// only perform validation if this payment method has been selected
 		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] === $this->gateway) {
-			$postdata		= new EwayPaymentsFormPost();
+			$postdata		= new FormPost();
 
 			$fields			= array(
 				'card_number'	=> $postdata->getValue('x_card_num'),
@@ -184,7 +192,7 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		if (!empty($post->post_type) && $post->post_type === EM_POST_TYPE_EVENT && !is_ssl()) {
 			try {
 				// create event object, check that it has bookings
-				$event = new EM_Event($post);
+				$event = new \EM_Event($post);
 				if ($event->event_rsvp) {
 					// redirect to SSL
 					$url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -305,17 +313,17 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 	public function booking_form(){
 		$card_msg	= esc_html(get_option("em_{$this->gateway}_card_msg"));
 
-		$postdata = new EwayPaymentsFormPost();
+		$postdata = new FormPost();
 
 		$card_num	= esc_html($postdata->getValue('x_card_num'));
 		$card_name	= esc_html($postdata->getValue('x_card_name'));
 		$card_code	= esc_html($postdata->getValue('x_card_code'));
 
-		$optMonths = EwayPaymentsFormUtils::getMonthOptions($postdata->getValue('x_exp_date_month'));
-		$optYears  = EwayPaymentsFormUtils::getYearOptions($postdata->getValue('x_exp_date_year'));
+		$optMonths = forms\get_month_options($postdata->getValue('x_exp_date_month'));
+		$optYears  = forms\get_year_options($postdata->getValue('x_exp_date_year'));
 
 		// load template with passed values, capture output and register
-		EwayPaymentsPlugin::loadTemplate('eventsmanager-eway-fields.php', compact('card_msg', 'card_num', 'card_name', 'card_code', 'optMonths', 'optYears'));
+		eway_load_template('eventsmanager-eway-fields.php', compact('card_msg', 'card_num', 'card_name', 'card_code', 'optMonths', 'optYears'));
 
 		// maybe set up Client Side Encryption
 		$creds = $this->getApiCredentials();
@@ -356,9 +364,9 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$capture	= !get_option("em_{$this->gateway}_stored");
 		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
 		$creds		= apply_filters('em_eway_credentials', $this->getApiCredentials(), $useSandbox, $EM_Booking);
-		$eway		= EwayPaymentsFormUtils::getApiWrapper($creds, $capture, $useSandbox);
+		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
 
-		$postdata = new EwayPaymentsFormPost();
+		$postdata = new FormPost();
 
 		$eway->invoiceDescription			= $EM_Booking->get_event()->event_name;
 		$eway->invoiceReference				= $EM_Booking->booking_id;						// customer invoice reference
@@ -371,12 +379,12 @@ class EwayPaymentsEventsManager extends EM_Gateway {
 		$eway->cardExpiryYear				= $postdata->getValue('x_exp_date_year');
 		$eway->cardVerificationNumber		= $postdata->getValue('x_card_code');
 		$eway->emailAddress					= $EM_Booking->get_person()->user_email;
-		$eway->address1						= EM_Gateways::get_customer_field('address', $EM_Booking);
-		$eway->address2						= EM_Gateways::get_customer_field('address_2', $EM_Booking);
-		$eway->suburb						= EM_Gateways::get_customer_field('city', $EM_Booking);
-		$eway->state						= EM_Gateways::get_customer_field('state', $EM_Booking);
+		$eway->address1						= \EM_Gateways::get_customer_field('address', $EM_Booking);
+		$eway->address2						= \EM_Gateways::get_customer_field('address_2', $EM_Booking);
+		$eway->suburb						= \EM_Gateways::get_customer_field('city', $EM_Booking);
+		$eway->state						= \EM_Gateways::get_customer_field('state', $EM_Booking);
 		$eway->postcode						= $postdata->getValue('zip');
-		$eway->country						= EM_Gateways::get_customer_field('country', $EM_Booking);
+		$eway->country						= \EM_Gateways::get_customer_field('country', $EM_Booking);
 		$eway->countryName					= $eway->country;
 
 		// convert Events Manager country code into country name
