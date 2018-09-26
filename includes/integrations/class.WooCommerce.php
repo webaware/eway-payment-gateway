@@ -19,7 +19,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	* hook WooCommerce to register gateway integration
 	*/
 	public static function register_eway() {
-		add_filter('woocommerce_payment_gateways', array(__CLASS__, 'register'));
+		add_filter('woocommerce_payment_gateways', [__CLASS__, 'register']);
 	}
 
 	/**
@@ -76,16 +76,16 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		// handle support for standard WooCommerce credit card form instead of our custom template
 		if ($this->eway_card_form === 'yes') {
 			$this->supports[]			= 'default_credit_card_form';
-			add_filter('woocommerce_credit_card_form_fields', array($this, 'wooCcFormFields'), 10, 2);
-			add_action('woocommerce_credit_card_form_start', array($this, 'wooCcFormStart'));
-			add_action('woocommerce_credit_card_form_end', array($this, 'wooCcFormEnd'));
+			add_filter('woocommerce_credit_card_form_fields', [$this, 'wooCcFormFields'], 10, 2);
+			add_action('woocommerce_credit_card_form_start', [$this, 'wooCcFormStart']);
+			add_action('woocommerce_credit_card_form_end', [$this, 'wooCcFormEnd']);
 		}
 
 		// create a logger
 		$this->logger = new Logging('woocommerce', empty($this->settings['eway_logging']) ? 'off' : $this->settings['eway_logging']);
 
-		add_filter('woocommerce_email_order_meta_fields', array($this, 'wooEmailOrderMetaKeys'), 10, 3);
-		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
+		add_filter('woocommerce_email_order_meta_fields', [$this, 'wooEmailOrderMetaKeys'], 10, 3);
+		add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
 	}
 
 	/**
@@ -95,146 +95,146 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		// get recorded settings, so we can determine sane defaults when upgrading
 		$settings = get_option('woocommerce_eway_payments_settings');
 
-		$this->form_fields = array(
+		$this->form_fields = [
 
-			'enabled' => array(
+			'enabled' => [
 							'title' 		=> translate('Enable/Disable', 'woocommerce'),
 							'type' 			=> 'checkbox',
 							'label' 		=> esc_html__('enable eWAY credit card payment', 'eway-payment-gateway'),
 							'default' 		=> 'no',
-						),
+			],
 
-			'title' => array(
+			'title' => [
 							'title' 		=> translate('Method Title', 'woocommerce'),
 							'type' 			=> 'text',
 							'description' 	=> translate('This controls the title which the user sees during checkout.', 'woocommerce'),
 							'desc_tip'		=> true,
 							'default'		=> _x('Credit card', 'WooCommerce payment method title', 'eway-payment-gateway'),
-						),
+			],
 
-			'description' => array(
+			'description' => [
 							'title' 		=> translate('Description', 'woocommerce'),
 							'type' 			=> 'textarea',
 							'description' 	=> translate('This controls the description which the user sees during checkout.', 'woocommerce'),
 							'desc_tip'		=> true,
 							'default'		=> _x('Pay with your credit card using eWAY secure checkout', 'WooCommerce payment method description', 'eway-payment-gateway'),
-						),
+			],
 
-			'availability' => array(
+			'availability' => [
 							'title' 		=> translate('Method availability', 'woocommerce'),
 							'type' 			=> 'select',
 							'default' 		=> 'all',
 							'class'			=> 'availability wc-enhanced-select',
-							'options'		=> array(
+							'options'		=> [
 								'all' 		=> translate('All allowed countries', 'woocommerce'),
 								'specific' 	=> translate('Specific Countries', 'woocommerce'),
-							),
-						),
+							],
+			],
 
-			'countries' => array(
+			'countries' => [
 							'title' 		=> translate('Specific Countries', 'woocommerce'),
 							'type' 			=> 'multiselect',
 							'class'			=> 'wc-enhanced-select',
 							'css'			=> 'width: 450px;',
 							'default' 		=> '',
 							'options'		=> WC()->countries->countries,
-						),
+			],
 
-			'eway_api_key' => array(
+			'eway_api_key' => [
 							'title' 		=> _x('API key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width: 100%',
-							'custom_attributes'	=> array(
+							'custom_attributes'	=> [
 														'autocorrect'		=> 'off',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
-													),
-						),
+												],
+			],
 
-			'eway_password' => array(
+			'eway_password' => [
 							'title' 		=> _x('API password', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
-							'custom_attributes'	=> array(
+							'custom_attributes'	=> [
 														'autocorrect'		=> 'off',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
-													),
-						),
+												],
+			],
 
-			'eway_ecrypt_key' => array(
+			'eway_ecrypt_key' => [
 							'title' 		=> _x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'textarea',
 							'css'			=> 'height: 6em',
-							'custom_attributes'	=> array(
+							'custom_attributes'	=> [
 														'autocorrect'		=> 'off',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
-													),
-						),
+												],
+			],
 
-			'eway_customerid' => array(
+			'eway_customerid' => [
 							'title' 		=> _x('Customer ID', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'description' 	=> esc_html__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
-						),
+			],
 
-			'eway_sandbox' => array(
+			'eway_sandbox' => [
 							'title' 		=> _x('Sandbox mode', 'settings field', 'eway-payment-gateway'),
 							'label' 		=> __('enable sandbox (testing) mode', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
 							'description' 	=> esc_html__('Use the sandbox testing environment, no live payments are accepted; use test card number 4444333322221111', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'yes',
-						),
+			],
 
-			'eway_sandbox_api_key' => array(
+			'eway_sandbox_api_key' => [
 							'title' 		=> _x('Sandbox API key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width: 100%',
-							'custom_attributes'	=> array(
+							'custom_attributes'	=> [
 														'autocorrect'		=> 'off',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
-													),
-						),
+												],
+			],
 
-			'eway_sandbox_password' => array(
+			'eway_sandbox_password' => [
 							'title' 		=> _x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
-							'custom_attributes'	=> array(
+							'custom_attributes'	=> [
 														'autocorrect'		=> 'off',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
-													),
-						),
+												],
+			],
 
-			'eway_sandbox_ecrypt_key' => array(
+			'eway_sandbox_ecrypt_key' => [
 							'title' 		=> _x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'textarea',
 							'css'			=> 'height: 6em',
-							'custom_attributes'	=> array(
+							'custom_attributes'	=> [
 														'autocorrect'		=> 'off',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
-													),
-						),
+												],
+			],
 
-			'eway_stored' => array(
+			'eway_stored' => [
 							'title' 		=> _x('Payment Method', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'select',
 							'class'			=> 'wc-enhanced-select',
 							'description' 	=> esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
-							'options'		=> array(
+							'options'		=> [
 								// for backwards-compatibility, Capture = "not stored", Authorize = "stored / Pre-Auth"
 								'no' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
 								'yes'	 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
-							),
-						),
+							],
+			],
 
-			'eway_logging' => array(
+			'eway_logging' => [
 							'title' 		=> _x('Logging', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'select',
 							'class'			=> 'wc-enhanced-select',
@@ -243,56 +243,56 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 													esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
 													esc_html(Logging::getLogFolderRelative())),
 							'default' 		=> 'off',
-							'options'		=> array(
+							'options'		=> [
 								'off' 		=> esc_html_x('Off', 'logging settings', 'eway-payment-gateway'),
 								'info'	 	=> esc_html_x('All messages', 'logging settings', 'eway-payment-gateway'),
 								'error' 	=> esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'),
-							),
-						),
+							],
+			],
 
-			'eway_card_form' => array(
+			'eway_card_form' => [
 							'title' 		=> _x('Credit card fields', 'settings field', 'eway-payment-gateway'),
 							'label' 		=> esc_html__('use WooCommerce standard credit card fields', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
 							'description' 	=> esc_html__('Ticked, the standard WooCommerce credit card fields will be used. Unticked, a custom template will be used for the credit card fields.', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> (is_array($settings) ? 'no' : 'yes'),
-						),
+			],
 
-			'eway_card_msg' => array(
+			'eway_card_msg' => [
 							'title' 		=> _x('Credit card message', 'settings field', 'eway-payment-gateway'),
 							'type' 			=> 'text',
 							'css'			=> 'width:100%',
 							'description' 	=> esc_html_x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'settings label', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default'		=> '',
-						),
+			],
 
-			'eway_emails_show_txid' => array(
+			'eway_emails_show_txid' => [
 							'title' 		=> _x('Transaction ID on emails', 'settings field', 'eway-payment-gateway'),
 							'label' 		=> esc_html__('show the eWAY transaction ID on order emails', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
 							'default' 		=> 'yes',
-						),
+			],
 
-			'eway_site_seal' => array(
+			'eway_site_seal' => [
 							'title' 		=> _x('Show eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
 							'label' 		=> esc_html__('show the eWAY site seal after the credit card fields', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
 							'description' 	=> esc_html__('Add the verified eWAY Site Seal to your checkout', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
-						),
+			],
 
-			'eway_site_seal_code' => array(
+			'eway_site_seal_code' => [
 							'type' 			=> 'textarea',
 							'description' 	=> sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" rel="noopener" target="_blank">%s</a>',
 													esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
 							'default'		=> '',
 							'css'			=> 'height:14em',
-						),
+			],
 
-			);
+		];
 	}
 
 	/**
@@ -318,7 +318,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	public function admin_options() {
 		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-woocommerce.php';
 
-		add_action('admin_print_footer_scripts', array($this, 'adminSettingsScript'));
+		add_action('admin_print_footer_scripts', [$this, 'adminSettingsScript']);
 	}
 
 	/**
@@ -344,7 +344,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 			require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/woocommerce-ccfields-card-name.php';
 			$card_name = ob_get_clean();
 
-			$fields = array_merge(array('card-name-field' => $card_name), $fields);
+			$fields = array_merge(['card-name-field' => $card_name], $fields);
 		}
 
 		return $fields;
@@ -371,7 +371,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		$creds = $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
 			wp_enqueue_script('eway-payment-gateway-ecrypt');
-			add_action('wp_footer', array($this, 'ecryptScript'));
+			add_action('wp_footer', [$this, 'ecryptScript']);
 		}
 	}
 
@@ -381,17 +381,17 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
 
-		$vars = array(
+		$vars = [
 			'mode'		=> 'woocommerce',
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> 'form.checkout',
-			'fields'	=> array(
-							"#{$this->id}-card-number"	=> array('name' => "cse:{$this->id}-card-number", 'is_cardnum' => true),
-							"#{$this->id}-card-cvc"		=> array('name' => "cse:{$this->id}-card-cvc", 'is_cardnum' => false),
-							'#eway_card_number'			=> array('name' => 'cse:eway_card_number', 'is_cardnum' => true),
-							'#eway_cvn'					=> array('name' => 'cse:eway_cvn', 'is_cardnum' => false),
-						),
-		);
+			'fields'	=> [
+							"#{$this->id}-card-number"	=> ['name' => "cse:{$this->id}-card-number", 'is_cardnum' => true],
+							"#{$this->id}-card-cvc"		=> ['name' => "cse:{$this->id}-card-cvc", 'is_cardnum' => false],
+							'#eway_card_number'			=> ['name' => 'cse:eway_card_number', 'is_cardnum' => true],
+							'#eway_cvn'					=> ['name' => 'cse:eway_cvn', 'is_cardnum' => false],
+						],
+		];
 
 		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
 	}
@@ -446,25 +446,25 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 				}
 			}
 			else {
-				$expiry = array('', '');
+				$expiry = ['', ''];
 			}
 
-			$fields = array(
+			$fields = [
 				'card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_payments-card-number')),
 				'card_name'    => $postdata->getValue('eway_payments-card-name'),
 				'expiry_month' => $expiry[0],
 				'expiry_year'  => $expiry[1],
 				'cvn'          => $postdata->getValue('eway_payments-card-cvc'),
-			);
+			];
 		}
 		else {
-			$fields = array(
+			$fields = [
 				'card_number'  => $postdata->cleanCardnumber($postdata->getValue('eway_card_number')),
 				'card_name'    => $postdata->getValue('eway_card_name'),
 				'expiry_month' => $postdata->getValue('eway_expiry_month'),
 				'expiry_year'  => $postdata->getValue('eway_expiry_year'),
 				'cvn'          => $postdata->getValue('eway_cvn'),
-			);
+			];
 		}
 
 		return $fields;
@@ -505,7 +505,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
 			wc_add_notice(esc_html__('eWAY payments is not configured for payments yet', 'eway-payment-gateway'), 'error');
-			return array('result' => 'failure');
+			return ['result' => 'failure'];
 		}
 
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
@@ -562,11 +562,11 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription		= apply_filters('woocommerce_eway_invoice_desc', $eway->invoiceDescription, $order_id);
 		$eway->invoiceReference			= apply_filters('woocommerce_eway_invoice_ref', $eway->invoiceReference, $order_id);
-		$eway->options					= array_filter(array(
+		$eway->options					= array_filter([
 												apply_filters('woocommerce_eway_option1', '', $order_id),
 												apply_filters('woocommerce_eway_option2', '', $order_id),
 												apply_filters('woocommerce_eway_option3', '', $order_id),
-											), 'strlen');
+										  ], 'strlen');
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
 			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
@@ -576,7 +576,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record details and complete payment
-				$meta = array('Transaction ID' => $response->TransactionID);
+				$meta = ['Transaction ID' => $response->TransactionID];
 				if (!empty($response->AuthorisationCode)) {
 					$meta['Authcode'] = $response->AuthorisationCode;
 				}
@@ -598,10 +598,10 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 				}
 				WC()->cart->empty_cart();
 
-				$result = array(
+				$result = [
 					'result'	=> 'success',
 					'redirect'	=> $this->get_return_url($order),
-				);
+				];
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
 					$eway->invoiceReference, $response->TransactionID, $this->eway_stored === 'yes' ? 'on-hold' : 'completed',
@@ -612,7 +612,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 				$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
 				$order->update_status('failed', $error_msg);
 				wc_add_notice($error_msg, 'error');
-				$result = array('result' => 'failure');
+				$result = ['result' => 'failure'];
 
 				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->getErrorsForLog()));
 				if ($response->BeagleScore > 0) {
@@ -624,7 +624,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 			// an exception occured, so record the error
 			$order->update_status('failed', nl2br(esc_html($e->getMessage())));
 			wc_add_notice(nl2br(esc_html($e->getMessage())), 'error');
-			$result = array('result' => 'failure');
+			$result = ['result' => 'failure'];
 
 			$this->logger->log('error', $e->getMessage());
 		}
@@ -640,20 +640,20 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		$useSandbox	= ($this->eway_sandbox === 'yes');
 
 		if (!$useSandbox) {
-			$creds = array(
+			$creds = [
 				'api_key'		=> $this->eway_api_key,
 				'password'		=> $this->eway_password,
 				'ecrypt_key'	=> $this->eway_ecrypt_key,
 				'customerid'	=> $this->eway_customerid,
-			);
+			];
 		}
 		else {
-			$creds = array(
+			$creds = [
 				'api_key'		=> $this->eway_sandbox_api_key,
 				'password'		=> $this->eway_sandbox_password,
 				'ecrypt_key'	=> $this->eway_sandbox_ecrypt_key,
 				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
-			);
+			];
 		}
 
 		return $creds;
@@ -671,10 +671,10 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 			$order			= self::getOrder($order);
 			$key			= 'Transaction ID';
 
-			$keys[$key]		= array(
+			$keys[$key]		= [
 				'label'		=> wptexturize($key),
 				'value'		=> wptexturize(get_post_meta($order->get_id(), $key, true)),
-			);
+			];
 		}
 
 		return $keys;

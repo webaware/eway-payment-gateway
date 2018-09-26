@@ -161,7 +161,7 @@ class EwayLegacyStoredAPI {
 	* optional additional information for use in shopping carts, etc.
 	* @var array[string] max. 255 characters, up to 3 elements
 	*/
-	public $options = array();
+	public $options = [];
 
 	#endregion
 
@@ -199,7 +199,7 @@ class EwayLegacyStoredAPI {
 	* validate the data members to ensure that sufficient and valid information has been given
 	*/
 	private function validate() {
-		$errors = array();
+		$errors = [];
 
 		if (strlen($this->accountID) === 0) {
 			$errors[] = __('CustomerID cannot be empty', 'eway-payment-gateway');
@@ -274,7 +274,7 @@ class EwayLegacyStoredAPI {
 	*/
 	public function getPaymentXML() {
 		// aggregate street, city, state, country into a single string
-		$parts = array($this->address1, $this->address2, $this->suburb, $this->state, $this->countryName);
+		$parts = [$this->address1, $this->address2, $this->suburb, $this->state, $this->countryName];
 		$address = implode(', ', array_filter($parts, 'strlen'));
 
 		$xml = new \XMLWriter();
@@ -338,13 +338,13 @@ class EwayLegacyStoredAPI {
 	*/
 	protected static function xmlPostRequest($url, $data, $sslVerifyPeer = true) {
 		// send data via HTTPS and receive response
-		$response = wp_remote_post($url, array(
+		$response = wp_remote_post($url, [
 			'user-agent'	=> 'WordPress/eWAY Payment Gateway ' . EWAY_PAYMENTS_VERSION,
 			'sslverify'		=> $sslVerifyPeer,
 			'timeout'		=> 60,
-			'headers'		=> array('Content-Type' => 'text/xml; charset=utf-8'),
+			'headers'		=> ['Content-Type' => 'text/xml; charset=utf-8'],
 			'body'			=> $data,
-		));
+		]);
 
 		if (is_wp_error($response)) {
 			throw new EwayPaymentsException($response->get_error_message());
@@ -448,11 +448,11 @@ class EwayResponseLegacyStored extends EwayResponse {
 			}
 
 			$this->AuthorisationCode			= (string) $xml->ewayAuthCode;
-			$this->ResponseMessage				= array();
+			$this->ResponseMessage				= [];
 			$this->TransactionStatus			= (strcasecmp((string) $xml->ewayTrxnStatus, 'true') === 0);
 			$this->TransactionID				= (string) $xml->ewayTrxnNumber;
 			$this->BeagleScore					= '';		// Stored Payment Legacy XML API does not support Beagle
-			$this->Errors						= array('ERROR' => (string) $xml->ewayTrxnError);
+			$this->Errors						= ['ERROR' => (string) $xml->ewayTrxnError];
 
 			// if we got an amount, convert it back into dollars.cents from just cents
 			$this->Payment						= new \stdClass;

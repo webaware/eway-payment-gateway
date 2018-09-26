@@ -24,7 +24,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	*/
 	public static function register_eway($gateways) {
 		// register the gateway class and additional functions
-		$gateways[] = array (
+		$gateways[] = [
 			'name'						=> _x('eWAY payment gateway', 'WP eCommerce payment method name', 'eway-payment-gateway'),
 			'api_version'				=> 2.0,
 			'image'						=> plugins_url('images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE),
@@ -33,23 +33,23 @@ class MethodWPeCommerce extends \wpsc_merchant {
 			'has_recurring_billing'		=> false,
 			'wp_admin_cannot_cancel'	=> true,
 			'display_name'				=> _x('eWAY Credit Card Payment', 'WP eCommerce payment method display name', 'eway-payment-gateway'),
-			'form'						=> array(__CLASS__, 'configForm'),
-			'submit_function'			=> array(__CLASS__, 'saveConfig'),
+			'form'						=> [__CLASS__, 'configForm'],
+			'submit_function'			=> [__CLASS__, 'saveConfig'],
 			'payment_type'				=> 'credit_card',
-			'requirements'				=> array(
+			'requirements'				=> [
 												'php_version' => 5.3,
-											),
-		);
+										   ],
+		];
 
 		// register extra fields we require on the checkout form
 		self::setCheckoutFields();
 
-		add_action('wpsc_before_shopping_cart_page', array(__CLASS__, 'enqueueCheckoutScript'));
+		add_action('wpsc_before_shopping_cart_page', [__CLASS__, 'enqueueCheckoutScript']);
 
 		// also register admin hooks if required
 		if (is_admin()) {
-			add_action('wpsc_billing_details_bottom', array(__CLASS__, 'actionBillingDetailsBottom'));
-			add_action('admin_print_footer_scripts-settings_page_wpsc-settings', array(__CLASS__, 'adminSettingsScript'));
+			add_action('wpsc_billing_details_bottom', [__CLASS__, 'actionBillingDetailsBottom']);
+			add_action('admin_print_footer_scripts-settings_page_wpsc-settings', [__CLASS__, 'adminSettingsScript']);
 		}
 
 		return $gateways;
@@ -82,7 +82,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 			$country = '';
 		}
 
-		$this->collected_gateway_data = array (
+		$this->collected_gateway_data = [
 			'card_number'	=> $postdata->cleanCardnumber($postdata->getValue('card_number')),
 			'card_name'		=> $postdata->getValue('card_name'),
 			'expiry_month'	=> $postdata->getValue('expiry_month'),
@@ -98,7 +98,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 			'country'		=> $country,
 			'post_code'		=> $postdata->getSubkey('collected_data', get_option('eway_form_post_code')),
 			'email'			=> $postdata->getSubkey('collected_data', get_option('eway_form_email')),
-		);
+		];
 	}
 
 	/**
@@ -173,11 +173,11 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription		= apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription, $this->purchase_id);
 		$eway->invoiceReference			= apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference, $this->purchase_id);
-		$eway->options					= array_filter(array(
+		$eway->options					= array_filter([
 												apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id),
 												apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id),
 												apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id),
-											), 'strlen');
+										  ], 'strlen');
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
 			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
@@ -193,11 +193,11 @@ class MethodWPeCommerce extends \wpsc_merchant {
 				else {
 					$status = 2; // WPSC_Purchase_Log::ORDER_RECEIVED
 				}
-				$log_details = array(
+				$log_details = [
 					'processed'			=> $status,
 					'transactid'		=> $response->TransactionID,
 					'authcode'			=> $response->AuthorisationCode,
-				);
+				];
 
 				if ($response->BeagleScore > 0) {
 					$log_details['notes'] = sprintf(__('Beagle score: %s', 'eway-payment-gateway'), $response->BeagleScore);
@@ -217,10 +217,10 @@ class MethodWPeCommerce extends \wpsc_merchant {
 				$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
 				$this->set_error_message($error_msg);
 
-				$log_details = array(
+				$log_details = [
 					'processed'			=> $status,
 					'notes'				=> __('Transaction failed', 'eway-payment-gateway') . '; ' . $response->getErrorsForLog(),
-				);
+				];
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
 				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->getErrorsForLog()));
@@ -266,13 +266,13 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	protected function validateData() {
 		$postdata		= new FormPost();
 
-		$fields			= array(
+		$fields			= [
 			'card_number'	=> $postdata->getValue('card_number'),
 			'card_name'		=> $postdata->getValue('card_name'),
 			'expiry_month'	=> $postdata->getValue('expiry_month'),
 			'expiry_year'	=> $postdata->getValue('expiry_year'),
 			'cvn'			=> $postdata->getValue('cvn'),
-		);
+		];
 
 		$errors			= $postdata->verifyCardDetails($fields);
 
@@ -402,7 +402,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		$creds = self::getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
 			wp_enqueue_script('eway-payment-gateway-ecrypt');
-			add_action('wp_footer', array(__CLASS__, 'ecryptScript'));
+			add_action('wp_footer', [__CLASS__, 'ecryptScript']);
 		}
 	}
 
@@ -412,15 +412,15 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	public static function ecryptScript() {
 		$creds	= self::getApiCredentials();
 
-		$vars = array(
+		$vars = [
 			'mode'		=> 'wp-e-commerce',
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> 'form.wpsc_checkout_forms',
-			'fields'	=> array(
-							'#eway_card_number'			=> array('name' => 'cse:card_number', 'is_cardnum' => true),
-							'#eway_cvn'					=> array('name' => 'cse:cvn', 'is_cardnum' => false),
-						),
-		);
+			'fields'	=> [
+							'#eway_card_number'			=> ['name' => 'cse:card_number', 'is_cardnum' => true],
+							'#eway_cvn'					=> ['name' => 'cse:cvn', 'is_cardnum' => false],
+						   ],
+		];
 
 		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
 	}
@@ -433,20 +433,20 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		$useSandbox	= (bool) get_option('eway_test');
 
 		if (!$useSandbox) {
-			$creds = array(
+			$creds = [
 				'api_key'		=> get_option('eway_api_key'),
 				'password'		=> get_option('eway_password'),
 				'ecrypt_key'	=> get_option('eway_ecrypt_key'),
 				'customerid'	=> get_option('ewayCustomerID_id'),
-			);
+			];
 		}
 		else {
-			$creds = array(
+			$creds = [
 				'api_key'		=> get_option('eway_sandbox_api_key'),
 				'password'		=> get_option('eway_sandbox_password'),
 				'ecrypt_key'	=> get_option('eway_sandbox_ecrypt_key'),
 				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
-			);
+			];
 		}
 
 		return $creds;

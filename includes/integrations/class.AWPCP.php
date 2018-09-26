@@ -19,9 +19,9 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	* set up hooks for the integration
 	*/
 	public static function register_eway() {
-		add_filter('awpcp-register-payment-methods', array(__CLASS__, 'awpcpRegisterPaymentMethods'), 20);
-		add_action('awpcp_register_settings', array(__CLASS__, 'awpcpRegisterSettings'));
-		add_action('admin_print_styles-classifieds_page_awpcp-admin-settings', array(__CLASS__, 'settingsStyles'));
+		add_filter('awpcp-register-payment-methods', [__CLASS__, 'awpcpRegisterPaymentMethods'], 20);
+		add_action('awpcp_register_settings', [__CLASS__, 'awpcpRegisterSettings']);
+		add_action('admin_print_styles-classifieds_page_awpcp-admin-settings', [__CLASS__, 'settingsStyles']);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		// create a new section
 		$section = $awpcp->settings->add_section('payment-settings',
 						esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
-						'eway', 100, array($awpcp->settings, 'section'));
+						'eway', 100, [$awpcp->settings, 'section']);
 
 		$awpcp->settings->add_setting($section, 'activateeway',
 						esc_html_x('Activate eWAY?', 'settings field', 'eway-payment-gateway'),
@@ -113,30 +113,30 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 						'textarea', '',
 						esc_html_x('Client Side Encryption key from your sandbox account', 'settings label', 'eway-payment-gateway'));
 
-		$methods = array(
+		$methods = [
 			'0' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
 			'1'		 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
-		);
+		];
 		$awpcp->settings->add_setting($section, 'eway_stored',
 						esc_html_x('Payment Method', 'settings field', 'eway-payment-gateway'),
 						'select', 0,
 						esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway')
 						. '<br/>'
 						. esc_html__('Authorize can be useful when ads must be approved by an admin, allowing you to reject payments for rejected ads.', 'eway-payment-gateway'),
-						array('options' => $methods));
+						['options' => $methods]);
 
-		$log_options = array(
+		$log_options = [
 			'off' 		=> esc_html_x('Off', 'logging settings', 'eway-payment-gateway'),
 			'info'	 	=> esc_html_x('All messages', 'logging settings', 'eway-payment-gateway'),
 			'error' 	=> esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'),
-		);
+		];
 		$log_descripton = sprintf('%s<br />%s<br />%s',
 							esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
 							Logging::getLogFolderRelative());
 		$awpcp->settings->add_setting($section, 'eway_logging',
 						esc_html_x('Logging', 'settings field', 'eway-payment-gateway'),
-						'select', 'off', $log_descripton, array('options' => $log_options));
+						'select', 'off', $log_descripton, ['options' => $log_options]);
 
 		$awpcp->settings->add_setting($section, 'eway_card_message',
 						esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'),
@@ -200,19 +200,19 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 		$creds = $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
-			add_action('wp_enqueue_scripts', array($this, 'ecryptEnqueue'), 20);	// can't enqueue yet, so wait until plugin has enqueued script
-			add_action('wp_footer', array($this, 'ecryptScript'));
+			add_action('wp_enqueue_scripts', [$this, 'ecryptEnqueue'], 20);	// can't enqueue yet, so wait until plugin has enqueued script
+			add_action('wp_footer', [$this, 'ecryptScript']);
 		}
 
-		wp_enqueue_script('eway-awpcp-checkout-form', plugins_url("js/awpcp-checkout-form$min.js", EWAY_PAYMENTS_PLUGIN_FILE), array('jquery'), $ver, true);
-		wp_localize_script('eway-awpcp-checkout-form', 'eway_awpcp_checkout', array(
-			'errors' => array(
+		wp_enqueue_script('eway-awpcp-checkout-form', plugins_url("js/awpcp-checkout-form$min.js", EWAY_PAYMENTS_PLUGIN_FILE), ['jquery'], $ver, true);
+		wp_localize_script('eway-awpcp-checkout-form', 'eway_awpcp_checkout', [
+			'errors' => [
 				'card_number'	=> __('card number cannot be empty', 'eway-payment-gateway'),
 				'card_name'		=> __('card holder name cannot be empty', 'eway-payment-gateway'),
 				'expiry_month'	=> __('credit card expiry is missing', 'eway-payment-gateway'),
 				'cvn'			=> __('cvn is missing', 'eway-payment-gateway'),
-			)
-		));
+			],
+		]);
 
 		return $form;
 	}
@@ -230,15 +230,15 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
 
-		$vars = array(
+		$vars = [
 			'mode'		=> 'awpcp',
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> '#awpcp-eway-checkout',
-			'fields'	=> array(
-							'#eway_card_number'			=> array('name' => 'cse:eway_card_number', 'is_cardnum' => true),
-							'#eway_cvn'					=> array('name' => 'cse:eway_cvn', 'is_cardnum' => false),
-						),
-		);
+			'fields'	=> [
+							'#eway_card_number'			=> ['name' => 'cse:eway_card_number', 'is_cardnum' => true],
+							'#eway_cvn'					=> ['name' => 'cse:eway_cvn', 'is_cardnum' => false],
+						],
+		];
 
 		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
 	}
@@ -258,19 +258,19 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	public function process_payment_completed($transaction) {
 		$postdata		= new FormPost();
 
-		$fields			= array(
+		$fields			= [
 			'card_number'	=> $postdata->getValue('eway_card_number'),
 			'card_name'		=> $postdata->getValue('eway_card_name'),
 			'expiry_month'	=> $postdata->getValue('eway_expiry_month'),
 			'expiry_year'	=> $postdata->getValue('eway_expiry_year'),
 			'cvn'			=> $postdata->getValue('eway_cvn'),
-		);
+		];
 
 		$errors			= $postdata->verifyCardDetails($fields);
 		$success		= (count($errors) === 0);
 
 		$transaction->errors['verification-post'] = $errors;
-		$transaction->errors['validation'] = array();
+		$transaction->errors['validation'] = [];
 
 		if ($success) {
 
@@ -375,11 +375,11 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		// allow plugins/themes to modify invoice description and reference, and set option fields
 		$eway->invoiceDescription			= apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
 		$eway->invoiceReference				= apply_filters('awpcp_eway_invoice_ref', $eway->invoiceReference, $transaction);
-		$eway->options						= array_filter(array(
+		$eway->options						= array_filter([
 													apply_filters('awpcp_eway_option1', '', $transaction),
 													apply_filters('awpcp_eway_option2', '', $transaction),
 													apply_filters('awpcp_eway_option3', '', $transaction),
-												), 'strlen');
+											  ], 'strlen');
 
 		$totals = $transaction->get_totals();
 		$eway->amount = $totals['money'];
@@ -408,20 +408,20 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		$useSandbox	= (bool) get_awpcp_option('paylivetestmode');
 
 		if (!$useSandbox) {
-			$creds = array(
+			$creds = [
 				'api_key'		=> get_awpcp_option('eway_api_key'),
 				'password'		=> get_awpcp_option('eway_password'),
 				'ecrypt_key'	=> get_awpcp_option('eway_ecrypt_key'),
 				'customerid'	=> get_awpcp_option('eway_customerid'),
-			);
+			];
 		}
 		else {
-			$creds = array(
+			$creds = [
 				'api_key'		=> get_awpcp_option('eway_sandbox_api_key'),
 				'password'		=> get_awpcp_option('eway_sandbox_password'),
 				'ecrypt_key'	=> get_awpcp_option('eway_sandbox_ecrypt_key'),
 				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
-			);
+			];
 		}
 
 		return $creds;
@@ -435,13 +435,13 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	* @return array two elements: first name, last name
 	*/
 	protected static function getContactNames($ad, $user, $cardHoldersName) {
-		$names = array('', '');
+		$names = ['', ''];
 
 		if ($ad->ad_contact_name) {
 			$names = self::splitCompoundName($ad->ad_contact_name);
 		}
 		elseif ($user) {
-			$names = array($user->first_name, $user->last_name);
+			$names = [$user->first_name, $user->last_name];
 		}
 
 		// use cardholder name for customer name if no customer name available
@@ -463,7 +463,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		$firstName = empty($names[0]) ? '' : array_shift($names);		// remove first name from array
 		$lastName = trim(implode(' ', $names));
 
-		return array($firstName, $lastName);
+		return [$firstName, $lastName];
 	}
 
 	/**
@@ -521,7 +521,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			$eway->country = $eway->countryName;
 		}
 		elseif ($eway->countryName) {
-			$countries = array(
+			$countries = [
 				// ISO-3166-1 alpha-2 list of country names => codes, in lowercase
 				'afghanistan'								=> 'af',
 				'albania'									=> 'al',
@@ -787,7 +787,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 				'usa'										=> 'us',
 				'u.s.a.'									=> 'us',
 				'united states of america'					=> 'us',
-			);
+			];
 
 			if (function_exists('mb_strtolower')) {
 				$countryLower = mb_strtolower($eway->countryName);

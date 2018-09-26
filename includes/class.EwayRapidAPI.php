@@ -367,7 +367,7 @@ class EwayRapidAPI {
 	* optional additional information for use in shopping carts, etc.
 	* @var array[string] max. 254 characters each
 	*/
-	public $options = array();
+	public $options = [];
 
 	#endregion "payment specific members"
 
@@ -413,7 +413,7 @@ class EwayRapidAPI {
 	* @return array list of errors in validation
 	*/
 	protected function validateAmount() {
-		$errors = array();
+		$errors = [];
 
 		if (!is_numeric($this->amount) || $this->amount <= 0) {
 			$errors[] = __('amount must be given as a number in dollars and cents', 'eway-payment-gateway');
@@ -607,11 +607,11 @@ class EwayRapidAPI {
 	* @return array
 	*/
 	protected function getOptionsRecord() {
-		$options = array();
+		$options = [];
 
 		foreach ($this->options as $option) {
 			if (!empty($option)) {
-				$options[] = array('Value' => substr($option, 0, 254));
+				$options[] = ['Value' => substr($option, 0, 254)];
 			}
 		}
 
@@ -631,16 +631,16 @@ class EwayRapidAPI {
 		$url = "$host/$endpoint";
 
 		// execute the request, and retrieve the response
-		$response = wp_remote_post($url, array(
+		$response = wp_remote_post($url, [
 			'user-agent'	=> $this->httpUserAgent,
 			'sslverify'		=> $this->sslVerifyPeer,
 			'timeout'		=> 30,
-			'headers'		=> array(
+			'headers'		=> [
 									'Content-Type'		=> 'application/json',
 									'Authorization'		=> $this->getBasicAuthentication(),
-							   ),
+							   ],
 			'body'			=> $request,
-		));
+		]);
 
 		// check for http error
 		$this->checkHttpResponse($response);
@@ -661,15 +661,15 @@ class EwayRapidAPI {
 		$url = sprintf('%s/%s/%s', $host, urlencode($endpoint), urlencode($request));
 
 		// execute the request, and retrieve the response
-		$response = wp_remote_get($url, array(
+		$response = wp_remote_get($url, [
 			'user-agent'	=> $this->httpUserAgent,
 			'sslverify'		=> $this->sslVerifyPeer,
 			'timeout'		=> 30,
-			'headers'		=> array(
+			'headers'		=> [
 									'Content-Type'		=> 'application/json',
 									'Authorization'		=> $this->getBasicAuthentication(),
-							   ),
-		));
+							   ],
+		]);
 
 		// check for http error
 		$this->checkHttpResponse($response);

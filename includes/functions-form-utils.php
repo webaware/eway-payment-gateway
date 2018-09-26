@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 function get_month_options($current_month = '') {
 	ob_start();
 
-	foreach (array('01','02','03','04','05','06','07','08','09','10','11','12') as $month) {
+	foreach (['01','02','03','04','05','06','07','08','09','10','11','12'] as $month) {
 		printf('<option value="%1$s"%2$s>%1$s</option>', $month, selected($month, $current_month, false));
 	}
 

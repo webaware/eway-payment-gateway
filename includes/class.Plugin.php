@@ -34,14 +34,14 @@ class Plugin {
 	*/
 	public function pluginStart() {
 		add_action('init', 'eway_payment_gateway_load_text_domain');
-		add_filter('plugin_row_meta', array($this, 'addPluginDetailsLinks'), 10, 2);
-		add_action('admin_notices', array($this, 'checkPrerequisites'));
-		add_action('wp_enqueue_scripts', array($this, 'registerScripts'));
+		add_filter('plugin_row_meta', [$this, 'addPluginDetailsLinks'], 10, 2);
+		add_action('admin_notices', [$this, 'checkPrerequisites']);
+		add_action('wp_enqueue_scripts', [$this, 'registerScripts']);
 
 		// register integrations
-		add_filter('wpsc_merchants_modules', array($this, 'registerWPeCommerce'));
-		add_action('init', array($this, 'maybeRegisterAWPCP'));
-		add_action('init', array($this, 'maybeRegisterEventsManager'));
+		add_filter('wpsc_merchants_modules', [$this, 'registerWPeCommerce']);
+		add_action('init', [$this, 'maybeRegisterAWPCP']);
+		add_action('init', [$this, 'maybeRegisterEventsManager']);
 		$this->maybeRegisterWooCommerce();		// hooked on plugins_loaded
 	}
 
@@ -54,13 +54,9 @@ class Plugin {
 		}
 
 		// need these PHP extensions
-		$prereqs = array('json', 'libxml', 'pcre', 'SimpleXML', 'xmlwriter');
-		$missing = array();
-		foreach ($prereqs as $ext) {
-			if (!extension_loaded($ext)) {
-				$missing[] = $ext;
-			}
-		}
+		$missing = array_filter(['json', 'libxml', 'pcre', 'SimpleXML', 'xmlwriter'], function($ext) {
+			return !extension_loaded($ext);
+		});
 		if (!empty($missing)) {
 			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-extensions.php';
 		}
@@ -73,12 +69,12 @@ class Plugin {
 		$min = SCRIPT_DEBUG ? '' : '.min';
 		$ver = SCRIPT_DEBUG ? time() : EWAY_PAYMENTS_VERSION;
 
-		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", array(), null, true);
-		wp_register_script('eway-payment-gateway-ecrypt', plugins_url("js/ecrypt$min.js", EWAY_PAYMENTS_PLUGIN_FILE), array('jquery','eway-ecrypt'), $ver, true);
-		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_msg', array(
+		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", [], null, true);
+		wp_register_script('eway-payment-gateway-ecrypt', plugins_url("js/ecrypt$min.js", EWAY_PAYMENTS_PLUGIN_FILE), ['jquery','eway-ecrypt'], $ver, true);
+		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_msg', [
 			'ecrypt_mask'			=> _x('•', 'encrypted field mask character', 'eway-payment-gateway'),
 			'card_number_invalid'	=> __('Card number is invalid', 'eway-payment-gateway'),
-		));
+		]);
 	}
 
 	/**

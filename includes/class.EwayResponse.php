@@ -59,7 +59,7 @@ abstract class EwayResponse {
 	* @return array
 	*/
 	protected function getResponseDetails($codes) {
-		$responses = array();
+		$responses = [];
 
 		if (!empty($codes)) {
 			foreach (explode(',', $codes) as $code) {
@@ -77,7 +77,7 @@ abstract class EwayResponse {
 	* @return string
 	*/
 	public function getErrorMessage($error_msg) {
-		$errors = array();
+		$errors = [];
 
 		if (!empty($this->Errors)) {
 			// add detailed error messages

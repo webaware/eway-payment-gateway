@@ -65,7 +65,7 @@ class FormPost {
 	* @return string
 	*/
 	public function cleanCardnumber($value) {
-		return strtr($value, array(' ' => '', '-' => ''));
+		return strtr($value, [' ' => '', '-' => '']);
 	}
 
     /**
@@ -74,7 +74,7 @@ class FormPost {
     * @return array an array of error messages
     */
     public function verifyCardDetails($fields) {
-		$errors = array();
+		$errors = [];
 		$expiryError = false;
 
 		if ($fields['card_number'] === '') {
