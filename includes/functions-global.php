@@ -23,8 +23,13 @@ function eway_payment_gateway_can_show_admin_notices() {
 	global $pagenow, $hook_suffix;
 
 	// only on specific pages
-	$is_wc_page = $hook_suffix === 'woocommerce_page_wc-settings';
-	if ($pagenow !== 'plugins.php' && !$is_wc_page) {
+	$settings_pages = array(
+		'settings_page_wpsc-settings',				// WP eCommerce
+		'woocommerce_page_wc-settings',				// WooCommerce
+		'event_page_events-manager-gateways',		// Events Manager
+		'classifieds_page_awpcp-admin-settings',	// AWPCP
+	);
+	if ($pagenow !== 'plugins.php' && !in_array($hook_suffix, $settings_pages)) {
 		return false;
 	}
 
