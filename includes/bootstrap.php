@@ -17,7 +17,7 @@ class EwayPaymentsException extends \Exception {}
 * kick start the plugin
 */
 add_action('plugins_loaded', function () {
-	require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsPlugin.php';
+	require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.Plugin.php';
 	$plugin = Plugin::getInstance();
 	$plugin->pluginStart();
 }, 5);
