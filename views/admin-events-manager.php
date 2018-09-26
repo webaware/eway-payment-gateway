@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
 </tbody>
 </table>
 
-<h3><?= sprintf(translate('%s Options', 'events-manager'), 'eWAY'); ?></h3>
+<h3><?php printf(translate('%s Options', 'events-manager'), 'eWAY'); ?></h3>
 
 <table class="form-table">
 <tbody>
@@ -170,14 +170,14 @@ if (!defined('ABSPATH')) {
 		</td>
 	</tr>
 
-	<tr><th colspan="2"><?= sprintf(translate('%s Options', 'events-manager'), translate('Advanced', 'em-pro')); ?></th></tr>
+	<tr><th colspan="2"><?php printf(translate('%s Options', 'events-manager'), translate('Advanced', 'em-pro')); ?></th></tr>
 
 	<tr valign="top">
 	  <th scope="row"><label for="em_eway_manual_approval"><?= translate('Manually approve completed transactions?', 'em-pro') ?></label></th>
 	  <td>
 		<input type="checkbox" name="em_eway_manual_approval" id="em_eway_manual_approval" value="1" <?= (get_option('em_eway_manual_approval')) ? 'checked="checked"':''; ?> />
 		<em><?= translate('By default, when someone pays for a booking, it gets automatically approved once the payment is confirmed. If you would like to manually verify and approve bookings, tick this box.','em-pro'); ?></em>
-		<em><?= sprintf(translate('Approvals must also be required for all bookings in your <a href="%s">settings</a> for this to work properly.','em-pro'),EM_ADMIN_URL.'&amp;page=events-manager-options'); ?></em>
+		<em><?php printf(translate('Approvals must also be required for all bookings in your <a href="%s">settings</a> for this to work properly.','em-pro'),EM_ADMIN_URL.'&amp;page=events-manager-options'); ?></em>
 	  </td>
 	</tr>
 
