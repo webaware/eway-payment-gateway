@@ -28,14 +28,14 @@ add_action('plugins_loaded', function () {
 */
 spl_autoload_register(function($class_name) {
 	static $classMap = [
-		'FormPost'							=> 'includes/class.EwayPaymentsFormPost.php',
-		'EwayLegacyAPI'						=> 'includes/class.EwayPaymentsPayment.php',
-		'EwayLegacyStoredAPI'				=> 'includes/class.EwayPaymentsStoredPayment.php',
-		'EwayRapidAPI'						=> 'includes/class.EwayPaymentsRapidAPI.php',
-		'EwayResponse'						=> 'includes/class.EwayPaymentsResponse.php',
-		'EwayResponseDirectPayment'			=> 'includes/class.EwayPaymentsResponseDirectPayment.php',
+		'FormPost'							=> 'includes/class.FormPost.php',
+		'EwayLegacyAPI'						=> 'includes/class.EwayLegacyAPI.php',
+		'EwayLegacyStoredAPI'				=> 'includes/class.EwayLegacyStoredAPI.php',
+		'EwayRapidAPI'						=> 'includes/class.EwayRapidAPI.php',
+		'EwayResponse'						=> 'includes/class.EwayResponse.php',
+		'EwayResponseDirectPayment'			=> 'includes/class.EwayResponseDirectPayment.php',
 
-		'woocommerce\CompatibleOrder'		=> 'includes/integrations/class.EwayPaymentsWooOrder.php',
+		'woocommerce\CompatibleOrder'		=> 'includes/integrations/class.WooCommerce.CompatibleOrder.php',
 	];
 
 	if (strpos($class_name, __NAMESPACE__) === 0) {

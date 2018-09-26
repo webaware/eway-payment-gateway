@@ -88,7 +88,7 @@ class Plugin {
 	*/
 	public function registerWPeCommerce($gateways) {
 		$this->loadRequired();
-		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWpsc.php';
+		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.WPeCommerce.php';
 
 		return MethodWPeCommerce::register_eway($gateways);
 	}
@@ -103,7 +103,7 @@ class Plugin {
 
 		$this->loadRequired();
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
-		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsWoo.php';
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.WooCommerce.php';
 
 		return MethodWooCommerce::register_eway();
 	}
@@ -114,7 +114,7 @@ class Plugin {
 	public function maybeRegisterEventsManager() {
 		if (class_exists('EM_Gateways')) {
 			$this->loadRequired();
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsEventsManager.php';
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EventsManager.php';
 			return MethodEventsManager::register_eway();
 		}
 	}
@@ -125,7 +125,7 @@ class Plugin {
 	public function maybeRegisterAWPCP() {
 		if (function_exists('awpcp')) {
 			$this->loadRequired();
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EwayPaymentsAWPCP3.php';
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.AWPCP.php';
 			MethodAWPCP::register_eway();
 		}
 	}
@@ -135,7 +135,7 @@ class Plugin {
 	*/
 	protected function loadRequired() {
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/functions-form-utils.php';
-		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.EwayPaymentsLogging.php';
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.Logging.php';
 	}
 
 	/**
