@@ -3,7 +3,8 @@
 
 (function($) {
 
-	const checkout = $(eway_ecrypt_vars.form);
+	const fields = eway_ecrypt_vars.fields;
+	let checkout = $(eway_ecrypt_vars.form);
 
 	/**
 	* basic card number validation using Luhn algorithm
@@ -61,9 +62,17 @@
 				}
 
 				const encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
+				const placeholder = repeatString(eway_ecrypt_msg.ecrypt_mask, length);
+
 				checkout.find("input[name='" + fieldspec.name + "']").remove();
 				$("<input type='hidden'>").attr("name", fieldspec.name).val(encrypted).appendTo(checkout);
-				field.val("").data("eway-old-placeholder", field.prop("placeholder")).prop("placeholder", repeatString(eway_ecrypt_msg.ecrypt_mask, length));
+
+				if (fieldspec.false_fill) {
+					field.val(placeholder);
+				}
+				else {
+					field.val("").data("eway-old-placeholder", field.prop("placeholder")).prop("placeholder", placeholder);
+				}
 			}
 		}
 	}
@@ -73,12 +82,10 @@
 	* @param {jQuery.event} event
 	*/
 	function processFields(event) {
-		const fields = eway_ecrypt_vars.fields;
-
 		try {
-			for (let i in fields) {
-				maybeEncryptField(i, fields[i]);
-			}
+			Object.keys(fields).forEach(selector => {
+				maybeEncryptField(selector, fields[selector]);
+			});
 		}
 		catch (e) {
 			event.preventDefault();
@@ -96,21 +103,50 @@
 	* @return {String}
 	*/
 	function elementValue(name) {
-		return checkout.get(0).elements[name].value;
+		let element = checkout.length ? checkout.get(0).elements[name] : false;
+		return element ? element.value : false;
 	}
 
 	/**
 	* reset the placeholders on WooCommerce checkout fields
 	*/
-	function wooResetPlaceholders() {
-		const fields = eway_ecrypt_vars.fields;
-
-		for (let i in fields) {
-			let field = checkout.find(i);
+	function resetEncryptedFields() {
+		Object.keys(fields).forEach(selector => {
+			let field = checkout.find(selector);
 			if (field.length) {
-				field.prop("placeholder", field.data("eway-old-placeholder"));
+				if (fields[selector].false_fill) {
+					field.val("");
+				}
+				else {
+					field.prop("placeholder", field.data("eway-old-placeholder"));
+				}
 			}
-		}
+		});
+	}
+
+	/**
+	* handle changes in Event Espresso's single page checkout form
+	*/
+	function handleEventEspresso() {
+		// refresh checkout object, because form may have been destroyed after Ajax call
+		checkout = $(eway_ecrypt_vars.form);
+
+		Object.keys(fields).forEach(selector => {
+			let field = $(selector);
+
+			// if the field hasn't been encrypted yet, do so
+			if (field.length > 0 && field.val().substring(0, 1) !== eway_ecrypt_msg.ecrypt_mask) {
+				try {
+					maybeEncryptField(selector, fields[selector]);
+				}
+				catch (e) {
+					SPCO.form_is_valid = false;
+					event.preventDefault();
+					e.field.focus();
+					window.alert(e.message);
+				}
+			}
+		});
 	}
 
 
@@ -118,7 +154,7 @@
 
 		case "woocommerce":
 			checkout.on("checkout_place_order_eway_payments", processFields);
-			$(document.body).on("checkout_error", wooResetPlaceholders);
+			$(document.body).on("checkout_error", resetEncryptedFields);
 			break;
 
 		case "wp-e-commerce":
@@ -134,6 +170,14 @@
 				if (elementValue("gateway") === "eway") {
 					processFields(event);
 				}
+			});
+			break;
+
+		case "event-espresso":
+			// must wait until Ready event, when Event Espresso single page checkout is available
+			$(document).ready(function() {
+				// process the form when the next step button is pressed
+				SPCO.main_container.on("process_next_step_button_click", handleEventEspresso);
 			});
 			break;
 

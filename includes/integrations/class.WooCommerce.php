@@ -417,8 +417,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 			$this->form();
 		}
 		else {
-			$optMonths = forms\get_month_options();
-			$optYears  = forms\get_year_options();
+			$optMonths = get_month_options();
+			$optYears  = get_year_options();
 
 			// load payment fields template with passed values
 			$settings = $this->settings;
@@ -500,7 +500,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		$capture	= ($this->eway_stored  !== 'yes');
 		$useSandbox	= ($this->eway_sandbox === 'yes');
 		$creds		= apply_filters('woocommerce_eway_credentials', $this->getApiCredentials(), $useSandbox, $order);
-		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
+		$eway		= get_api_wrapper($creds, $capture, $useSandbox);
 
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');

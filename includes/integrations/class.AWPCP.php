@@ -188,8 +188,8 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 		$card_msg = esc_html(get_awpcp_option('eway_card_message'));
 
-		$optMonths = forms\get_month_options();
-		$optYears  = forms\get_year_options();
+		$optMonths = get_month_options();
+		$optYears  = get_year_options();
 
 		// load template with passed values
 		ob_start();
@@ -350,7 +350,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		$capture	= !get_awpcp_option('eway_stored');
 		$useSandbox	= (bool) get_awpcp_option('paylivetestmode');
 		$creds		= apply_filters('awpcp_eway_credentials', $this->getApiCredentials(), $useSandbox, $transaction);
-		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
+		$eway		= get_api_wrapper($creds, $capture, $useSandbox);
 
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');

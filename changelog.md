@@ -4,7 +4,9 @@
 
 ### 4.2.3, soon...
 
-* added: setting to enable/disable adding the transaction ID to order emails
+* changed: requires minimum PHP version 5.4 (recommend version 7.1 or greater)
+* added: integration with Event Espresso
+* added: setting to enable/disable adding the transaction ID to WooCommerce order emails
 
 ### 4.2.2, 2018-05-24
 

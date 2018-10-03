@@ -319,8 +319,8 @@ class MethodEventsManager extends \EM_Gateway {
 		$card_name	= esc_html($postdata->getValue('x_card_name'));
 		$card_code	= esc_html($postdata->getValue('x_card_code'));
 
-		$optMonths = forms\get_month_options($postdata->getValue('x_exp_date_month'));
-		$optYears  = forms\get_year_options($postdata->getValue('x_exp_date_year'));
+		$optMonths = get_month_options($postdata->getValue('x_exp_date_month'));
+		$optYears  = get_year_options($postdata->getValue('x_exp_date_year'));
 
 		// load template with passed values, capture output and register
 		eway_load_template('eventsmanager-eway-fields.php', compact('card_msg', 'card_num', 'card_name', 'card_code', 'optMonths', 'optYears'));
@@ -364,7 +364,7 @@ class MethodEventsManager extends \EM_Gateway {
 		$capture	= !get_option("em_{$this->gateway}_stored");
 		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
 		$creds		= apply_filters('em_eway_credentials', $this->getApiCredentials(), $useSandbox, $EM_Booking);
-		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
+		$eway		= get_api_wrapper($creds, $capture, $useSandbox);
 
 		$postdata = new FormPost();
 

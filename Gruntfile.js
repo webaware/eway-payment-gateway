@@ -25,6 +25,7 @@ module.exports = function (grunt) {
 				files: [{
 					expand: true,
 					cwd: "./dist/",
+					date: new Date(),
 					src: [ "<%= pkg.name %>/**" ]
 				}]
 			}

@@ -137,7 +137,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		$capture	= !get_option('wpsc_merchant_eway_stored');
 		$useSandbox	= (bool) get_option('eway_test');
 		$creds		= apply_filters('wpsc_eway_credentials', self::getApiCredentials(), $useSandbox, $this->purchase_id);
-		$eway		= forms\get_api_wrapper($creds, $capture, $useSandbox);
+		$eway		= get_api_wrapper($creds, $capture, $useSandbox);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
 		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
@@ -304,8 +304,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 
 		// check if this gateway is selected for checkout payments
 		if (in_array(self::WPSC_GATEWAY_NAME, (array) get_option('custom_gateway_options'))) {
-			$optMonths = forms\get_month_options();
-			$optYears  = forms\get_year_options();
+			$optMonths = get_month_options();
+			$optYears  = get_year_options();
 
 			// use TH for field label cells if selected, otherwise use TD (default wp-e-commerce behaviour)
 			$th = get_option('wpsc_merchant_eway_th') ? 'th' : 'td';
