@@ -32,12 +32,30 @@
 		return checksum % 10 === 0;
 	}
 
-	function repeatString(character, length) {
-		let s = character;
-		for (let i = 1; i < length; i++) {
-			s += character;
+	/**
+	* use ES6 String.prototype.repeat() if available, providing fallback for IE11
+	* @param {String} character
+	* @param {Number}
+	* @return {String}
+	*/
+	let repeatString;
+	if (typeof String.prototype.repeat === "function") {
+
+		repeatString = (character, length) => {
+			return character.repeat(length);
 		}
-		return s;
+
+	}
+	else {
+
+		repeatString = (character, length) => {
+			let s = character;
+			for (let i = 1; i < length; i++) {
+				s += character;
+			}
+			return s;
+		}
+
 	}
 
 	/**
