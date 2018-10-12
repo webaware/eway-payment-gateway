@@ -1,6 +1,6 @@
 {
   "name": "eway-payment-gateway",
-  "version": "4.2.3-dev",
+  "version": "4.3.0",
   "description": "eWAY Payment Gateway",
   "main": "Gruntfile.js",
   "browserslist": [
@@ -9,8 +9,8 @@
     "not dead"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.1.0",
-    "@babel/core": "^7.1.0",
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
     "grunt": "^1.0.3",
     "grunt-babel": "^8.0.0",

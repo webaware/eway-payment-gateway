@@ -2,10 +2,10 @@
 
 ## Changelog
 
-### 4.2.3, soon...
+### 4.3.0, 2018-10-12
 
 * changed: requires minimum PHP version 5.4 (recommend version 7.1 or greater)
-* added: integration with Event Espresso
+* added: integration with Event Espresso 4
 * added: setting to enable/disable adding the transaction ID to WooCommerce order emails
 
 ### 4.2.2, 2018-05-24

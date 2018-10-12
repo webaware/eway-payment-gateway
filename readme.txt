@@ -7,8 +7,8 @@ Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+G
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.2
 Tested up to: 4.9
-Requires PHP: 5.3
-Stable tag: 4.2.2
+Requires PHP: 5.4
+Stable tag: 4.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,7 @@ The eWAY Payment Gateway adds integrations for the [eWAY credit card payment gat
 * [WP eCommerce](https://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
 * [WooCommerce](https://wordpress.org/plugins/woocommerce/) shopping cart plugin
 * [Another WordPress Classifieds Plugin](https://wordpress.org/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
+* [Event Espresso 4](https://wordpress.org/plugins/event-espresso-decaf/)
 * [Events Manager Pro](https://eventsmanagerpro.com/) event bookings plugin
 
 Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://gfeway.webaware.net.au/).
@@ -53,6 +54,7 @@ If you'd like to help out by translating this plugin, please [sign up for an acc
 
 * Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
 * Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+* Event Espress 4 integration generously sponsored by [Rural Aid](https://www.ruralaid.org.au/)
 
 Thanks for sponsoring new features for eWAY Payment Gateway!
 
@@ -84,6 +86,14 @@ Information gathered for processing a credit card transaction is transmitted to 
 2. Click the Activate eWAY checkbox
 3. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
 4. Select the appropriate settings for your site
+
+### Configuring for Event Espresso
+
+1. Navigate to 'Event Espresso > Payment Methods' on the menu
+2. Select eWAY from the Payment Methods menu
+3. Click the Activate eWAY Payments buttom
+4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
+5. Select the appropriate settings for your site
 
 ### Configuring for Events Manager
 
@@ -152,6 +162,7 @@ Settings > Sandbox > Direction Connection > PCI
 
 * **WP eCommerce**: the eWAY transaction number and the bank authcode are shown under Billing Details when you view the sales log for a purchase in the WordPress admin.
 * **WooCommerce**: the eWAY transaction number and the bank authcode are shown in the Custom Fields block when you view the order in the WordPress admin.
+* **Event Espresso**: the eWAY transaction number and the bank authcode are shown in the Payment Details block when you view the transaction in the WordPress admin.
 * **Events Manager**: from the Payment Gateways menu item or the Bookings menu item, you can view a list of transactions; the eWAY transaction ID is shown in the Transaction ID column, and the authcode in the Notes column.
 * **Another WordPress Classifieds Plugin**: not available yet
 
@@ -165,7 +176,7 @@ This is a common problem in local testing environments. Please [read this post](
 
 ### Can I use this plugin on any shared-hosting environment?
 
-The plugin will run in shared hosting environments, but requires PHP 5 with the following modules enabled (talk to your host). Both are typically available because they are enabled by default in PHP 5, but may be disabled on some shared hosts.
+The plugin will run in shared hosting environments, but requires minimum PHP 5.4 with the following modules enabled (talk to your host). They are typically available because they are enabled by default in PHP 5, but may be disabled on some shared hosts.
 
 * libxml
 * XMLWriter
@@ -173,51 +184,46 @@ The plugin will run in shared hosting environments, but requires PHP 5 with the 
 
 ### WP eCommerce filter hooks
 
-Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsWpsc.php) for filter hook parameters.
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.WPeCommerce.php) for filter hook parameters.
 
 * `wpsc_merchant_eway_invoice_desc` for modifying the invoice description
 * `wpsc_merchant_eway_invoice_ref` for modifying the invoice reference
-* `wpsc_merchant_eway_option1` for setting the option1 field
-* `wpsc_merchant_eway_option2` for setting the option2 field
-* `wpsc_merchant_eway_option3` for setting the option3 field
 * `wpsc_eway_credentials` for modifying the eWAY credentials used in the transaction
 
 ### WooCommerce filter hooks
 
-Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsWoo.php) for filter hook parameters.
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.WooCommerce.php) for filter hook parameters.
 
 * `woocommerce_eway_invoice_desc` for modifying the invoice description
 * `woocommerce_eway_invoice_ref` for modifying the invoice reference
-* `woocommerce_eway_option1` for setting the option1 field
-* `woocommerce_eway_option2` for setting the option2 field
-* `woocommerce_eway_option3` for setting the option3 field
 * `woocommerce_eway_icon` for changing the payment gateway icon
 * `woocommerce_eway_credentials` for modifying the eWAY credentials used in the transaction
 
 ### Another WordPress Classifieds Plugin filter hooks
 
-Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsAWPCP3.php) for filter hook parameters.
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.AWPCP.php) for filter hook parameters.
 
 * `awpcp_eway_invoice_desc` for modifying the invoice description
 * `awpcp_eway_invoice_ref` for modifying the invoice reference
-* `awpcp_eway_option1` for setting the option1 field
-* `awpcp_eway_option2` for setting the option2 field
-* `awpcp_eway_option3` for setting the option3 field
 * `awpcp_eway_icon` for changing the payment gateway icon
 * `awpcp_eway_checkout_message` for changing the message above the checkout form
 * `awpcp_eway_credentials` for modifying the eWAY credentials used in the transaction
 
 ### Events Manager filter hooks
 
-Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EwayPaymentsEventsManager.php) for filter hook parameters.
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/class.EventsManager.php) for filter hook parameters.
 
 * `em_eway_invoice_desc` for modifying the invoice description
 * `em_eway_invoice_ref` for modifying the invoice reference
-* `em_eway_option1` for setting the option1 field
-* `em_eway_option2` for setting the option2 field
-* `em_eway_option3` for setting the option3 field
 * `em_eway_amount` for changing the billed amount (e.g. adding fees)
 * `em_eway_credentials` for modifying the eWAY credentials used in the transaction
+
+### Event Espresso 4 filter hooks
+
+Developers can [refer to the code](https://github.com/webaware/eway-payment-gateway/blob/master/includes/integrations/event_espresso_eway/class.Gateway.php) for filter hook parameters.
+
+* `event_espresso_eway_invoice_desc` for modifying the invoice description
+* `event_espresso_eway_invoice_ref` for modifying the invoice reference
 
 ## Screenshots
 
@@ -228,17 +234,20 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 5. Events Manager payments settings
 6. Events Manager transactions with transaction ID and authcode
 7. Another WordPress Classifieds Plugin payments settings
+8. Event Espresso 4 payments settings
 
 ## Upgrade Notice
 
-### 4.2.2
+### 4.3.0
 
-marked as tested up to WooCommerce 3.4
+requires minimum PHP version 5.4 (recommend version 7.1 or greater); added support for Event Espresso 4
 
 ## Changelog
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.2.2, 2018-05-24
+### 4.3.0, 2018-10-12
 
-* changed: marked as tested up to WooCommerce 3.4
+* changed: requires minimum PHP version 5.4 (recommend version 7.1 or greater)
+* added: integration with Event Espresso 4
+* added: setting to enable/disable adding the transaction ID to WooCommerce order emails
