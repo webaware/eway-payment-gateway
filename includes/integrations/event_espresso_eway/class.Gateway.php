@@ -3,8 +3,6 @@ namespace webaware\eway_payment_gateway\event_espresso;
 
 use webaware\eway_payment_gateway\Logging;
 
-use function webaware\eway_payment_gateway\get_api_wrapper;
-
 if (!defined('ABSPATH')) {
 	exit;
 }
@@ -42,7 +40,7 @@ class Gateway extends \EE_Onsite_Gateway {
 			$capture	= true;		// TODO: maybe support stored payment for EE
 			$useSandbox	= $this->_debug_mode;
 			$creds		= $this->getApiCredentials();
-			$eway		= get_api_wrapper($creds, $capture, $useSandbox);
+			$eway		= \webaware\eway_payment_gateway\get_api_wrapper($creds, $capture, $useSandbox);
 
 			if (!$eway) {
 				throw new EwayPaymentsException(__('eWAY payments is not configured for payments yet.', 'eway-payment-gateway'));
