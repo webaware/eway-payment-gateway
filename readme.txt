@@ -246,7 +246,9 @@ requires minimum PHP version 5.4 (recommend version 7.1 or greater); added suppo
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.0, 2018-10-12
+### 4.3.0
+
+Released 2018-10-12
 
 * changed: requires minimum PHP version 5.4 (recommend version 7.1 or greater)
 * added: integration with Event Espresso 4
