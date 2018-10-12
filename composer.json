@@ -1,0 +1,12 @@
+{
+	"require-dev": {
+		"phpcompatibility/php-compatibility": "*",
+		"squizlabs/php_codesniffer": "*"
+	},
+	"scripts": {
+		"post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility",
+		"post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility",
+		"phplint": "phpcs -p -s --runtime-set testVersion 5.4- --standard=PHPCompatibility --extensions=php eway-payment-gateway.php includes/. templates/. views/."
+	},
+	"prefer-stable" : true
+}

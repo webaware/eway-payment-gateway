@@ -9,7 +9,15 @@ module.exports = function (grunt) {
 			main: {
 				files: [
 					{
-						src: ["./**", "!./node_modules/**", "!./Gruntfile.js", "!./package*.json", "!./es6/**"],
+						src: [
+							"./**",
+							"!./es6/**",
+							"!./node_modules/**",
+							"!./vendor/**",
+							"!./composer.*",
+							"!./Gruntfile.js",
+							"!./package*.json",
+						],
 						dest: "dist/<%= pkg.name %>/"
 					}
 				]
