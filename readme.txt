@@ -54,7 +54,7 @@ If you'd like to help out by translating this plugin, please [sign up for an acc
 
 * Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
 * Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
-* Event Espress 4 integration generously sponsored by [Rural Aid](https://www.ruralaid.org.au/)
+* Event Espresso 4 integration generously sponsored by [Rural Aid](https://www.ruralaid.org.au/)
 
 Thanks for sponsoring new features for eWAY Payment Gateway!
 
@@ -91,7 +91,7 @@ Information gathered for processing a credit card transaction is transmitted to 
 
 1. Navigate to 'Event Espresso > Payment Methods' on the menu
 2. Select eWAY from the Payment Methods menu
-3. Click the Activate eWAY Payments buttom
+3. Click the Activate eWAY Payments button
 4. Enter your Rapid API key/password and Client Side Encryption keys for your live site and the sandbox
 5. Select the appropriate settings for your site
 
