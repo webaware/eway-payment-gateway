@@ -39,13 +39,15 @@ class Logging {
 					// need to create parent folder
 					if (mkdir($base, 0755)) {
 						// prevent web access to index of folder
+						// phpcs:disable Generic.PHP.NoSilencedErrors.Discouraged
 						@file_put_contents($base . '/.htaccess', "Options -Indexes\n");
 						@touch($base . '/index.html');
+						// phpcs:enable Generic.PHP.NoSilencedErrors.Discouraged
 					}
 				}
 				// create log folder if parent folder was created OK
 				if (is_dir($base) && mkdir($logFolder, 0755)) {
-					@touch($logFolder . '/index.html');
+					@touch($logFolder . '/index.html');  // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 					$this->logFolder = $logFolder;
 				}
 			}
