@@ -63,7 +63,7 @@ if (!defined('ABSPATH')) {
 	<p>
 		<input type="submit" value="Make payment" />
 		<?php if (get_awpcp_option('eway_site_seal_code')): ?>
-		<?= wp_kses_post(get_awpcp_option('eway_site_seal_code')); ?>
+			<?= wp_kses_post(get_awpcp_option('eway_site_seal_code')); ?>
 		<?php else: ?>
 		<a href="https://www.eway.com.au/" rel="noopener" target="_blank">
 			<img src="<?= esc_url(plugins_url('images/eway-siteseal-tagline.png', EWAY_PAYMENTS_PLUGIN_FILE)); ?>" />

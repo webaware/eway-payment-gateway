@@ -4,7 +4,7 @@
 		"squizlabs/php_codesniffer": "*"
 	},
 	"scripts": {
-		"lint": "php -l eway-payment-gateway.php; find includes views -name '*.php' -exec php -l '{}' \\;",
+		"lint": "php -l eway-payment-gateway.php; find includes templates views -name '*.php' -exec php -l '{}' \\;",
 		"sniff": "phpcs -ps --colors"
 	},
 	"prefer-stable" : true

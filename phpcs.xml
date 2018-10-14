@@ -4,6 +4,7 @@
 
 	<file>eway-payment-gateway.php</file>
 	<file>includes</file>
+	<file>templates</file>
 	<file>views</file>
 
 	<arg name="basepath" value="." />
