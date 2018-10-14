@@ -26,6 +26,7 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 		parent::__construct($pm_instance);
 
 		add_action('AHEE__EED_Single_Page_Checkout__enqueue_styles_and_scripts', [$this, 'maybeEnqueueCSE']);
+		add_action('admin_print_scripts', [$this, 'adminEnqueueScripts']);
 	}
 
 	/**
@@ -101,34 +102,33 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 			'extra_meta_inputs'	=> [
 
 				'eway_api_key'				=>	new EE_Text_Input([
-													// TODO: autocorrect=off, autocapitalize=off, spellcheck=false
 													'html_label_text'	=> _x('API key', 'settings field', 'eway-payment-gateway'),
-													'html_other_attributes'	=> 'autocorrect="off"',
+													'html_class'		=> 'eway-no-autocorrupt',
 												]),
 
 				'eway_password'				=>	new EE_Text_Input([
-													// TODO: autocorrect=off, autocapitalize=off, spellcheck=false
 													'html_label_text'	=> _x('API password', 'settings field', 'eway-payment-gateway'),
+													'html_class'		=> 'eway-no-autocorrupt',
 												]),
 
 				'eway_ecrypt_key'			=>	new EE_Text_Area_Input([
-													// TODO: autocorrect=off, autocapitalize=off, spellcheck=false
 													'html_label_text'	=> _x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
+													'html_class'		=> 'eway-no-autocorrupt',
 												]),
 
 				'eway_sandbox_api_key'		=>	new EE_Text_Input([
-													// TODO: autocorrect=off, autocapitalize=off, spellcheck=false
 													'html_label_text'	=> _x('Sandbox API key', 'settings field', 'eway-payment-gateway'),
+													'html_class'		=> 'eway-no-autocorrupt',
 												]),
 
 				'eway_sandbox_password'		=>	new EE_Text_Input([
-													// TODO: autocorrect=off, autocapitalize=off, spellcheck=false
 													'html_label_text'	=> _x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
+													'html_class'		=> 'eway-no-autocorrupt',
 												]),
 
 				'eway_sandbox_ecrypt_key'	=>	new EE_Text_Area_Input([
-													// TODO: autocorrect=off, autocapitalize=off, spellcheck=false
 													'html_label_text'	=> _x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
+													'html_class'		=> 'eway-no-autocorrupt',
 												]),
 
 				'eway_logging'				=>	new EE_Select_Input([
@@ -137,7 +137,6 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 													'error' 	=> esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'),
 												],
 												[
-													// TODO: autocorrect=off, autocapitalize=off, spellcheck=false
 													'html_label_text'	=> _x('Logging', 'settings field', 'eway-payment-gateway'),
 													'html_help_text'	=>	sprintf('%s<br/>%s<br/>%s',
 																				esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
@@ -150,6 +149,19 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 		]);
 
 		return $form;
+	}
+
+	/**
+	* enqueue admin scripts for settings fields
+	*/
+	public function adminEnqueueScripts() {
+		global $plugin_page;
+
+		if ($plugin_page === 'espresso_payment_settings') {
+			$min = SCRIPT_DEBUG ? '' : '.min';
+			$ver = SCRIPT_DEBUG ? time() : EWAY_PAYMENTS_VERSION;
+			wp_enqueue_script('event_espresso_eway-settings', plugins_url("js/admin-event-espresso$min.js", EWAY_PAYMENTS_PLUGIN_FILE), ['jquery'], $ver, true);
+		}
 	}
 
 	/**
