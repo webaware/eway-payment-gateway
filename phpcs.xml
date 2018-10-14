@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="PHP_CodeSniffer">
-	<description>The coding standard for Gravity Forms eWAY Pro.</description>
+	<description>Some basic coding standards sniffs for this project.</description>
 
 	<file>eway-payment-gateway.php</file>
 	<file>includes</file>
