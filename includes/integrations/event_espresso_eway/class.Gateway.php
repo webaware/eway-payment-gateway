@@ -70,7 +70,7 @@ class Gateway extends \EE_Onsite_Gateway {
 			$eway->currencyCode				= $payment->currency_code();
 			$eway->firstName				= $billing->first_name;
 			$eway->lastName					= $billing->last_name;
-			// $eway->companyName				= $???;
+			// $eway->companyName				= ???; TODO: determine whether we can pick this up somewhere
 			$eway->emailAddress				= $billing->email;
 			$eway->phone					= $billing->phone;
 			$eway->address1					= $billing->address;
@@ -79,7 +79,7 @@ class Gateway extends \EE_Onsite_Gateway {
 			$eway->state					= $billing->state;
 			$eway->postcode					= $billing->zip;
 			$eway->country					= $billing->country;
-			// $eway->comments					= ???;
+			// $eway->comments					= ???; TODO: determine whether we can pick this up somewhere
 
 			// use cardholder name for last name if no customer name entered
 			if (empty($eway->firstName) && empty($eway->lastName)) {

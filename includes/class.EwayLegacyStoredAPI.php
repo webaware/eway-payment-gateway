@@ -299,7 +299,6 @@ class EwayLegacyStoredAPI {
 		$xml->writeElement('ewayOption1', empty($this->option[0]) ? '' : $this->option[0]);
 		$xml->writeElement('ewayOption2', empty($this->option[1]) ? '' : $this->option[1]);
 		$xml->writeElement('ewayOption3', empty($this->option[2]) ? '' : $this->option[2]);
-		//~ $xml->writeElement('ewayCVN', $this->cardVerificationNumber);
 
 		$xml->endElement();		// ewaygateway
 

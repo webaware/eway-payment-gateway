@@ -36,7 +36,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	* initialise gateway with custom settings
 	*/
 	public function __construct() {
-		//~ parent::__construct();		// no parent constructor (yet!)
+		// NB: no parent constructor (yet!)
 
 		$this->id						= 'eway_payments';
 		$this->icon						= apply_filters('woocommerce_eway_icon', plugins_url('images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE));
@@ -228,7 +228,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
 							'options'		=> [
-								// for backwards-compatibility, Capture = "not stored", Authorize = "stored / Pre-Auth"
+								// for backwards-compatibility, Capture: "not stored", Authorize: "stored / Pre-Auth"
 								'no' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
 								'yes'	 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
 							],

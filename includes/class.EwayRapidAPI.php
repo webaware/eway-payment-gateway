@@ -469,7 +469,6 @@ class EwayRapidAPI {
 	protected function getCustomerRecord() {
 		$record = new \stdClass;
 
-		//~ $record->Reference		= '';		// TODO: customer reference?
 		$record->Title				= $this->title				? self::sanitiseTitle($this->title) : '';
 		$record->FirstName			= $this->firstName			? substr($this->firstName, 0, 50) : '';
 		$record->LastName			= $this->lastName			? substr($this->lastName, 0, 50) : '';

@@ -113,7 +113,6 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		// if there were errors, fail the transaction so that user can fix things up
 		if ($errors) {
 			$this->set_purchase_processed_by_purchid(1);	// failed
-			//~ $this->go_to_transaction_results($this->cart_data['session_id']);
 			return;
 		}
 

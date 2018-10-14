@@ -49,7 +49,7 @@ class MethodEventsManager extends \EM_Gateway {
 		// create a logger
 		$this->logger = new Logging('events-manager', get_option("em_{$this->gateway}_logging", 'off'));
 
-		// initialise parent class
+		// initialise the parent class
 		parent::__construct();
 
 		add_action('admin_print_styles-event_page_events-manager-gateways', [$this, 'adminSettingsStyles']);

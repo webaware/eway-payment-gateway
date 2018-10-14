@@ -35,10 +35,7 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	*/
 	public function help_tabs_config() {
 		return [
-			// $this->get_help_tab_name() => [
-			// 	'title' => __('New Payment Method Onsite Settings', 'event_espresso'),
-			// 	'filename' => 'new_payment_method_onsite',
-			// ],
+			// TODO: add help tab content
 		];
 	}
 
