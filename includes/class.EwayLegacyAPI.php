@@ -241,7 +241,7 @@ class EwayLegacyAPI {
 			}
 			else {
 				$this->cardExpiryMonth = intval($this->cardExpiryMonth);
-		}
+			}
 		}
 		if (is_int($this->cardExpiryMonth)) {
 			if ($this->cardExpiryMonth < 1 || $this->cardExpiryMonth > 12) {
@@ -259,7 +259,7 @@ class EwayLegacyAPI {
 			}
 			else {
 				$this->cardExpiryYear = intval($this->cardExpiryYear);
-		}
+			}
 		}
 		if (is_int($this->cardExpiryYear)) {
 			$thisYear = intval(date_create()->format('Y'));

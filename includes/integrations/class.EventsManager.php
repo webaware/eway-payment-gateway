@@ -212,7 +212,7 @@ class MethodEventsManager extends \EM_Gateway {
 	* @param EM_Booking $EM_Booking
 	* @param boolean $post_validation
 	*/
-	public function booking_add($EM_Event, $EM_Booking, $post_validation = false){
+	public function booking_add($EM_Event, $EM_Booking, $post_validation = false) {
 		$this->registered_timer = current_time('timestamp', 1);
 
 		parent::booking_add($EM_Event, $EM_Booking, $post_validation);
@@ -234,7 +234,7 @@ class MethodEventsManager extends \EM_Gateway {
 	* @param EM_Booking $EM_Booking
 	* @return bool
 	*/
-	public function em_booking_save($result, $EM_Booking){
+	public function em_booking_save($result, $EM_Booking) {
 		// make sure booking save was successful before we try anything
 		if ($result) {
 			if ($EM_Booking->get_price() > 0) {
@@ -287,7 +287,7 @@ class MethodEventsManager extends \EM_Gateway {
 	* @param EM_Booking $EM_Booking
 	* @return array
 	*/
-	public function booking_form_feedback( $return, $EM_Booking = false ){
+	public function booking_form_feedback( $return, $EM_Booking = false ) {
 		// Double check $EM_Booking is an EM_Booking object and that we have a booking awaiting payment.
 		if (!empty($return['result'])) {
 			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] === $this->gateway && $EM_Booking->get_price() > 0) {
@@ -310,7 +310,7 @@ class MethodEventsManager extends \EM_Gateway {
 	/**
 	* Outputs custom content and credit card information.
 	*/
-	public function booking_form(){
+	public function booking_form() {
 		$card_msg	= esc_html(get_option("em_{$this->gateway}_card_msg"));
 
 		$postdata = new FormPost();
@@ -357,7 +357,7 @@ class MethodEventsManager extends \EM_Gateway {
 	* @param EM_Booking $EM_Booking
 	* @return boolean
 	*/
-	public function processPayment($EM_Booking){
+	public function processPayment($EM_Booking) {
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
 		$transactionID = apply_filters('em_eway_trans_number', $EM_Booking->booking_id);
 
