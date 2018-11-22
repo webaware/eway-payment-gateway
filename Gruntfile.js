@@ -17,7 +17,7 @@ module.exports = function (grunt) {
 							"!./composer.*",
 							"!./Gruntfile.js",
 							"!./package*.json",
-							"!./phpcs.xml",
+							"!./phpcs*.xml",
 						],
 						dest: "dist/<%= pkg.name %>/"
 					}
