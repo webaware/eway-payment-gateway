@@ -5,9 +5,13 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+// special test customer ID for sandbox
+const EWAY_PAYMENTS_TEST_CUSTOMER		= '87654321';
+
 /**
-* utility functions for payment forms
+* custom exceptons
 */
+class EwayPaymentsException extends \Exception {}
 
 /**
 * load template from theme or plugin
