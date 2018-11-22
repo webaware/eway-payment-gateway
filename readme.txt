@@ -44,6 +44,10 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://gfeway
 
 ### Translations
 
+Many thanks to the generous efforts of our translators:
+
+* English (en_GB) -- [the English (British) translation team](https://translate.wordpress.org/locale/en-gb/default/wp-plugins/eway-payment-gateway)
+
 If you'd like to help out by translating this plugin, please [sign up for an account and dig in](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway).
 
 ### Contributions
