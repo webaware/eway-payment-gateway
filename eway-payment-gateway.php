@@ -34,9 +34,9 @@ if (!defined('ABSPATH')) {
 }
 
 define('EWAY_PAYMENTS_PLUGIN_FILE', __FILE__);
-define('EWAY_PAYMENTS_PLUGIN_ROOT', __DIR__ . '/');
-define('EWAY_PAYMENTS_PLUGIN_NAME', basename(__DIR__) . '/' . basename(__FILE__));
-define('EWAY_PAYMENTS_MIN_PHP', '5.4');
+define('EWAY_PAYMENTS_PLUGIN_ROOT', dirname(__FILE__) . '/');
+define('EWAY_PAYMENTS_PLUGIN_NAME', basename(dirname(__FILE__)) . '/' . basename(__FILE__));
+define('EWAY_PAYMENTS_MIN_PHP', '5.6');
 define('EWAY_PAYMENTS_VERSION', '4.3.1-dev');
 
 require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/functions-global.php';
