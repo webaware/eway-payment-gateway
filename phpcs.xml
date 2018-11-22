@@ -12,7 +12,7 @@
 	<arg name="extensions" value="php" />
 	<arg name="tab-width" value="4" />
 
-	<config name="testVersion" value="5.4-"/>
+	<config name="testVersion" value="5.6-"/>
 
 	<rule ref="PHPCompatibility" />
 
@@ -21,6 +21,7 @@
 	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
 	<!-- <rule ref="Generic.Metrics.CyclomaticComplexity" /> -->
 	<!-- <rule ref="Generic.Metrics.NestingLevel" /> -->
+	<rule ref="Generic.PHP.DisallowShortOpenTag.Found" />
 	<rule ref="Generic.PHP.NoSilencedErrors" />
 	<rule ref="Generic.Strings.UnnecessaryStringConcat" />
 
@@ -36,7 +37,6 @@
 	</rule>
 
 	<rule ref="Generic.WhiteSpace.ArbitraryParenthesesSpacing">
-		<exclude-pattern>includes/class.EDDUpdater.php</exclude-pattern>
 		<properties>
 			<property name="ignoreNewlines" value="true" />
 		</properties>
