@@ -2,6 +2,14 @@
 
 ## Changelog
 
+### 4.3.1
+
+Released 2018-11-22
+
+* changed: requires minimum PHP version 5.6 (recommend version 7.2 or greater)
+* fixed: plugin file broke on PHP 5.2 before it could issue version warning
+* tested: WordPress 5.0
+
 ### 4.3.0
 
 Released 2018-10-12

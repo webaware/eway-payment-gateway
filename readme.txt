@@ -6,9 +6,9 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.2
-Tested up to: 4.9
-Requires PHP: 5.4
-Stable tag: 4.3.0
+Tested up to: 5.0
+Requires PHP: 5.6
+Stable tag: 4.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -238,18 +238,18 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.0
+### 4.3.1
 
-requires minimum PHP version 5.4 (recommend version 7.1 or greater); added support for Event Espresso 4
+requires minimum PHP version 5.6 (recommend version 7.2 or greater)
 
 ## Changelog
 
 The full changelog can be found [on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.0
+### 4.3.1
 
-Released 2018-10-12
+Released 2018-11-22
 
-* changed: requires minimum PHP version 5.4 (recommend version 7.1 or greater)
-* added: integration with Event Espresso 4
-* added: setting to enable/disable adding the transaction ID to WooCommerce order emails
+* changed: requires minimum PHP version 5.6 (recommend version 7.2 or greater)
+* fixed: plugin file broke on PHP 5.2 before it could issue version warning
+* tested: WordPress 5.0
