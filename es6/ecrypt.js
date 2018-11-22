@@ -38,17 +38,17 @@
 	* @param {Number}
 	* @return {String}
 	*/
-	let repeatString;
-	if (typeof String.prototype.repeat === "function") {
+	const repeatString = (function() {
 
-		repeatString = (character, length) => {
-			return character.repeat(length);
+		if (typeof String.prototype.repeat === "function") {
+
+			return (character, length) => {
+				return character.repeat(length);
+			}
+
 		}
 
-	}
-	else {
-
-		repeatString = (character, length) => {
+		return (character, length) => {
 			let s = character;
 			for (let i = 1; i < length; i++) {
 				s += character;
@@ -56,6 +56,21 @@
 			return s;
 		}
 
+	})();
+
+	/**
+	* get placeholder mask for field
+	* @param {String} mask_character
+	* @param {Number} length
+	* @param {bool} is_cardnum
+	*/
+	function getPlaceholder(mask_character, length, is_cardnum) {
+		if (is_cardnum) {
+			const fragment = repeatString(mask_character, 4);
+			return fragment + " " + fragment + " " + fragment + " " + fragment;
+		}
+
+		return repeatString(mask_character, length);
 	}
 
 	/**
@@ -80,7 +95,7 @@
 				}
 
 				const encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
-				const placeholder = repeatString(eway_ecrypt_msg.ecrypt_mask, length);
+				const placeholder = getPlaceholder(eway_ecrypt_msg.ecrypt_mask, length, fieldspec.is_cardnum);
 
 				checkout.find("input[name='" + fieldspec.name + "']").remove();
 				$("<input type='hidden'>").attr("name", fieldspec.name).val(encrypted).appendTo(checkout);
