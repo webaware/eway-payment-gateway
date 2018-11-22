@@ -36,14 +36,14 @@
   */
 
 
-  var repeatString;
+  var repeatString = function () {
+    if (typeof String.prototype.repeat === "function") {
+      return function (character, length) {
+        return character.repeat(length);
+      };
+    }
 
-  if (typeof String.prototype.repeat === "function") {
-    repeatString = function repeatString(character, length) {
-      return character.repeat(length);
-    };
-  } else {
-    repeatString = function repeatString(character, length) {
+    return function (character, length) {
       var s = character;
 
       for (var i = 1; i < length; i++) {
@@ -52,6 +52,22 @@
 
       return s;
     };
+  }();
+  /**
+  * get placeholder mask for field
+  * @param {String} mask_character
+  * @param {Number} length
+  * @param {bool} is_cardnum
+  */
+
+
+  function getPlaceholder(mask_character, length, is_cardnum) {
+    if (is_cardnum) {
+      var fragment = repeatString(mask_character, 4);
+      return fragment + " " + fragment + " " + fragment + " " + fragment;
+    }
+
+    return repeatString(mask_character, length);
   }
   /**
   * if form field has a value, add encrypted hidden field and remove plain-text value from form
@@ -77,7 +93,7 @@
         }
 
         var encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
-        var placeholder = repeatString(eway_ecrypt_msg.ecrypt_mask, length);
+        var placeholder = getPlaceholder(eway_ecrypt_msg.ecrypt_mask, length, fieldspec.is_cardnum);
         checkout.find("input[name='" + fieldspec.name + "']").remove();
         $("<input type='hidden'>").attr("name", fieldspec.name).val(encrypted).appendTo(checkout);
 
