@@ -2,6 +2,13 @@
 
 ## Changelog
 
+### 4.3.2
+
+Released soon...
+
+* changed: requires minimum WooCommerce version 2.6 (recommend version 3.5 or greater)
+* tested: WooCommerce 3.6
+
 ### 4.3.1
 
 Released 2018-11-22

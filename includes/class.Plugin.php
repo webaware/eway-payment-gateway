@@ -101,11 +101,18 @@ class Plugin {
 	* maybe load WooCommerce payment gateway
 	*/
 	public function maybeRegisterWooCommerce() {
-		if (function_exists('WC')) {
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.WooCommerce.php';
-			MethodWooCommerce::register_eway();
+		if (!function_exists('WC')) {
+			return;
 		}
+
+		if (version_compare(WC()->version, MIN_VERSION_WOOCOMMERCE, '<')) {
+			add_action('admin_notices', __NAMESPACE__ . '\\notice_woocommerce_version');
+			// return;
+		}
+
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.WooCommerce.php';
+		MethodWooCommerce::register_eway();
 	}
 
 	/**

@@ -8,6 +8,9 @@ if (!defined('ABSPATH')) {
 // special test customer ID for sandbox
 const EWAY_PAYMENTS_TEST_CUSTOMER		= '87654321';
 
+// prerequisites
+const MIN_VERSION_WOOCOMMERCE	= '2.6';
+
 /**
 * custom exceptons
 */
@@ -145,4 +148,13 @@ function is_IP_address($maybeIP) {
 
 	// just check for IPv4 addresses
 	return !!ip2long($maybeIP);
+}
+
+/**
+* maybe show notice of minimum WooCommerce version failure
+*/
+function notice_woocommerce_version() {
+	if (eway_payment_gateway_can_show_admin_notices()) {
+		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-woocommerce-version.php';
+	}
 }

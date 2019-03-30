@@ -26,6 +26,7 @@ function eway_payment_gateway_can_show_admin_notices() {
 	$settings_pages = array(
 		'settings_page_wpsc-settings',				// WP eCommerce
 		'woocommerce_page_wc-settings',				// WooCommerce
+		'woocommerce_page_wc-status',				// WooCommerce
 		'event_page_events-manager-gateways',		// Events Manager
 		'classifieds_page_awpcp-admin-settings',	// AWPCP
 	);
