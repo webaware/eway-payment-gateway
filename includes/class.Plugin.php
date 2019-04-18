@@ -107,7 +107,7 @@ class Plugin {
 
 		if (version_compare(WC()->version, MIN_VERSION_WOOCOMMERCE, '<')) {
 			add_action('admin_notices', __NAMESPACE__ . '\\notice_woocommerce_version');
-			// return;
+			return;
 		}
 
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
