@@ -186,8 +186,8 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 			'key'		=> $creds['ecrypt_key'],
 			'form'		=> '#ee-spco-payment_options-reg-step-form',
 			'fields'	=> [
-							"#event-espresso-eway-form-card-number"	=> ['name' => "cse:card_number", 'is_cardnum' => true, 'false_fill' => true],
-							"#event-espresso-eway-form-cvn"			=> ['name' => "cse:cvn", 'is_cardnum' => false, 'false_fill' => true],
+							'#event-espresso-eway-form-card-number'	=> ['name' => 'cse:card_number', 'is_cardnum' => true, 'false_fill' => true],
+							'#event-espresso-eway-form-cvn'			=> ['name' => 'cse:cvn', 'is_cardnum' => false, 'false_fill' => true],
 						],
 		];
 
