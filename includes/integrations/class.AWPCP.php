@@ -249,7 +249,6 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	* @param AWPCP_Payment_Transaction $transaction
 	*/
 	public function process_payment_notification($transaction) {
-		return;
 	}
 
 	/**
