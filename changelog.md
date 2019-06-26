@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 4.3.3
+
+Released soon...
+
+* fixed: conflict with unknown plugin over `wc_add_notice()` loaded on WordPress admin
+
 ### 4.3.2
 
 Released 2019-04-18
