@@ -4,9 +4,9 @@
 
 ### 4.3.3
 
-Released soon...
+Released 2019-06-28
 
-* fixed: conflict with unknown plugin over `wc_add_notice()` loaded on WordPress admin
+* fixed: a conflict with WooCommerce add-ons that load front end includes in the WordPress admin
 
 ### 4.3.2
 

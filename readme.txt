@@ -8,7 +8,7 @@ Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, a
 Requires at least: 4.2
 Tested up to: 5.2
 Requires PHP: 5.6
-Stable tag: 4.3.2
+Stable tag: 4.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -242,17 +242,16 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.2
+### 4.3.3
 
-tested with WooCommerce 3.6; requires minimum WooCommerce version 2.6 (recommend version 3.5 or greater)
+fixed a conflict with WooCommerce add-ons that load front end includes in the WordPress admin
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.2
+### 4.3.3
 
-Released 2019-04-18
+Released 2019-06-28
 
-* changed: requires minimum WooCommerce version 2.6 (recommend version 3.5 or greater)
-* tested: WooCommerce 3.6
+* fixed: a conflict with WooCommerce add-ons that load front end includes in the WordPress admin
