@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 4.3.4
+
+Released 2019-07-24
+
+* fixed: AWPCP 4.0 crashes with error on settings API
+
 ### 4.3.3
 
 Released 2019-06-28
