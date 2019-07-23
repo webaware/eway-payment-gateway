@@ -21,6 +21,9 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	public static function register_eway() {
 		add_filter('awpcp-register-payment-methods', [__CLASS__, 'awpcpRegisterPaymentMethods'], 20);
 		add_action('awpcp_register_settings', [__CLASS__, 'awpcpRegisterSettings']);
+		add_action('admin_print_styles-classified-admin_page_awpcp-admin-settings', [__CLASS__, 'settingsStyles']);
+
+		// pre AWPCP 4.0
 		add_action('admin_print_styles-classifieds_page_awpcp-admin-settings', [__CLASS__, 'settingsStyles']);
 	}
 
@@ -64,51 +67,76 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 	/**
 	* register settings for this payment method
+	* @param AWPCP_SettingsManager $settings
 	*/
-	public static function awpcpRegisterSettings() {
-		$awpcp = awpcp();
-
+	public static function awpcpRegisterSettings($settings) {
 		// create a new section
-		$section = $awpcp->settings->add_section('payment-settings',
-						esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
-						'eway', 100, [$awpcp->settings, 'section']);
+		if (method_exists($settings, 'add_settings_subgroup')) {
+			// since AWPC 4.0.0
+			$subgroup = 'eway-settings';
+			$section = 'eway';
 
-		$awpcp->settings->add_setting($section, 'activateeway',
+			$settings->add_settings_subgroup([
+				'id'       => $subgroup,
+				'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
+				'priority' => 100,
+				'parent'   => 'payment-settings',
+			]);
+
+			$settings->add_settings_section([
+				'id'       => 'eway',
+				'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
+				'priority' => 10,
+				'subgroup' => $subgroup,
+			]);
+		}
+		else {
+			// pre AWPCP 4.0.0
+			$section = $settings->add_section(
+				'payment-settings',
+				esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
+				'eway',
+				100,
+				[$settings, 'section']
+			);
+		}
+
+		$settings->add_setting($section, 'activateeway',
 						esc_html_x('Activate eWAY?', 'settings field', 'eway-payment-gateway'),
 						'checkbox', 1,
 						esc_html_x('Activate eWAY?', 'settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_api_key',
+		$settings->add_setting($section, 'eway_api_key',
 						esc_html_x('API key', 'settings field', 'eway-payment-gateway'),
 						'textfield', '',
 						esc_html_x('Rapid API key from your live eWAY account', 'settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_password',
+		$settings->add_setting($section, 'eway_password',
 						esc_html_x('API password', 'settings field', 'eway-payment-gateway'),
 						'textfield', '',
 						esc_html_x('Rapid API password from your live eWAY account', 'settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_ecrypt_key',
+		$settings->add_setting($section, 'eway_ecrypt_key',
 						esc_html_x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 						'textarea', '',
 						esc_html_x('Client Side Encryption key from your live eWAY account', 'settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_customerid',
+		$settings->add_setting($section, 'eway_customerid',
 						esc_html_x('eWAY customer ID', 'settings field', 'eway-payment-gateway'),
 						'textfield', '',
 						esc_html__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_sandbox_api_key',
+		$settings->add_setting($section, 'eway_sandbox_api_key',
 						esc_html_x('Sandbox API key', 'settings field', 'eway-payment-gateway'),
 						'textfield', '',
 						esc_html_x('Rapid API key from your sandbox account', 'settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_sandbox_password',
+		$settings->add_setting($section, 'eway_sandbox_password',
 						esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
 						'textfield', '',
 						esc_html_x('Rapid API password from your sandbox account', 'settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_sandbox_ecrypt_key',
+		$settings->add_setting($section, 'eway_sandbox_ecrypt_key',
 						esc_html_x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 						'textarea', '',
 						esc_html_x('Client Side Encryption key from your sandbox account', 'settings label', 'eway-payment-gateway'));
@@ -117,7 +145,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			'0' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
 			'1'		 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
 		];
-		$awpcp->settings->add_setting($section, 'eway_stored',
+		$settings->add_setting($section, 'eway_stored',
 						esc_html_x('Payment Method', 'settings field', 'eway-payment-gateway'),
 						'select', 0,
 						esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway')
@@ -134,22 +162,22 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 							esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
 							esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
 							Logging::getLogFolderRelative());
-		$awpcp->settings->add_setting($section, 'eway_logging',
+		$settings->add_setting($section, 'eway_logging',
 						esc_html_x('Logging', 'settings field', 'eway-payment-gateway'),
 						'select', 'off', $log_descripton, ['options' => $log_options]);
 
-		$awpcp->settings->add_setting($section, 'eway_card_message',
+		$settings->add_setting($section, 'eway_card_message',
 						esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'),
 						'textfield', '',
 						esc_html_x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'settings label', 'eway-payment-gateway'));
 
-		$awpcp->settings->add_setting($section, 'eway_site_seal_code',
+		$settings->add_setting($section, 'eway_site_seal_code',
 						esc_html_x('eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
 						'textarea', '',
 						sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" rel="noopener" target="_blank">%s</a>',
 							esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')));
 
-		$awpcp->settings->add_setting($section, 'eway_icon',
+		$settings->add_setting($section, 'eway_icon',
 						esc_html_x('Payment Method Icon', 'settings field', 'eway-payment-gateway'),
 						'textfield', '',
 						esc_html_x('URL to a custom icon to show for the payment method.', 'settings label', 'eway-payment-gateway'));
