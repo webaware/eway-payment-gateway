@@ -371,7 +371,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	*/
 	protected function processTransaction($transaction) {
 		$item		= $transaction->get_item(0); // no support for multiple items
-		$ad			= \AWPCP_Ad::find_by_id($transaction->get('ad-id'));
+		$ad			= self::getAdByID($transaction->get('ad-id'));
 		$user		= wp_get_current_user();
 
 		$capture	= !get_awpcp_option('eway_stored');
@@ -829,6 +829,21 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			}
 		}
 
+	}
+
+	/**
+	* retreive an advertisement by ID
+	* @param string $ad_id
+	* @return object
+	*/
+	protected static function getAdByID($ad_id) {
+		try {
+			$ad = awpcp_listings_collection()->get($adid);
+		} catch (\AWPCP_Exception $e) {
+			$ad = null;
+		}
+
+		return $ad;
 	}
 
 }
