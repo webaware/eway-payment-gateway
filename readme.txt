@@ -5,7 +5,7 @@ Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
-Requires at least: 4.2
+Requires at least: 4.9
 Tested up to: 5.2
 Requires PHP: 5.6
 Stable tag: 4.3.3
@@ -242,16 +242,16 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.3
+### 4.3.4
 
-fixed a conflict with WooCommerce add-ons that load front end includes in the WordPress admin
+fixed a crash in AWPCP 4.0 with error on settings API
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.3
+### 4.3.4
 
-Released 2019-06-28
+Released 2019-07-24
 
-* fixed: a conflict with WooCommerce add-ons that load front end includes in the WordPress admin
+* fixed: AWPCP 4.0 crashes with error on settings API
