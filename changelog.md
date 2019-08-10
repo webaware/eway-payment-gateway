@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 4.3.5
+
+Released 2019-08-10
+
+* tested: WooCommerce 3.7
+
 ### 4.3.4
 
 Released 2019-07-24
