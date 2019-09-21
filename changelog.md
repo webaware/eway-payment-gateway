@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 4.3.6
+
+Released soon...
+
+* fixed: Events Manager multiple bookings fails when page caching is enabled
+
 ### 4.3.5
 
 Released 2019-08-10
