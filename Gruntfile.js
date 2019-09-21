@@ -56,6 +56,14 @@ module.exports = function (grunt) {
 					"mkdir dist",
 					"git archive HEAD --prefix=<%= pkg.name %>/ --format=zip -9 -o dist/<%= pkg.name %>-<%= pkg.version %>.zip",
 				].join("&&")
+			},
+			wpsvn: {
+				command: [
+					"svn up .wordpress.org",
+					"rm -rf .wordpress.org/trunk",
+					"mkdir .wordpress.org/trunk",
+					"git archive HEAD --format=tar | tar x --directory=.wordpress.org/trunk",
+				].join("&&")
 			}
 		}
 
@@ -67,6 +75,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-shell");
 
 	grunt.registerTask("release", ["shell:dist"]);
+	grunt.registerTask("wpsvn", ["shell:wpsvn"]);
 	grunt.registerTask("es6", ["babel","uglify"]);
 
 };
