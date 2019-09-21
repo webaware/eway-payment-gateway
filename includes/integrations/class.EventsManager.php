@@ -55,6 +55,9 @@ class MethodEventsManager extends \EM_Gateway {
 		add_action('admin_print_styles-event_page_events-manager-gateways', [$this, 'adminSettingsStyles']);
 
 		if ($this->is_active()) {
+			add_action('em_cart_js_footer', [$this, 'maybeEnqueueEcrypt']);
+			add_action('em_booking_js_footer', [$this, 'maybeEnqueueEcrypt']);
+
 			// force SSL for booking submissions on live site, because credit card details need to be encrypted
 			if (get_option("em_{$this->gateway}_mode") === 'live') {
 				add_filter('em_wp_localize_script', [__CLASS__, 'forceBookingAjaxSSL']);
@@ -324,20 +327,26 @@ class MethodEventsManager extends \EM_Gateway {
 
 		// load template with passed values, capture output and register
 		eway_load_template('eventsmanager-eway-fields.php', compact('card_msg', 'card_num', 'card_name', 'card_code', 'optMonths', 'optYears'));
+	}
 
-		// maybe set up Client Side Encryption
-		$creds = $this->getApiCredentials();
+	/**
+	* maybe set up Client Side Encryption
+	*/
+	public function maybeEnqueueEcrypt() {
+		$creds	= $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
-			wp_enqueue_script('eway-payment-gateway-ecrypt');
-			add_action('wp_footer', [$this, 'ecryptScript']);
+			// hook wp_footer at priority 110, because this function was called on wp_footer at priority 20 or 100
+			add_action('wp_footer', [$this, 'ecryptScript'], 110);
 		}
 	}
 
 	/**
-	* configure the scripts for client-side encryption
+	* maybe set up Client Side Encryption
 	*/
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
+
+		wp_enqueue_script('eway-payment-gateway-ecrypt');
 
 		$vars = [
 			'mode'		=> 'events-manager',
@@ -350,6 +359,7 @@ class MethodEventsManager extends \EM_Gateway {
 		];
 
 		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
+		wp_print_scripts('eway-payment-gateway-ecrypt');
 	}
 
 	/**

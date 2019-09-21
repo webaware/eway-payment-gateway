@@ -158,6 +158,32 @@
 	}
 
 	/**
+	* handle Events Manager form submit
+	* @param {Event} event
+	*/
+	function handleEventsManager(event) {
+		if (elementValue("gateway") === "eway") {
+			processFields(event);
+		}
+	}
+
+	/**
+	* handle changes in Events Manager Pro multiple-bookings checkout form when loaded via Ajax
+	* @param {Event} event
+	* @param {jqXHR} xhr
+	* @param {Object} settings
+	*/
+	function refreshEventsManagerCheckout(event, xhr, settings) {
+		// only process Events Manager checkout page load
+		if (settings.data.indexOf("em_checkout_page_contents") !== -1) {
+			// refresh the checkout object, because the form has only just arrived via Ajax payload
+			checkout = $(eway_ecrypt_vars.form);
+			resetEncryptedFields();
+			checkout.on("submit", handleEventsManager);
+		}
+	}
+
+	/**
 	* handle changes in Event Espresso's single page checkout form
 	*/
 	function handleEventEspresso() {
@@ -199,10 +225,10 @@
 			break;
 
 		case "events-manager":
-			checkout.on("submit", function(event) {
-				if (elementValue("gateway") === "eway") {
-					processFields(event);
-				}
+			checkout.on("submit", handleEventsManager);
+			$(document).on("em_checkout_page_refresh", function() {
+				// watch for changes in Events Manager Pro multiple-bookings checkout form when loaded via Ajax
+				$(document).ajaxComplete(refreshEventsManagerCheckout);
 			});
 			break;
 
