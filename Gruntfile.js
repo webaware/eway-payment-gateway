@@ -52,9 +52,9 @@ module.exports = function (grunt) {
 			// @link https://github.com/sindresorhus/grunt-shell
 			dist: {
 				command: [
-					"rm -rf dist",
-					"mkdir dist",
-					"git archive HEAD --prefix=<%= pkg.name %>/ --format=zip -9 -o dist/<%= pkg.name %>-<%= pkg.version %>.zip",
+					"rm -rf .dist",
+					"mkdir .dist",
+					"git archive HEAD --prefix=<%= pkg.name %>/ --format=zip -9 -o .dist/<%= pkg.name %>-<%= pkg.version %>.zip",
 				].join("&&")
 			},
 			wpsvn: {

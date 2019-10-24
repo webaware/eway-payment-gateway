@@ -1,6 +1,6 @@
 /.svn
 /.vscode
 /.wordpress.org
-/dist
+/.dist
 /node_modules
 /vendor
