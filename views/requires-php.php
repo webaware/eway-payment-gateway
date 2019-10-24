@@ -12,5 +12,5 @@ if (!defined('ABSPATH')) {
 				'https://www.php.net/supported-versions.php'
 			); ?>
 	</p>
-	<p><?php printf(esc_html__('Please upgrade your website hosting. At least PHP %s is recommended.', 'eway-payment-gateway'), '7.2'); ?></p>
+	<p><?php printf(esc_html__('Please upgrade your website hosting. At least PHP %s is recommended.', 'eway-payment-gateway'), '7.3'); ?></p>
 </div>
