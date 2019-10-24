@@ -8,7 +8,7 @@ Author: WebAware
 Author URI: https://shop.webaware.com.au/
 Text Domain: eway-payment-gateway
 WC requires at least: 2.6
-WC tested up to: 3.7
+WC tested up to: 3.8
 */
 
 /*
