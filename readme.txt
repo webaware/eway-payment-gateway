@@ -8,7 +8,7 @@ Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, a
 Requires at least: 4.9
 Tested up to: 5.3
 Requires PHP: 5.6
-Stable tag: 4.3.7
+Stable tag: 4.3.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -242,16 +242,17 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.7
+### 4.3.8
 
-marked as tested up to WooCommerce 3.8
+marked as tested up to WooCommerce 3.9; AWPCP: fixed customer details not being passed through to eWAY
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.7
+### 4.3.8
 
-Released 2019-10-24
+Released 2019-12-27
 
-* tested: WooCommerce 3.8
+* fixed: AWPCP customer details not being passed through to eWAY
+* tested: WooCommerce 3.9

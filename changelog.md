@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 4.3.8, soon...
+### 4.3.8, 2019-12-27
 
 * fixed: AWPCP customer details not being passed through to eWAY
 * tested: WooCommerce 3.9
