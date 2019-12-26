@@ -9,12 +9,12 @@
     "not dead"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
     "grunt": "^1.0.4",
     "grunt-babel": "^8.0.0",
-    "grunt-contrib-uglify-es": "^3.3.0",
+    "grunt-contrib-uglify": "^4.0.1",
     "grunt-eslint": "^22.0.0",
     "grunt-shell": "^3.0.1"
   },
