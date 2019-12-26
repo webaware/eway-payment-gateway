@@ -465,8 +465,9 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	protected static function getContactNames($ad, $user, $cardHoldersName) {
 		$names = ['', ''];
 
-		if ($ad->ad_contact_name) {
-			$names = self::splitCompoundName($ad->ad_contact_name);
+		$ad_contact_name = awpcp_listing_renderer()->get_contact_name($ad);
+		if ($ad_contact_name) {
+			$names = self::splitCompoundName($ad_contact_name);
 		}
 		elseif ($user) {
 			$names = [$user->first_name, $user->last_name];
@@ -512,17 +513,21 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		$eway->countryName			= '';
 		$eway->postcode				= '';
 
-		if ($ad->ad_contact_email) {
-			$eway->emailAddress		= $ad->ad_contact_email;
+		$renderer = awpcp_listing_renderer();
+		$ad_contact_email	= $renderer->get_contact_email($ad);
+		$ad_region			= $renderer->get_first_region($ad);
+
+		if ($ad_contact_email) {
+			$eway->emailAddress		= $ad_contact_email;
 		}
 		elseif ($user) {
 			$eway->emailAddress		= $user->user_email;
 		}
 
-		if ($ad->ad_city || $ad->ad_state || $ad->ad_country) {
-			$eway->suburb			= $ad->ad_city;
-			$eway->state			= $ad->ad_state;
-			$eway->countryName		= $ad->ad_country;
+		if (!empty($ad_region['city']) || !empty($ad_region['state']) || !empty($ad_region['country'])) {
+			$eway->suburb			= $ad_region['city'];
+			$eway->state			= $ad_region['state'];
+			$eway->countryName		= $ad_region['country'];
 		}
 		elseif (method_exists('AWPCP_Ad', 'get_ad_regions')) {
 			$regions = \AWPCP_Ad::get_ad_regions($ad->ad_id);
@@ -838,7 +843,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	*/
 	protected static function getAdByID($ad_id) {
 		try {
-			$ad = awpcp_listings_collection()->get($adid);
+			$ad = awpcp_listings_collection()->get($ad_id);
 		} catch (\AWPCP_Exception $e) {
 			$ad = null;
 		}
