@@ -2,14 +2,18 @@
 
 ## Changelog
 
+### 4.3.9, 2020-03-10
+
+* changed: marked as tested up to WooCommerce 4.0
+
 ### 4.3.8, 2019-12-27
 
 * fixed: AWPCP customer details not being passed through to eWAY
-* tested: WooCommerce 3.9
+* changed: marked as tested up to WooCommerce 3.9
 
 ### 4.3.7, 2019-10-24
 
-* tested: WooCommerce 3.8
+* changed: marked as tested up to WooCommerce 3.8
 
 ### 4.3.6, 2019-09-23
 
@@ -17,7 +21,7 @@
 
 ### 4.3.5, 2019-08-10
 
-* tested: WooCommerce 3.7
+* changed: marked as tested up to WooCommerce 3.7
 
 ### 4.3.4, 2019-07-24
 
@@ -30,7 +34,7 @@
 ### 4.3.2, 2019-04-18
 
 * changed: requires minimum WooCommerce version 2.6 (recommend version 3.5 or greater)
-* tested: WooCommerce 3.6
+* changed: marked as tested up to WooCommerce 3.6
 
 ### 4.3.1, 2018-11-22
 
