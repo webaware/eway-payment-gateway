@@ -5,17 +5,6 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-// special test customer ID for sandbox
-const EWAY_PAYMENTS_TEST_CUSTOMER		= '87654321';
-
-// prerequisites
-const MIN_VERSION_WOOCOMMERCE	= '2.6';
-
-/**
-* custom exceptons
-*/
-class EwayPaymentsException extends \Exception {}
-
 /**
 * load template from theme or plugin
 * @param string $template name of template file
