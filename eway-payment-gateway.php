@@ -40,6 +40,7 @@ define('EWAY_PAYMENTS_MIN_PHP', '5.6');
 define('EWAY_PAYMENTS_VERSION', '4.3.8');
 
 require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/functions-global.php';
+require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.Requires.php';
 
 if (version_compare(PHP_VERSION, EWAY_PAYMENTS_MIN_PHP, '<')) {
 	add_action('admin_notices', 'eway_payment_gateway_fail_php_version');

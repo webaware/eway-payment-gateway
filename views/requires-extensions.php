@@ -4,11 +4,9 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
-<div class="notice notice-error">
-	<p><?php esc_html_e('eWAY Payment Gateway requires these missing PHP extensions. Please contact your website host to have these extensions installed.', 'eway-payment-gateway'); ?></p>
-	<ul style="padding-left: 2em">
-		<?php foreach ($missing as $ext): ?>
-		<li style="list-style-type:disc"><?= esc_html($ext); ?></li>
-		<?php endforeach; ?>
-	</ul>
-</div>
+<p><?php esc_html_e('Requires these missing PHP extensions. Please contact your website host to have these extensions installed.', 'eway-payment-gateway'); ?></p>
+<ul style="list-style-type:circle;padding-left: 1em;margin-left:0">
+	<?php foreach ($missing as $ext): ?>
+		<li><?= esc_html($ext); ?></li>
+	<?php endforeach; ?>
+</ul>

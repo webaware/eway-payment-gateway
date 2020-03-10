@@ -1,6 +1,8 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
+use \EwayPaymentGatewayRequires as Requires;
+
 if (!defined('ABSPATH')) {
 	exit;
 }
@@ -35,7 +37,11 @@ class Plugin {
 	public function pluginStart() {
 		add_action('init', 'eway_payment_gateway_load_text_domain');
 		add_filter('plugin_row_meta', [$this, 'addPluginDetailsLinks'], 10, 2);
-		add_action('admin_notices', [$this, 'checkPrerequisites']);
+
+		if (!$this->checkPrerequisites()) {
+			return;
+		}
+
 		add_action('wp_enqueue_scripts', [$this, 'registerScripts']);
 
 		// register integrations
@@ -49,18 +55,22 @@ class Plugin {
 	/**
 	* check for required PHP extensions, tell admin if any are missing
 	*/
-	public function checkPrerequisites() {
-		if (!eway_payment_gateway_can_show_admin_notices()) {
-			return;
-		}
-
+	protected function checkPrerequisites() {
 		// need these PHP extensions
 		$missing = array_filter(['json', 'libxml', 'pcre', 'SimpleXML', 'xmlwriter'], function($ext) {
 			return !extension_loaded($ext);
 		});
+
 		if (!empty($missing)) {
+			$requires = new Requires();
+			ob_start();
 			include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-extensions.php';
+			$requires->addNotice(ob_get_clean());
+
+			return false;
 		}
+
+		return true;
 	}
 
 	/**
@@ -105,8 +115,14 @@ class Plugin {
 			return;
 		}
 
+		$requires = new Requires();
+
 		if (version_compare(WC()->version, MIN_VERSION_WOOCOMMERCE, '<')) {
-			add_action('admin_notices', __NAMESPACE__ . '\\notice_woocommerce_version');
+			$requires->addNotice(
+				/* translators: %1$s: minimum required version number, %2$s: installed version number */
+				sprintf(esc_html__('Requires WooCommerce version %1$s or higher; your website has WooCommerce version %2$s', 'eway-payment-gateway'),
+				esc_html(MIN_VERSION_WOOCOMMERCE), esc_html(WC()->version))
+			);
 			return;
 		}
 
