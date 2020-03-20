@@ -50,6 +50,12 @@ class EwayPaymentGatewayRequires {
 	* show plugin page row with requires notices
 	*/
 	public static function showPluginRowNotices() {
+		global $wp_list_table;
+
+		if (empty($wp_list_table)) {
+			return;
+		}
+
 		$notices = self::$notices;
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/requires-plugin-notice.php';
 	}
