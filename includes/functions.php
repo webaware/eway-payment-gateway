@@ -99,23 +99,23 @@ function get_api_wrapper($creds, $capture, $useSandbox) {
 function get_customer_IP($isLiveSite) {
 	$ip = '';
 
-	if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+	if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
 		$ip = is_IP_address($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : '';
 	}
 
-	elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-		$proxies = preg_split('/[,:]/', $_SERVER['HTTP_X_FORWARDED_FOR']);
+	elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+		$proxies = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
 		$ip = trim(current($proxies));
 		$ip = is_IP_address($ip) ? $ip : '';
 	}
 
-	elseif (isset($_SERVER['REMOTE_ADDR'])) {
+	elseif (!empty($_SERVER['REMOTE_ADDR'])) {
 		$ip = is_IP_address($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
 	}
 
 	// if test mode and running on localhost, then kludge to an Aussie IP address
 	if ($ip === '127.0.0.1' && !$isLiveSite) {
-		$ip = '210.1.199.10';
+		$ip = '103.29.100.101';
 	}
 
 	// allow hookers to override for network-specific fixes
@@ -130,13 +130,8 @@ function get_customer_IP($isLiveSite) {
 * @return bool
 */
 function is_IP_address($maybeIP) {
-	if (function_exists('inet_pton')) {
-		// check for IPv4 and IPv6 addresses
-		return !!inet_pton($maybeIP);
-	}
-
-	// just check for IPv4 addresses
-	return !!ip2long($maybeIP);
+	// check for IPv4 and IPv6 addresses
+	return !!inet_pton($maybeIP);
 }
 
 /**
