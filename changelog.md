@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.3.10, 2020-05-05
+
+* changed: marked as tested up to WooCommerce 4.1
+
 ### 4.3.9, 2020-03-10
 
 * changed: marked as tested up to WooCommerce 4.0
