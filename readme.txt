@@ -242,16 +242,16 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.10
+### 4.3.11
 
-marked as tested up to WooCommerce 4.1
+marked as tested up to WooCommerce 4.2
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.10
+### 4.3.11
 
-Released 2020-05-05
+Released 2020-06-03
 
-* changed: marked as tested up to WooCommerce 4.1
+* changed: marked as tested up to WooCommerce 4.2
