@@ -14,7 +14,7 @@ function eway_payment_gateway_fail_php_version() {
 	$requires = new EwayPaymentGatewayRequires();
 
 	$requires->addNotice(
-		min_age_woo_external_link(
+		eway_payment_gateway_external_link(
 			/* translators: %1$s: minimum required version number, %2$s: installed version number */
 			sprintf(esc_html__('It requires PHP %1$s or higher; your website has PHP %2$s which is {{a}}old, obsolete, and unsupported{{/a}}.', 'eway-payment-gateway'),
 				esc_html(EWAY_PAYMENTS_MIN_PHP), esc_html(PHP_VERSION)),
