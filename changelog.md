@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.3.15, 2021-02-12
+
+* changed: marked as tested up to WooCommerce 5.0
+
 ### 4.3.14, 2020-08-26
 
 * fixed: crash on plugins page in admin when running with PHP < version 5.6

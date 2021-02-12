@@ -6,9 +6,9 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.9
-Tested up to: 5.5
+Tested up to: 5.6
 Requires PHP: 5.6
-Stable tag: 4.3.14
+Stable tag: 4.3.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -242,22 +242,16 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.14
+### 4.3.15
 
-fixes crash on plugins page in admin when running with PHP < version 5.6
+marked as tested up to WooCommerce 5.0
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.14
+### 4.3.15
 
-Released 2020-08-26
+Released 2021-02-12
 
-* fixed: crash on plugins page in admin when running with PHP < version 5.6
-
-### 4.3.13
-
-Released 2020-08-12
-
-* changed: marked as tested up to WooCommerce 4.4
+* changed: marked as tested up to WooCommerce 5.0
