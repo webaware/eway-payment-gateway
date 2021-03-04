@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.3.16, soon...
+
+* changed: don't call `libxml_disable_entity_loader()` in PHP 8.0 (now deprecated)
+
 ### 4.3.15, 2021-02-12
 
 * changed: marked as tested up to WooCommerce 5.0
