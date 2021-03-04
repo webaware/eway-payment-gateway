@@ -242,16 +242,17 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.15
+### 4.3.16
 
-marked as tested up to WooCommerce 5.0
+doesn't call `libxml_disable_entity_loader()` in PHP 8.0; tested up to WooCommerce 5.1
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.15
+### 4.3.16
 
-Released 2021-02-12
+Released 2021-03-04
 
-* changed: marked as tested up to WooCommerce 5.0
+* changed: don't call `libxml_disable_entity_loader()` in PHP 8.0 (now deprecated)
+* changed: marked as tested up to WooCommerce 5.1
