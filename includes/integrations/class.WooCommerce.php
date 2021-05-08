@@ -153,9 +153,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 
 			'eway_password' => [
 							'title' 		=> _x('API password', 'settings field', 'eway-payment-gateway'),
-							'type' 			=> 'text',
+							'type' 			=> 'password',
 							'custom_attributes'	=> [
-														'autocorrect'		=> 'off',
+														'autocorrect'		=> 'new-password',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
 												],
@@ -201,9 +201,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 
 			'eway_sandbox_password' => [
 							'title' 		=> _x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
-							'type' 			=> 'text',
+							'type' 			=> 'password',
 							'custom_attributes'	=> [
-														'autocorrect'		=> 'off',
+														'autocorrect'		=> 'new-password',
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
 												],

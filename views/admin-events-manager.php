@@ -60,8 +60,8 @@ if (!defined('ABSPATH')) {
 			<label for="em_eway_password"><?= esc_html_x('API password', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
 		<td>
-			<input type="text" name="em_eway_password" id="em_eway_password" value="<?= esc_attr(get_option('em_eway_password')); ?>"
-				autocorrect="off" autocapitalize="off" spellcheck="false" />
+			<input type="password" name="em_eway_password" id="em_eway_password" value="<?= esc_attr(get_option('em_eway_password')); ?>"
+				autocorrect="new-password" autocapitalize="off" spellcheck="false" />
 		</td>
 	</tr>
 
@@ -100,8 +100,8 @@ if (!defined('ABSPATH')) {
 			<label for="em_eway_sandbox_password"><?= esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
 		<td>
-			<input type="text" name="em_eway_sandbox_password" id="em_eway_sandbox_password" value="<?= esc_attr(get_option('em_eway_sandbox_password')); ?>"
-				autocorrect="off" autocapitalize="off" spellcheck="false" />
+			<input type="password" name="em_eway_sandbox_password" id="em_eway_sandbox_password" value="<?= esc_attr(get_option('em_eway_sandbox_password')); ?>"
+				autocorrect="new-password" autocapitalize="off" spellcheck="false" />
 		</td>
 	</tr>
 

@@ -4,6 +4,7 @@
 
 ### 4.4.0, soon...
 
+* changed: use masked password fields for API passwords in settings
 * changed: marked as tested up to WooCommerce 5.3
 
 ### 4.3.16, 2021-03-04

@@ -31,8 +31,8 @@ $eway_logging	= get_option('eway_logging', 'off');
 			<label for="eway_password"><?= esc_html_x('API password', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
 		<td>
-			<input type="text" value="<?= esc_attr(get_option('eway_password')); ?>" name="eway_password" id="eway_password"
-				class="regular-text" autocorrect="off" autocapitalize="off" spellcheck="false" />
+			<input type="password" value="<?= esc_attr(get_option('eway_password')); ?>" name="eway_password" id="eway_password"
+				class="regular-text" autocorrect="new-password" autocapitalize="off" spellcheck="false" />
 		</td>
 	</tr>
 
@@ -83,8 +83,8 @@ $eway_logging	= get_option('eway_logging', 'off');
 			<label for="eway_sandbox_password"><?= esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'); ?></label>
 		</th>
 		<td>
-			<input type="text" value="<?= esc_attr(get_option('eway_sandbox_password')); ?>" name="eway_sandbox_password" id="eway_sandbox_password"
-				class="regular-text" autocorrect="off" autocapitalize="off" spellcheck="false" />
+			<input type="password" value="<?= esc_attr(get_option('eway_sandbox_password')); ?>" name="eway_sandbox_password" id="eway_sandbox_password"
+				class="regular-text" autocorrect="new-password" autocapitalize="off" spellcheck="false" />
 		</td>
 	</tr>
 
