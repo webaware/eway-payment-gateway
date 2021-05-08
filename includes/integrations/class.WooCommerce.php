@@ -228,7 +228,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
 							'options'		=> [
-								// for backwards-compatibility, Capture: "not stored", Authorize: "stored / Pre-Auth"
+								// for backwards-compatibility, Capture - "not stored", Authorize - "stored / Pre-Auth"
 								'no' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
 								'yes'	 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
 							],

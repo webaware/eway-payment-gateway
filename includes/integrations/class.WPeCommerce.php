@@ -239,7 +239,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 			return;
 		}
 
-	 	exit();
+		exit();
 	}
 
 	/**

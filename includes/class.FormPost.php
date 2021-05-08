@@ -68,12 +68,12 @@ class FormPost {
 		return strtr($value, [' ' => '', '-' => '']);
 	}
 
-    /**
-    * verify credit card details
-    * @param array $ map of field names to values, using standardised field names
-    * @return array an array of error messages
-    */
-    public function verifyCardDetails($fields) {
+	/**
+	* verify credit card details
+	* @param array $ map of field names to values, using standardised field names
+	* @return array an array of error messages
+	*/
+	public function verifyCardDetails($fields) {
 		$errors = [];
 		$expiryError = false;
 
