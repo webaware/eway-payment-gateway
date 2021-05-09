@@ -48,7 +48,7 @@ class Plugin {
 		add_filter('wpsc_merchants_modules', [$this, 'registerWPeCommerce']);
 		add_action('AHEE__EE_System__load_espresso_addons', [$this, 'registerEventEspresso']);
 		add_action('plugins_loaded', [$this, 'maybeRegisterWooCommerce']);
-		add_action('init', [$this, 'maybeRegisterAWPCP']);
+		add_action('plugins_loaded', [$this, 'maybeRegisterAWPCP']);
 		add_action('init', [$this, 'maybeRegisterEventsManager']);
 	}
 

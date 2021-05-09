@@ -70,36 +70,27 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	* @param AWPCP_SettingsManager $settings
 	*/
 	public static function awpcpRegisterSettings($settings) {
+		if (!method_exists($settings, 'add_settings_subgroup')) {
+			return;
+		}
+
 		// create a new section
-		if (method_exists($settings, 'add_settings_subgroup')) {
-			// since AWPC 4.0.0
-			$subgroup = 'eway-settings';
-			$section = 'eway';
+		$subgroup = 'eway-settings';
+		$section = 'eway';
 
-			$settings->add_settings_subgroup([
-				'id'       => $subgroup,
-				'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
-				'priority' => 100,
-				'parent'   => 'payment-settings',
-			]);
+		$settings->add_settings_subgroup([
+			'id'       => $subgroup,
+			'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
+			'priority' => 100,
+			'parent'   => 'payment-settings',
+		]);
 
-			$settings->add_settings_section([
-				'id'       => 'eway',
-				'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
-				'priority' => 10,
-				'subgroup' => $subgroup,
-			]);
-		}
-		else {
-			// pre AWPCP 4.0.0
-			$section = $settings->add_section(
-				'payment-settings',
-				esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
-				'eway',
-				100,
-				[$settings, 'section']
-			);
-		}
+		$settings->add_settings_section([
+			'id'       => 'eway',
+			'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
+			'priority' => 10,
+			'subgroup' => $subgroup,
+		]);
 
 		$settings->add_setting($section, 'activateeway',
 						esc_html_x('Activate eWAY?', 'settings field', 'eway-payment-gateway'),

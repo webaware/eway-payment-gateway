@@ -4,6 +4,7 @@
 
 ### 4.4.0, soon...
 
+* fixed: settings no longer displaying on Another WordPress Classifieds Plugin
 * changed: use masked password fields for API passwords in settings
 * changed: marked as tested up to WooCommerce 5.3
 
