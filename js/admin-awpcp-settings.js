@@ -4,7 +4,7 @@
  * ask browsers to stop with the autocorrupt already
  */
 (function () {
-  var fields = document.querySelectorAll(".eway-no-autocorrupt");
+  var fields = document.querySelectorAll("input[type='text'],input[type='password'],textarea");
 
   for (var i = 0, len = fields.length; i < len; i++) {
     var field = fields[i];
