@@ -21,10 +21,8 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	public static function register_eway() {
 		add_filter('awpcp-register-payment-methods', [__CLASS__, 'awpcpRegisterPaymentMethods'], 20);
 		add_action('awpcp_register_settings', [__CLASS__, 'awpcpRegisterSettings']);
-		add_action('admin_print_styles-classified-admin_page_awpcp-admin-settings', [__CLASS__, 'settingsStyles']);
-
-		// pre AWPCP 4.0
-		add_action('admin_print_styles-classifieds_page_awpcp-admin-settings', [__CLASS__, 'settingsStyles']);
+		add_action('admin_print_styles-classified-ads_page_awpcp-admin-settings', [__CLASS__, 'settingsStyles']);
+		add_action('admin_print_footer_scripts-classified-ads_page_awpcp-admin-settings', [__CLASS__, 'settingsScripts']);
 	}
 
 	/**
@@ -50,9 +48,25 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	* customise styles for settings page
 	*/
 	public static function settingsStyles() {
+		if (empty($_GET['sg']) || $_GET['sg'] !== 'eway-settings') {
+			return;
+		}
 		echo '<style>';
 		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'css/admin-awpcp-settings.css');
 		echo '</style>';
+	}
+
+	/**
+	* load scripts for settings page
+	*/
+	public static function settingsScripts() {
+		if (empty($_GET['sg']) || $_GET['sg'] !== 'eway-settings') {
+			return;
+		}
+		$min = SCRIPT_DEBUG ? '' : '.min';
+		echo '<script>';
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-awpcp-settings$min.js");
+		echo '</script>';
 	}
 
 	/**
@@ -92,86 +106,140 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			'subgroup' => $subgroup,
 		]);
 
-		$settings->add_setting($section, 'activateeway',
-						esc_html_x('Activate eWAY?', 'settings field', 'eway-payment-gateway'),
-						'checkbox', 1,
-						esc_html_x('Activate eWAY?', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'activateeway',
+			'name'			=> esc_html_x('Activate eWAY?', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'checkbox',
+			'default'		=> 1,
+			'description'	=> esc_html_x('Activate eWAY?', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_api_key',
-						esc_html_x('API key', 'settings field', 'eway-payment-gateway'),
-						'textfield', '',
-						esc_html_x('Rapid API key from your live eWAY account', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_api_key',
+			'name'			=> esc_html_x('API key', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textfield',
+			'default'		=> '',
+			'description'	=> esc_html_x('Rapid API key from your live eWAY account', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_password',
-						esc_html_x('API password', 'settings field', 'eway-payment-gateway'),
-						'textfield', '',
-						esc_html_x('Rapid API password from your live eWAY account', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_password',
+			'name'			=> esc_html_x('API password', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'password',
+			'default'		=> '',
+			'description'	=> esc_html_x('Rapid API key from your live eWAY account', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_ecrypt_key',
-						esc_html_x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
-						'textarea', '',
-						esc_html_x('Client Side Encryption key from your live eWAY account', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_ecrypt_key',
+			'name'			=> esc_html_x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textarea',
+			'default'		=> '',
+			'description'	=> esc_html_x('Client Side Encryption key from your live eWAY account', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_customerid',
-						esc_html_x('eWAY customer ID', 'settings field', 'eway-payment-gateway'),
-						'textfield', '',
-						esc_html__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_customerid',
+			'name'			=> esc_html_x('eWAY customer ID', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textfield',
+			'default'		=> '',
+			'description'	=> esc_html__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_sandbox_api_key',
-						esc_html_x('Sandbox API key', 'settings field', 'eway-payment-gateway'),
-						'textfield', '',
-						esc_html_x('Rapid API key from your sandbox account', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_sandbox_api_key',
+			'name'			=> esc_html_x('Sandbox API key', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textfield',
+			'default'		=> '',
+			'description'	=> esc_html_x('Rapid API key from your sandbox account', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_sandbox_password',
-						esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
-						'textfield', '',
-						esc_html_x('Rapid API password from your sandbox account', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_sandbox_password',
+			'name'			=> esc_html_x('Sandbox API password', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'password',
+			'default'		=> '',
+			'description'	=> esc_html_x('Rapid API password from your sandbox account', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_sandbox_ecrypt_key',
-						esc_html_x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
-						'textarea', '',
-						esc_html_x('Client Side Encryption key from your sandbox account', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_sandbox_ecrypt_key',
+			'name'			=> esc_html_x('Sandbox Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textarea',
+			'default'		=> '',
+			'description'	=> esc_html_x('Client Side Encryption key from your sandbox account', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$methods = [
-			'0' 		=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
-			'1'		 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
-		];
-		$settings->add_setting($section, 'eway_stored',
-						esc_html_x('Payment Method', 'settings field', 'eway-payment-gateway'),
-						'select', 0,
-						esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway')
-						. '<br/>'
-						. esc_html__('Authorize can be useful when ads must be approved by an admin, allowing you to reject payments for rejected ads.', 'eway-payment-gateway'),
-						['options' => $methods]);
+		$descripton = sprintf('%s<br />%s',
+			esc_html__("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway'),
+			esc_html__('Authorize can be useful when ads must be approved by an admin, allowing you to reject payments for rejected ads.', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_stored',
+			'name'			=> esc_html_x('Payment Method', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'select',
+			'default'		=> '0',
+			'description'	=> $descripton,
+			'options'		=> [
+				'0' 	=> esc_html_x('Capture', 'payment method', 'eway-payment-gateway'),
+				'1'	 	=> esc_html_x('Authorize', 'payment method', 'eway-payment-gateway'),
+			],
+		]);
 
-		$log_options = [
-			'off' 		=> esc_html_x('Off', 'logging settings', 'eway-payment-gateway'),
-			'info'	 	=> esc_html_x('All messages', 'logging settings', 'eway-payment-gateway'),
-			'error' 	=> esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'),
-		];
-		$log_descripton = sprintf('%s<br />%s<br />%s',
-							esc_html__('Enable logging to assist trouble shooting', 'eway-payment-gateway'),
-							esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
-							Logging::getLogFolderRelative());
-		$settings->add_setting($section, 'eway_logging',
-						esc_html_x('Logging', 'settings field', 'eway-payment-gateway'),
-						'select', 'off', $log_descripton, ['options' => $log_options]);
+		$descripton = sprintf('%s<br />%s<br />%s',
+			esc_html__('Enable logging to assist trouble shooting;', 'eway-payment-gateway'),
+			esc_html__('the log file can be found in this folder:', 'eway-payment-gateway'),
+			Logging::getLogFolderRelative());
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_logging',
+			'name'			=> esc_html_x('Logging', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'select',
+			'default'		=> 'off',
+			'description'	=> $descripton,
+			'options'		=> [
+				'off' 	=> esc_html_x('Off', 'logging settings', 'eway-payment-gateway'),
+				'info'	=> esc_html_x('All messages', 'logging settings', 'eway-payment-gateway'),
+				'error' => esc_html_x('Errors only', 'logging settings', 'eway-payment-gateway'),
+			],
+		]);
 
-		$settings->add_setting($section, 'eway_card_message',
-						esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'),
-						'textfield', '',
-						esc_html_x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_card_message',
+			'name'			=> esc_html_x('Credit card message', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textfield',
+			'default'		=> '',
+			'description'	=> esc_html_x('Message to show above credit card fields, e.g. "Visa and Mastercard only"', 'settings label', 'eway-payment-gateway'),
+		]);
 
-		$settings->add_setting($section, 'eway_site_seal_code',
-						esc_html_x('eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
-						'textarea', '',
-						sprintf('<a href="https://www.eway.com.au/features/tools-site-seal" rel="noopener" target="_blank">%s</a>',
-							esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')));
+		$description = sprintf('<a href="https://www.eway.com.au/features/tools/tools-site-seal/" rel="noopener" target="_blank">%s</a>',
+			esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_site_seal_code',
+			'name'			=> esc_html_x('eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textarea',
+			'default'		=> '',
+			'description'	=> $description,
+		]);
 
-		$settings->add_setting($section, 'eway_icon',
-						esc_html_x('Payment Method Icon', 'settings field', 'eway-payment-gateway'),
-						'textfield', '',
-						esc_html_x('URL to a custom icon to show for the payment method.', 'settings label', 'eway-payment-gateway'));
+		$settings->add_setting([
+			'section'		=> $section,
+			'id'			=> 'eway_icon',
+			'name'			=> esc_html_x('Payment Method Icon', 'settings field', 'eway-payment-gateway'),
+			'type'			=> 'textfield',
+			'default'		=> '',
+			'description'	=> esc_html_x('URL to a custom icon to show for the payment method.', 'settings label', 'eway-payment-gateway'),
+		]);
 	}
 
 	/**
