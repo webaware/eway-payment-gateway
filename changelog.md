@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 4.4.0, soon...
+### 4.4.0, 2021-05-10
 
 * fixed: settings no longer displaying on Another WordPress Classifieds Plugin
 * changed: use masked password fields for API passwords in settings

@@ -8,7 +8,7 @@ Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, a
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 4.3.16
+Stable tag: 4.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,11 +16,11 @@ Take credit card payments via eWAY in some popular WordPress plugins
 
 ## Description
 
-The eWAY Payment Gateway adds integrations for the [eWAY credit card payment gateway](https://eway.io/) through [Rapid API Direct Payments](https://eway.io/features/api-rapid-api), with legacy XML API support. These plugins are supported:
+The eWAY Payment Gateway adds integrations for the [eWAY credit card payment gateway](https://eway.io/) through [Rapid API Direct Payments](https://www.eway.com.au/features/api-rapid-api/), with legacy XML API support. These plugins are supported:
 
 * [WP eCommerce](https://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
 * [WooCommerce](https://wordpress.org/plugins/woocommerce/) shopping cart plugin
-* [Another WordPress Classifieds Plugin](https://wordpress.org/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
+* [WordPress Classifieds Plugin](https://wordpress.org/plugins/another-wordpress-classifieds-plugin/) classified ads plugin
 * [Event Espresso 4](https://wordpress.org/plugins/event-espresso-decaf/)
 * [Events Manager Pro](https://eventsmanagerpro.com/) event bookings plugin
 
@@ -40,7 +40,7 @@ Looking for a Gravity Forms integration? Try [Gravity Forms eWAY](https://gfeway
 * you need to install one of the ecommerce plugins listed above
 * you need an SSL/TLS certificate for your hosting account
 * you need an account with eWAY Australia
-* this plugin uses eWAY's [Rapid API Direct Payments](https://eway.io/features/api-rapid-api), and does not support eWAY's Responsive Shared Page
+* this plugin uses eWAY's [Rapid API Direct Payments](https://www.eway.com.au/features/api-rapid-api/), and does not support eWAY's Responsive Shared Page
 
 ### Translations
 
@@ -50,14 +50,10 @@ Many thanks to the generous efforts of our translators:
 
 If you'd like to help out by translating this plugin, please [sign up for an account and dig in](https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway).
 
-### Contributions
-
-* [Fork me on GitHub](https://github.com/webaware/eway-payment-gateway/)
-
 ### Sponsorships
 
-* Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
-* Events Manager Pro integration generously sponsored by [Michael Major Media](http://michaelmajor.com.au/)
+* Another WordPress Classifieds Plugin integration generously sponsored by [Michael Major Media](https://michaelmajor.com.au/)
+* Events Manager Pro integration generously sponsored by [Michael Major Media](https://michaelmajor.com.au/)
 * Event Espresso 4 integration generously sponsored by [Rural Aid](https://www.ruralaid.org.au/)
 
 Thanks for sponsoring new features for eWAY Payment Gateway!
@@ -111,8 +107,8 @@ Information gathered for processing a credit card transaction is transmitted to 
 
 You should always test your payments first in the eWAY sandbox. You will need to sign up for a sandbox account, and copy your Rapid API key/password and Client Side Encryption key from the sandbox MYeWAY. When you go to pay, only use dummy card numbers like 4444333322221111. This allows you to make as many test purchases as you like, without billing a real credit card.
 
-* [What is the sandbox and how do I get it?](https://go.eway.io/s/article/ka828000000L1ZTAA0/What-is-the-Sandbox-and-how-do-I-get-it)
-* [Test Credit Card Numbers](https://go.eway.io/s/article/ka828000000L1PdAAK/Test-Credit-Card-Numbers)
+* [What is the sandbox and how do I get it?](https://go.eway.io/s/article/What-is-the-Sandbox-and-how-do-I-get-it)
+* [Test Credit Card Numbers](https://go.eway.io/s/article/Test-Credit-Card-Numbers)
 
 ### What is eWAY?
 
@@ -132,7 +128,7 @@ Yes. This plugin uses the Direction Connection method to process transactions, s
 
 Capture charges the customer's credit card immediately. This is the default payment method, and is the method most websites will use for credit card payments.
 
-Authorize checks to see that the transaction would be approved, but does not process it. eWAY calls this method [PreAuth](https://eway.io/features/payments-pre-auth) (or Stored Payments in the old XML API). Once the transaction has been authorized, you can complete it manually in your MYeWAY console. You cannot complete PreAuth transactions from WordPress.
+Authorize checks to see that the transaction would be approved, but does not process it. eWAY calls this method [PreAuth](https://www.eway.com.au/features/payments/payments-pre-auth/) (or Stored Payments in the old XML API). Once the transaction has been authorized, you can complete it manually in your MYeWAY console. You cannot complete PreAuth transactions from WordPress.
 
 You need to add your eWAY API key and password to see PreAuth transactions in the sandbox, so that the Rapid API is used. The old Stored Payments XML API does not have a sandbox.
 
@@ -158,7 +154,7 @@ Settings > Sandbox > Direction Connection > PCI
 
 ### What is Beagle Lite?
 
-[Beagle Lite](https://eway.io/features/antifraud-beagle-lite) is a service from eWAY that provides fraud protection for your transactions. It uses information about the purchaser to suggest whether there is a risk of fraud. Configure Beagle Lite rules in your MYeWAY console.
+[Beagle Lite](https://www.eway.com.au/features/fraud-protection/fraud-lite/) is a service from eWAY that provides fraud protection for your transactions. It uses information about the purchaser to suggest whether there is a risk of fraud. Configure Beagle Lite rules in your MYeWAY console.
 
 **NB**: Beagle Lite fraud detection requires an address for each transaction. Be sure to add an Address field to your forms, and make it a required field. The minimum address part required is the Country, so you can just enable that subfield if you don't need a full address.
 
@@ -242,17 +238,18 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.3.16
+### 4.4.0
 
-doesn't call `libxml_disable_entity_loader()` in PHP 8.0; tested up to WooCommerce 5.1
+Another WordPress Classifieds Plugin settings fixed; use masked password fields for API passwords in settings; tested to WooCommerce 5.3
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.3.16
+### 4.4.0
 
-Released 2021-03-04
+Released 2021-05-10
 
-* changed: don't call `libxml_disable_entity_loader()` in PHP 8.0 (now deprecated)
-* changed: marked as tested up to WooCommerce 5.1
+* fixed: settings no longer displaying on Another WordPress Classifieds Plugin
+* changed: use masked password fields for API passwords in settings
+* changed: marked as tested up to WooCommerce 5.3
