@@ -720,4 +720,37 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		}
 	}
 
+	/**
+	 * Get the settings keys required for setup during onboarding.
+	 *
+	 * @return array
+	 */
+	public function get_required_settings_keys() {
+		return array(
+			'eway_api_key',
+			'eway_password',
+		);
+	}
+
+	/**
+	 * Get help text to display during onboarding setup.
+	 *
+	 * @return string
+	 */
+	public function get_setup_help_text() {
+		return sprintf(
+			__( 'Your API details can be obtained from your <a href="%s" target="_blank">eWAY account</a>.', 'eway-payment-gateway' ),
+			'https://www.eway.com.au/',
+		);
+	}
+
+	/**
+	 * Determine if the gateway still requires setup.
+	 *
+	 * @return bool
+	 */
+	public function needs_setup() {
+		return ! $this->get_option( 'eway_api_key' ) || ! $this->get_option( 'eway_password' );
+	}
+
 }
