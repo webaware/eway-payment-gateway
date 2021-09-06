@@ -6,7 +6,7 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, events manager, awpcp
 Requires at least: 4.9
-Tested up to: 5.7
+Tested up to: 5.8
 Requires PHP: 5.6
 Stable tag: 4.4.0
 License: GPLv2 or later
@@ -131,6 +131,8 @@ Capture charges the customer's credit card immediately. This is the default paym
 Authorize checks to see that the transaction would be approved, but does not process it. eWAY calls this method [PreAuth](https://www.eway.com.au/features/payments/payments-pre-auth/) (or Stored Payments in the old XML API). Once the transaction has been authorized, you can complete it manually in your MYeWAY console. You cannot complete PreAuth transactions from WordPress.
 
 You need to add your eWAY API key and password to see PreAuth transactions in the sandbox, so that the Rapid API is used. The old Stored Payments XML API does not have a sandbox.
+
+**NB: PreAuth is currently only available for Australian, Singapore, Malaysian, & Hong Kong merchants. Do not select Authorize if you are a New Zealand merchant!**
 
 ### Do I need to set the Client-Side Encryption Key?
 
