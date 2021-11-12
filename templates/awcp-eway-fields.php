@@ -66,7 +66,7 @@ if (!defined('ABSPATH')) {
 			<?= wp_kses_post(get_awpcp_option('eway_site_seal_code')); ?>
 		<?php else: ?>
 		<a href="https://www.eway.com.au/" rel="noopener" target="_blank">
-			<img src="<?= esc_url(plugins_url('static/images/eway-siteseal-tagline.png', EWAY_PAYMENTS_PLUGIN_FILE)); ?>" />
+			<img src="<?= esc_url(plugins_url('static/images/eway-small.svg', EWAY_PAYMENTS_PLUGIN_FILE)); ?>" />
 		</a>
 		<?php endif; ?>
 	</p>

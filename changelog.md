@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 4.5.0, soon...
+
+* changed: update eWAY to Eway and replaced logo images for new Eway branding
+
 ### 4.4.0, 2021-05-10
 
 * fixed: settings no longer displaying on Another WordPress Classifieds Plugin

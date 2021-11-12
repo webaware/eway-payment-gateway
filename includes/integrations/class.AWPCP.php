@@ -33,7 +33,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 		$icon = get_awpcp_option('eway_icon');
 		if (empty($icon)) {
-			$icon = plugins_url('static/images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
+			$icon = plugins_url('static/images/eway-small.svg', EWAY_PAYMENTS_PLUGIN_FILE);
 		}
 
 		parent::__construct(
