@@ -39,7 +39,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		// NB: no parent constructor (yet!)
 
 		$this->id						= 'eway_payments';
-		$this->icon						= apply_filters('woocommerce_eway_icon', plugins_url('images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE));
+		$this->icon						= apply_filters('woocommerce_eway_icon', plugins_url('static/images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE));
 		$this->method_title				= _x('eWAY', 'WooCommerce payment method title', 'eway-payment-gateway');
 		$this->method_description		= __('Take payments online with eWAY credit card payments.', 'eway-payment-gateway');
 		$this->admin_page_heading 		= _x('eWAY payment gateway', 'WooCommerce admin page heading', 'eway-payment-gateway');
@@ -328,7 +328,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		echo '<script>';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-woocommerce-settings$min.js");
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "static/js/admin-woocommerce-settings$min.js");
 		echo '</script>';
 	}
 

@@ -88,7 +88,7 @@ class MethodEventsManager extends \EM_Gateway {
 		}
 
 		echo '<style>';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'css/admin-events-manager-settings.css');
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'static/css/admin-events-manager-settings.css');
 		echo '</style>';
 	}
 
@@ -99,7 +99,7 @@ class MethodEventsManager extends \EM_Gateway {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		echo '<script>';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-events-manager-settings$min.js");
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "static/js/admin-events-manager-settings$min.js");
 		echo '</script>';
 	}
 

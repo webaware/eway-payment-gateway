@@ -27,7 +27,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		$gateways[] = [
 			'name'						=> _x('eWAY payment gateway', 'WP eCommerce payment method name', 'eway-payment-gateway'),
 			'api_version'				=> 2.0,
-			'image'						=> plugins_url('images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE),
+			'image'						=> plugins_url('static/images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE),
 			'internalname'				=> self::WPSC_GATEWAY_NAME,
 			'class_name'				=> __CLASS__,
 			'has_recurring_billing'		=> false,
@@ -291,7 +291,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		echo '<script>';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-wpsc-settings$min.js");
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "static/js/admin-wpsc-settings$min.js");
 		echo '</script>';
 	}
 

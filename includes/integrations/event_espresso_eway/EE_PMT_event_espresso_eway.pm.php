@@ -161,7 +161,7 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 		if ($plugin_page === 'espresso_payment_settings') {
 			$min = SCRIPT_DEBUG ? '' : '.min';
 			$ver = SCRIPT_DEBUG ? time() : EWAY_PAYMENTS_VERSION;
-			wp_enqueue_script('event_espresso_eway-settings', plugins_url("js/admin-event-espresso$min.js", EWAY_PAYMENTS_PLUGIN_FILE), [], $ver, true);
+			wp_enqueue_script('event_espresso_eway-settings', plugins_url("static/js/admin-event-espresso$min.js", EWAY_PAYMENTS_PLUGIN_FILE), [], $ver, true);
 		}
 	}
 

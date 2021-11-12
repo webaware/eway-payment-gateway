@@ -33,7 +33,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 		$icon = get_awpcp_option('eway_icon');
 		if (empty($icon)) {
-			$icon = plugins_url('images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
+			$icon = plugins_url('static/images/eway-siteseal.png', EWAY_PAYMENTS_PLUGIN_FILE);
 		}
 
 		parent::__construct(
@@ -52,7 +52,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			return;
 		}
 		echo '<style>';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'css/admin-awpcp-settings.css');
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'static/css/admin-awpcp-settings.css');
 		echo '</style>';
 	}
 
@@ -65,7 +65,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		}
 		$min = SCRIPT_DEBUG ? '' : '.min';
 		echo '<script>';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "js/admin-awpcp-settings$min.js");
+		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "static/js/admin-awpcp-settings$min.js");
 		echo '</script>';
 	}
 
@@ -292,7 +292,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			add_action('wp_footer', [$this, 'ecryptScript']);
 		}
 
-		wp_enqueue_script('eway-awpcp-checkout-form', plugins_url("js/awpcp-checkout-form$min.js", EWAY_PAYMENTS_PLUGIN_FILE), ['jquery'], $ver, true);
+		wp_enqueue_script('eway-awpcp-checkout-form', plugins_url("static/js/awpcp-checkout-form$min.js", EWAY_PAYMENTS_PLUGIN_FILE), ['jquery'], $ver, true);
 		wp_localize_script('eway-awpcp-checkout-form', 'eway_awpcp_checkout', [
 			'errors' => [
 				'card_number'	=> __('card number cannot be empty', 'eway-payment-gateway'),
