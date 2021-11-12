@@ -1,5 +1,5 @@
 # directories
-/es6				export-ignore
+/source				export-ignore
 
 # files
 /.eslintrc			export-ignore
