@@ -1,5 +1,5 @@
 <?php
-// show eWAY billing details
+// show Eway billing details
 
 if (!defined('ABSPATH')) {
 	exit;

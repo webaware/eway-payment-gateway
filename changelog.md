@@ -1,4 +1,4 @@
-# eWAY Payment Gateway
+# Eway Payment Gateway
 
 ## Changelog
 
@@ -43,7 +43,7 @@
 
 ### 4.3.8, 2019-12-27
 
-* fixed: AWPCP customer details not being passed through to eWAY
+* fixed: AWPCP customer details not being passed through to Eway
 * changed: marked as tested up to WooCommerce 3.9
 
 ### 4.3.7, 2019-10-24
@@ -95,7 +95,7 @@
 
 ### 4.2.0, 2018-02-02
 
-* changed: support reverse proxy headers for customer IP address sent to eWAY Beagle
+* changed: support reverse proxy headers for customer IP address sent to Eway Beagle
 * changed: load front end CSE script from file, don't inline in the checkout footer
 * added: filter hook `eway_payment_customer_ip` so that hookers can set the customer IP address
 
@@ -117,7 +117,7 @@
 
 ### 4.0.0, 2017-03-13
 
-* changed: uses eWAY Rapid API if API key and password are set
+* changed: uses Eway Rapid API if API key and password are set
 * changed: WooCommerce 3.0 compatibility, with fallback support to previous version
 * changed: AWPCP minimum version now 3.0
 * changed: sandbox always uses customer ID 87654321 if no Rapid API key/password are set for the sandbox
@@ -130,16 +130,16 @@
 
 ### 3.7.0, 2016-11-18
 
-* added: filters for changing the transaction ID sent to eWAY; use with caution!
+* added: filters for changing the transaction ID sent to Eway; use with caution!
 * added: filter `woocommerce_eway_email_show_trans_number` for disabling display of transaction ID on new order email
 * fixed: undefined index `eway_form` when saving another payment gateway's settings in WP eCommerce
 
 ### 3.6.0, 2016-06-15
 
 * fixed: WooCommerce 2.6 compatibility (deprecated notice on credit card form)
-* added: basic logging for eWAY transactions
+* added: basic logging for Eway transactions
 * changed: remove dependency on WP eCommerce deprecated function for checkout field list
-* changed: use `wp_remote_retrieve_body()` instead of array access to get eWAY response (WP4.6 compatibility)
+* changed: use `wp_remote_retrieve_body()` instead of array access to get Eway response (WP4.6 compatibility)
 * changed: improved accessibility for credit card forms, admin settings forms
 * changed: minimum required WordPress version is now 4.2
 
@@ -147,11 +147,11 @@
 
 * fixed: PHP warning when save Events Manager settings
 * fixed: pre-transaction validation for Events Manager was being skipped
-* added: eWAY site seal support for AWPCP
+* added: Eway site seal support for AWPCP
 * added: custom payment method icon setting for AWPCP
 * added: filter `awpcp_eway_checkout_message` for changing the message above the checkout form in AWPCP
-* added: filters for modifying the eWAY customer ID used in transaction
-* changed: try harder to fill eWAY transaction contact details in AWPCP
+* added: filters for modifying the Eway customer ID used in transaction
+* changed: try harder to fill Eway transaction contact details in AWPCP
 
 ### 3.4.0, 2015-06-21
 
@@ -165,7 +165,7 @@
 
 * fixed: force Events Manager bookings form AJAX url and form action to use HTTPS if forcing SSL for events with bookings
 * fixed: WooCommerce 2.0.20 settings backwards compatibility
-* added: eWAY site seal support for WooCommerce
+* added: Eway site seal support for WooCommerce
 * changed: updated screenshots
 
 ### 3.2.0, 2014-06-28
@@ -196,7 +196,7 @@
 ### 3.1.1, 2013-12-10
 
 * fixed: doco / settings page didn't explain that Beagle requires an Address field
-* changed: permit card numbers with spaces / dashes, but strip before submitting to eWAY
+* changed: permit card numbers with spaces / dashes, but strip before submitting to Eway
 * changed: move some WooCommerce setting descriptions into tips to reduce screen clutter in admin
 * added: HTML5 text field patterns for credit card number, CVV/CVN
 * added: filter `woocommerce_eway_icon` for changing the payment gateway icon
@@ -204,7 +204,7 @@
 ### 3.1.0, 2013-11-21
 
 * changed: support multiple bookings mode in Events Manager
-* changed: some links to eWAY website
+* changed: some links to Eway website
 * added: support for v3 of Another WordPress Classifieds Plugin
 * added: WooCommerce and WP eCommerce payment method logos
 
@@ -234,34 +234,34 @@
 ### 2.3.0, 2013-01-20
 
 * fixed: successful Direct transactions are now marked as Accepted Payment, not Order Received
-* added: eWAY credit card form fields now in template, can be customised by theme
-* added: can now use eWAY Stored Payments, e.g. for merchants who do drop-shipping
+* added: Eway credit card form fields now in template, can be customised by theme
+* added: can now use Eway Stored Payments, e.g. for merchants who do drop-shipping
 * changed: use WordPress function wp_remote_post() instead of directly calling curl functions
 
 ### 2.2.1, 2012-10-22
 
-* fixed: address on eWAY invoice was getting "0, " prepended when PHP < 5.3
+* fixed: address on Eway invoice was getting "0, " prepended when PHP < 5.3
 
 ### 2.2.0, 2012-09-25
 
-* fixed: country name used in eWAY address field, not country code
-* changed: remote SSL certificate is verified (i.e. eWAY's certificate)
-* added: prevent XML injection attacks when loading eWAY response (security hardening)
+* fixed: country name used in Eway address field, not country code
+* changed: remote SSL certificate is verified (i.e. Eway's certificate)
+* added: prevent XML injection attacks when loading Eway response (security hardening)
 * added: filter hooks for invoice description and reference
 * added: if customer name isn't mandatory and not given, will use cardholder's name
 
 ### 2.1.0, 2012-07-03
 
 * changed: CVN is now a required field, no option to omit; Australian banks are all moving to require CVN and some already do
-* added: customer name is now supported, if configured in WP eCommerce payment admin; card holder name is not seen in eWAY notification emails, so customer name is required for showing who made the purchase
+* added: customer name is now supported, if configured in WP eCommerce payment admin; card holder name is not seen in Eway notification emails, so customer name is required for showing who made the purchase
 
 ### 2.0.4, 2012-05-13
 
-* fixed: invoice number recorded in eWAY invoice reference field
+* fixed: invoice number recorded in Eway invoice reference field
 
 ### 2.0.3, 2012-05-05
 
-* fixed: optional fields for address, email are no longer required for eWAY payment
+* fixed: optional fields for address, email are no longer required for Eway payment
 
 ### 2.0.2, 2012-04-16
 

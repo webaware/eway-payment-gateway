@@ -3,7 +3,7 @@
 If you want to customise the checkout form, copy this file into your theme folder and edit it there.
 Take care to keep the field names the same, or your checkout form won't charge credit cards!
 
-* $th = 'th' or 'td' depending on Settings -> Store -> Payments -> eWAY
+* $th = 'th' or 'td' depending on Settings -> Store -> Payments -> Eway
 * $optMonths = options for drop-down list of months of the year
 * $optYears = options for drop-down list of current year + 15
 

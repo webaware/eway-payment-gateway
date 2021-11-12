@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="notice notice-error">
-	<p><?php esc_html_e('eWAY Payment Gateway is not fully active.', 'eway-payment-gateway'); ?></p>
+	<p><?php esc_html_e('Eway Payment Gateway is not fully active.', 'eway-payment-gateway'); ?></p>
 	<ul style="list-style:disc;padding-left: 2em">
 		<?php foreach ($notices as $notice): ?>
 			<li><?php echo $notice; ?></li>

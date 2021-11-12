@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* Class for dealing with an eWAY Rapid API payment
+* Class for dealing with an Eway Rapid API payment
 * @link https://eway.io/api-v3/
 */
 class EwayRapidAPI {
@@ -50,7 +50,7 @@ class EwayRapidAPI {
 	#region "connection specific members"
 
 	/**
-	* use eWAY sandbox
+	* use Eway sandbox
 	* @var boolean
 	*/
 	public $useSandbox;
@@ -375,9 +375,9 @@ class EwayRapidAPI {
 
 	/**
 	* populate members with defaults, and set account and environment information
-	* @param string $apiKey eWAY API key
-	* @param string $apiPassword eWAY API password
-	* @param boolean $useSandbox use eWAY sandbox
+	* @param string $apiKey Eway API key
+	* @param string $apiPassword Eway API password
+	* @param boolean $useSandbox use Eway sandbox
 	*/
 	public function __construct($apiKey, $apiPassword, $useSandbox = true) {
 		$this->apiKey			= $apiKey;
@@ -385,11 +385,11 @@ class EwayRapidAPI {
 		$this->useSandbox		= $useSandbox;
 		$this->capture			= true;
 		$this->sslVerifyPeer	= true;
-		$this->httpUserAgent	= 'eWAY Payment Gateway v' . EWAY_PAYMENTS_VERSION;
+		$this->httpUserAgent	= 'Eway Payment Gateway v' . EWAY_PAYMENTS_VERSION;
 	}
 
 	/**
-	* process a payment against eWAY; throws exception on error with error described in exception message.
+	* process a payment against Eway; throws exception on error with error described in exception message.
 	* @throws EwayPaymentsException
 	*/
 	public function processPayment() {
@@ -693,7 +693,7 @@ class EwayRapidAPI {
 		// failure to handle the http request
 		if (is_wp_error($response)) {
 			$msg = $response->get_error_message();
-			throw new EwayPaymentsException(sprintf(__('Error posting eWAY request: %s', 'eway-payment-gateway'), $msg));
+			throw new EwayPaymentsException(sprintf(__('Error posting Eway request: %s', 'eway-payment-gateway'), $msg));
 		}
 
 		// error code returned by request
@@ -702,11 +702,11 @@ class EwayRapidAPI {
 			$msg = wp_remote_retrieve_response_message($response);
 
 			if (empty($msg)) {
-				$msg = sprintf(__('Error posting eWAY request: %s', 'eway-payment-gateway'), $code);
+				$msg = sprintf(__('Error posting Eway request: %s', 'eway-payment-gateway'), $code);
 			}
 			else {
 				/* translators: 1. the error code; 2. the error message */
-				$msg = sprintf(__('Error posting eWAY request: %1$s, %2$s', 'eway-payment-gateway'), $code, $msg);
+				$msg = sprintf(__('Error posting Eway request: %1$s, %2$s', 'eway-payment-gateway'), $code, $msg);
 			}
 			throw new EwayPaymentsException($msg);
 		}

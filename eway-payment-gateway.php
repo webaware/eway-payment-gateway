@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: eWAY Payment Gateway
+Plugin Name: Eway Payment Gateway
 Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
-Description: Take credit card payments via eWAY in some popular WordPress plugins
+Description: Take credit card payments via Eway in some popular WordPress plugins
 Version: 4.5.0-dev
 Author: WebAware
 Author URI: https://shop.webaware.com.au/

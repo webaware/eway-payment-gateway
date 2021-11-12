@@ -6,14 +6,14 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* Class for dealing with an eWAY Rapid API response
+* Class for dealing with an Eway Rapid API response
 * @link https://eway.io/api-v3/
 */
 abstract class EwayResponse {
 
 	/**
-	* load eWAY response data as JSON string
-	* @param string $json eWAY response as a string (hopefully of JSON data)
+	* load Eway response data as JSON string
+	* @param string $json Eway response as a string (hopefully of JSON data)
 	* @throws EwayPaymentsException
 	*/
 	public function loadResponse($json) {
@@ -72,7 +72,7 @@ abstract class EwayResponse {
 	}
 
 	/**
-	* get formatted error message for front end, with eWAY errors or response codes appended
+	* get formatted error message for front end, with Eway errors or response codes appended
 	* @param string $error_msg
 	* @return string
 	*/

@@ -1,5 +1,5 @@
 
-// script supporting eWAY's Client Side Encryption
+// script supporting Eway's Client Side Encryption
 
 (function($) {
 

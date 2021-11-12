@@ -22,7 +22,7 @@
 	$("#mainform").on("change", "#woocommerce_eway_payments_eway_sandbox", setVisibility);
 
 	/**
-	* enable the eWAY site seal code input
+	* enable the Eway site seal code input
 	*/
 	$("#woocommerce_eway_payments_eway_site_seal").on("change", function() {
 		const codeRow = $("#woocommerce_eway_payments_eway_site_seal_code").closest("tr");

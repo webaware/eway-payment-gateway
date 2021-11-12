@@ -43,7 +43,7 @@ class Gateway extends \EE_Onsite_Gateway {
 			$eway		= \webaware\eway_payment_gateway\get_api_wrapper($creds, $capture, $useSandbox);
 
 			if (!$eway) {
-				throw new EwayPaymentsException(__('eWAY payments is not configured for payments yet.', 'eway-payment-gateway'));
+				throw new EwayPaymentsException(__('Eway payments is not configured for payments yet.', 'eway-payment-gateway'));
 			}
 
 			$gateway_formatter		= $this->_get_gateway_formatter();
@@ -52,7 +52,7 @@ class Gateway extends \EE_Onsite_Gateway {
 
 			$TXN_ID = $payment->TXN_ID();
 
-			// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+			// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 			$transactionID = apply_filters('event_espresso_eway_trans_number', $TXN_ID);
 
 			// wrap up the billing information cleanly

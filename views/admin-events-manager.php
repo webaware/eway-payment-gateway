@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
 </tbody>
 </table>
 
-<h3><?php printf(translate('%s Options', 'events-manager'), 'eWAY'); ?></h3>
+<h3><?php printf(translate('%s Options', 'events-manager'), 'Eway'); ?></h3>
 
 <table class="form-table">
 <tbody>

@@ -1,6 +1,6 @@
 <?php
 /**
-* Classes for dealing with eWAY stored payments
+* Classes for dealing with Eway stored payments
 * TODO: either merge into the other legacy API class; subclass the other legacy API class; remove (i.e. no legacy API)
 * NB: for testing, the only account number recognised is '87654321' and the only card number seen as valid is '4444333322221111'
 */
@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* eWAY stored payment request
+* Eway stored payment request
 */
 class EwayLegacyStoredAPI {
 
@@ -31,7 +31,7 @@ class EwayLegacyStoredAPI {
 
 	// payment specific members
 	/**
-	* account name / email address at eWAY
+	* account name / email address at Eway
 	* @var string max. 8 characters
 	*/
 	public $accountID;
@@ -146,9 +146,9 @@ class EwayLegacyStoredAPI {
 	public $cardVerificationNumber;
 
 	/**
-	* eWAYTrxnNumber - This value is returned to your website.
+	* ewayTrxnNumber - This value is returned to your website.
 	*
-	* You can pass a unique transaction number from your site. You can update and track the status of a transaction when eWAY
+	* You can pass a unique transaction number from your site. You can update and track the status of a transaction when Eway
 	* returns to your site.
 	*
 	* NB. This number is returned as 'ewayTrxnReference', member transactionReference of EwayResponseLegacyStored.
@@ -167,9 +167,9 @@ class EwayLegacyStoredAPI {
 
 	#region constants
 
-	/** host for the eWAY Real Time API in the developer sandbox environment */
+	/** host for the Eway Real Time API in the developer sandbox environment */
 	const REALTIME_API_SANDBOX = 'https://www.eway.com.au/gateway/xmltest/testpage.asp';
-	/** host for the eWAY Real Time API in the production environment */
+	/** host for the Eway Real Time API in the production environment */
 	const REALTIME_API_LIVE = 'https://www.eway.com.au/gateway/xmlstored.asp';
 
 	#endregion
@@ -177,7 +177,7 @@ class EwayLegacyStoredAPI {
 	/**
 	* populate members with defaults, and set account and environment information
 	*
-	* @param string $accountID eWAY account ID
+	* @param string $accountID Eway account ID
 	* @param boolean $isLiveSite running on the live (production) website
 	*/
 	public function __construct($accountID, $isLiveSite = false) {
@@ -187,7 +187,7 @@ class EwayLegacyStoredAPI {
 	}
 
 	/**
-	* process a payment against eWAY; throws exception on error with error described in exception message.
+	* process a payment against Eway; throws exception on error with error described in exception message.
 	*/
 	public function processPayment() {
 		$this->validate();
@@ -306,9 +306,9 @@ class EwayLegacyStoredAPI {
 	}
 
 	/**
-	* send the eWAY payment request and retrieve and parse the response
+	* send the Eway payment request and retrieve and parse the response
 	* @return EwayResponseLegacyStored
-	* @param string $xml eWAY payment request as an XML document, per eWAY specifications
+	* @param string $xml Eway payment request as an XML document, per Eway specifications
 	*/
 	private function sendPayment($xml) {
 		// use sandbox if not from live website
@@ -319,7 +319,7 @@ class EwayLegacyStoredAPI {
 			$responseXML = self::xmlPostRequest($url, $xml, $this->sslVerifyPeer);
 		}
 		catch (EwayPaymentsException $e) {
-			throw new EwayPaymentsException(sprintf(__('Error posting eWAY payment to %1$s: %2$s', 'eway-payment-gateway'), $url, $e->getMessage()));
+			throw new EwayPaymentsException(sprintf(__('Error posting Eway payment to %1$s: %2$s', 'eway-payment-gateway'), $url, $e->getMessage()));
 		}
 
 		$response = new EwayResponseLegacyStored();
@@ -338,7 +338,7 @@ class EwayLegacyStoredAPI {
 	protected static function xmlPostRequest($url, $data, $sslVerifyPeer = true) {
 		// send data via HTTPS and receive response
 		$response = wp_remote_post($url, [
-			'user-agent'	=> 'WordPress/eWAY Payment Gateway ' . EWAY_PAYMENTS_VERSION,
+			'user-agent'	=> 'WordPress/Eway Payment Gateway ' . EWAY_PAYMENTS_VERSION,
 			'sslverify'		=> $sslVerifyPeer,
 			'timeout'		=> 60,
 			'headers'		=> ['Content-Type' => 'text/xml; charset=utf-8'],
@@ -356,11 +356,11 @@ class EwayLegacyStoredAPI {
 
 			if (empty($msg)) {
 				/* translators: %s = the error code */
-				$msg = sprintf(__('Error posting eWAY request: %s', 'eway-payment-gateway'), $code);
+				$msg = sprintf(__('Error posting Eway request: %s', 'eway-payment-gateway'), $code);
 			}
 			else {
 				/* translators: 1. the error code; 2. the error message */
-				$msg = sprintf(__('Error posting eWAY request: %1$s, %2$s', 'eway-payment-gateway'), $code, $msg);
+				$msg = sprintf(__('Error posting Eway request: %1$s, %2$s', 'eway-payment-gateway'), $code, $msg);
 			}
 			throw new EwayPaymentsException($msg);
 		}
@@ -371,7 +371,7 @@ class EwayLegacyStoredAPI {
 }
 
 /**
-* eWAY stored payment response
+* Eway stored payment response
 */
 class EwayResponseLegacyStored extends EwayResponse {
 
@@ -390,13 +390,13 @@ class EwayResponseLegacyStored extends EwayResponse {
 	public $ResponseMessage;
 
 	/**
-	* eWAY transacation ID
+	* Eway transacation ID
 	* @var string
 	*/
 	public $TransactionID;
 
 	/**
-	* eWAY transaction status: true for success
+	* Eway transaction status: true for success
 	* @var boolean
 	*/
 	public $TransactionStatus;
@@ -422,14 +422,14 @@ class EwayResponseLegacyStored extends EwayResponse {
 	#endregion
 
 	/**
-	* load eWAY response data as XML string
+	* load Eway response data as XML string
 	*
-	* @param string $response eWAY response as a string (hopefully of XML data)
+	* @param string $response Eway response as a string (hopefully of XML data)
 	*/
 	public function loadResponseXML($response) {
-		// make sure we actually got something from eWAY
+		// make sure we actually got something from Eway
 		if (strlen($response) === 0) {
-			throw new EwayPaymentsException(__('eWAY payment request returned nothing; please check your card details', 'eway-payment-gateway'));
+			throw new EwayPaymentsException(__('Eway payment request returned nothing; please check your card details', 'eway-payment-gateway'));
 		}
 
 		// prevent XML injection attacks, and handle errors without warnings
@@ -471,7 +471,7 @@ class EwayResponseLegacyStored extends EwayResponse {
 			}
 			libxml_use_internal_errors($oldUseInternalErrors);
 
-			throw new EwayPaymentsException(sprintf(__('Error parsing eWAY response: %s', 'eway-payment-gateway'), $e->getMessage()));
+			throw new EwayPaymentsException(sprintf(__('Error parsing Eway response: %s', 'eway-payment-gateway'), $e->getMessage()));
 		}
 	}
 
@@ -480,7 +480,7 @@ class EwayResponseLegacyStored extends EwayResponse {
 	* @return string
 	*/
 	protected function getMessageInvalid() {
-		return __('Invalid response from eWAY for legacy XML Stored payment', 'eway-payment-gateway');
+		return __('Invalid response from Eway for legacy XML Stored payment', 'eway-payment-gateway');
 	}
 
 }

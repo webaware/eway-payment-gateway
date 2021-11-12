@@ -19,7 +19,7 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 		require_once __DIR__ . '/class.Gateway.php';
 
 		$this->_gateway				= new Gateway();
-		$this->_pretty_name			= _x('eWAY', 'Event Espresso method name', 'eway-payment-gateway');
+		$this->_pretty_name			= _x('Eway', 'Event Espresso method name', 'eway-payment-gateway');
 		$this->_requires_https		= true;
 		$this->_has_billing_form	= true;
 

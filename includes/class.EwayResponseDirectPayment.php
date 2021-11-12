@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* extend eWAY response for Direct Connection payment request
+* extend Eway response for Direct Connection payment request
 * @link https://eway.io/api-v3/
 */
 class EwayResponseDirectPayment extends EwayResponse {
@@ -32,19 +32,19 @@ class EwayResponseDirectPayment extends EwayResponse {
 	public $ResponseMessage;
 
 	/**
-	* eWAY transacation ID
+	* Eway transacation ID
 	* @var string
 	*/
 	public $TransactionID;
 
 	/**
-	* eWAY transaction status: true for success
+	* Eway transaction status: true for success
 	* @var boolean
 	*/
 	public $TransactionStatus;
 
 	/**
-	* eWAY transaction type
+	* Eway transaction type
 	* @var string
 	*/
 	public $TransactionType;
@@ -86,7 +86,7 @@ class EwayResponseDirectPayment extends EwayResponse {
 	* @return string
 	*/
 	protected function getMessageInvalid() {
-		return __('Invalid response from eWAY for Direct payment', 'eway-payment-gateway');
+		return __('Invalid response from Eway for Direct payment', 'eway-payment-gateway');
 	}
 
 }

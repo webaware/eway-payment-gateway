@@ -159,7 +159,7 @@ class Plugin {
 			$links[] = sprintf('<a href="https://wordpress.org/support/plugin/eway-payment-gateway" rel="noopener" target="_blank">%s</a>', _x('Get help', 'plugin details links', 'eway-payment-gateway'));
 			$links[] = sprintf('<a href="https://wordpress.org/plugins/eway-payment-gateway/" rel="noopener" target="_blank">%s</a>', _x('Rating', 'plugin details links', 'eway-payment-gateway'));
 			$links[] = sprintf('<a href="https://translate.wordpress.org/projects/wp-plugins/eway-payment-gateway" rel="noopener" target="_blank">%s</a>', _x('Translate', 'plugin details links', 'eway-payment-gateway'));
-			$links[] = sprintf('<a href="https://shop.webaware.com.au/donations/?donation_for=eWAY+Payment+Gateway" rel="noopener" target="_blank">%s</a>', _x('Donate', 'plugin details links', 'eway-payment-gateway'));
+			$links[] = sprintf('<a href="https://shop.webaware.com.au/donations/?donation_for=Eway+Payment+Gateway" rel="noopener" target="_blank">%s</a>', _x('Donate', 'plugin details links', 'eway-payment-gateway'));
 		}
 
 		return $links;

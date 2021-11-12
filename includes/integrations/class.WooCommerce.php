@@ -40,9 +40,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 
 		$this->id						= 'eway_payments';
 		$this->icon						= apply_filters('woocommerce_eway_icon', plugins_url('static/images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE));
-		$this->method_title				= _x('eWAY', 'WooCommerce payment method title', 'eway-payment-gateway');
-		$this->method_description		= __('Take payments online with eWAY credit card payments.', 'eway-payment-gateway');
-		$this->admin_page_heading 		= _x('eWAY payment gateway', 'WooCommerce admin page heading', 'eway-payment-gateway');
+		$this->method_title				= _x('Eway', 'WooCommerce payment method title', 'eway-payment-gateway');
+		$this->method_description		= __('Take payments online with Eway credit card payments.', 'eway-payment-gateway');
+		$this->admin_page_heading 		= _x('Eway payment gateway', 'WooCommerce admin page heading', 'eway-payment-gateway');
 		$this->admin_page_description 	= $this->method_description;
 		$this->has_fields = true;
 
@@ -100,7 +100,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 			'enabled' => [
 							'title' 		=> translate('Enable/Disable', 'woocommerce'),
 							'type' 			=> 'checkbox',
-							'label' 		=> esc_html__('enable eWAY credit card payment', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('enable Eway credit card payment', 'eway-payment-gateway'),
 							'default' 		=> 'no',
 			],
 
@@ -117,7 +117,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 							'type' 			=> 'textarea',
 							'description' 	=> translate('This controls the description which the user sees during checkout.', 'woocommerce'),
 							'desc_tip'		=> true,
-							'default'		=> _x('Pay with your credit card using eWAY secure checkout', 'WooCommerce payment method description', 'eway-payment-gateway'),
+							'default'		=> _x('Pay with your credit card using Eway secure checkout', 'WooCommerce payment method description', 'eway-payment-gateway'),
 			],
 
 			'availability' => [
@@ -270,16 +270,16 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 
 			'eway_emails_show_txid' => [
 							'title' 		=> _x('Transaction ID on emails', 'settings field', 'eway-payment-gateway'),
-							'label' 		=> esc_html__('show the eWAY transaction ID on order emails', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('show the Eway transaction ID on order emails', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
 							'default' 		=> 'yes',
 			],
 
 			'eway_site_seal' => [
-							'title' 		=> _x('Show eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
-							'label' 		=> esc_html__('show the eWAY site seal after the credit card fields', 'eway-payment-gateway'),
+							'title' 		=> _x('Show Eway Site Seal', 'settings field', 'eway-payment-gateway'),
+							'label' 		=> esc_html__('show the Eway site seal after the credit card fields', 'eway-payment-gateway'),
 							'type' 			=> 'checkbox',
-							'description' 	=> esc_html__('Add the verified eWAY Site Seal to your checkout', 'eway-payment-gateway'),
+							'description' 	=> esc_html__('Add the verified Eway Site Seal to your checkout', 'eway-payment-gateway'),
 							'desc_tip'		=> true,
 							'default' 		=> 'no',
 			],
@@ -287,7 +287,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 			'eway_site_seal_code' => [
 							'type' 			=> 'textarea',
 							'description' 	=> sprintf('<a href="https://www.eway.com.au/features/tools/tools-site-seal/" rel="noopener" target="_blank">%s</a>',
-													esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway')),
+													esc_html__('Generate your site seal on the Eway website, and paste it here', 'eway-payment-gateway')),
 							'default'		=> '',
 							'css'			=> 'height:14em',
 			],
@@ -504,11 +504,11 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
-			wc_add_notice(esc_html__('eWAY payments is not configured for payments yet', 'eway-payment-gateway'), 'error');
+			wc_add_notice(esc_html__('Eway payments is not configured for payments yet', 'eway-payment-gateway'), 'error');
 			return ['result' => 'failure'];
 		}
 
-		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('woocommerce_eway_trans_number', $order_id);
 
 		$eway->invoiceDescription		= get_bloginfo('name');
@@ -532,7 +532,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 		$eway->state					= $order->get_billing_state();
 		$eway->postcode					= $order->get_billing_postcode();
 		$eway->country					= $order->get_billing_country();
-		$eway->countryName				= $eway->country;									// for eWAY legacy API
+		$eway->countryName				= $eway->country;									// for Eway legacy API
 		$eway->comments					= $order->get_customer_note();
 
 		// maybe send shipping details
@@ -548,7 +548,7 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 			$eway->shipPostcode			= $order->get_shipping_postcode();
 		}
 
-		// convert WooCommerce country code into country name (for eWAY legacy API)
+		// convert WooCommerce country code into country name (for Eway legacy API)
 		$countries = WC()->countries->countries;
 		if (isset($countries[$eway->country])) {
 			$eway->countryName = $countries[$eway->country];

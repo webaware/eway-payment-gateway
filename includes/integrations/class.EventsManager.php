@@ -27,9 +27,9 @@ class MethodEventsManager extends \EM_Gateway {
 	*/
 	public function __construct() {
 		$this->gateway						= 'eway';
-		$this->title						= _x('eWAY', 'Events Manager payment method title', 'eway-payment-gateway');
+		$this->title						= _x('Eway', 'Events Manager payment method title', 'eway-payment-gateway');
 		$this->status						= 4;
-		$this->status_txt					= _x('Processing (eWAY)', 'Events Manager status text', 'eway-payment-gateway');
+		$this->status_txt					= _x('Processing (Eway)', 'Events Manager status text', 'eway-payment-gateway');
 		$this->button_enabled				= false;
 		$this->supports_multiple_bookings	= true;
 
@@ -82,7 +82,7 @@ class MethodEventsManager extends \EM_Gateway {
 	* load custom styles for settings page
 	*/
 	public function adminSettingsStyles() {
-		// only for eWAY settings page
+		// only for Eway settings page
 		if (empty($_GET['gateway']) || $_GET['gateway'] !== $this->gateway) {
 			return;
 		}
@@ -368,7 +368,7 @@ class MethodEventsManager extends \EM_Gateway {
 	* @return boolean
 	*/
 	public function processPayment($EM_Booking) {
-		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('em_eway_trans_number', $EM_Booking->booking_id);
 
 		$capture	= !get_option("em_{$this->gateway}_stored");

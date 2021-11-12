@@ -25,14 +25,14 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	public static function register_eway($gateways) {
 		// register the gateway class and additional functions
 		$gateways[] = [
-			'name'						=> _x('eWAY payment gateway', 'WP eCommerce payment method name', 'eway-payment-gateway'),
+			'name'						=> _x('Eway payment gateway', 'WP eCommerce payment method name', 'eway-payment-gateway'),
 			'api_version'				=> 2.0,
 			'image'						=> plugins_url('static/images/eway-tiny.png', EWAY_PAYMENTS_PLUGIN_FILE),
 			'internalname'				=> self::WPSC_GATEWAY_NAME,
 			'class_name'				=> __CLASS__,
 			'has_recurring_billing'		=> false,
 			'wp_admin_cannot_cancel'	=> true,
-			'display_name'				=> _x('eWAY Credit Card Payment', 'WP eCommerce payment method display name', 'eway-payment-gateway'),
+			'display_name'				=> _x('Eway Credit Card Payment', 'WP eCommerce payment method display name', 'eway-payment-gateway'),
 			'form'						=> [__CLASS__, 'configForm'],
 			'submit_function'			=> [__CLASS__, 'saveConfig'],
 			'payment_type'				=> 'credit_card',
@@ -130,7 +130,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 			return;
 		}
 
-		// allow plugins/themes to modify transaction ID; NB: must remain unique for eWAY account!
+		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('wpsc_merchant_eway_trans_number', $this->purchase_id);
 
 		$capture	= !get_option('wpsc_merchant_eway_stored');
@@ -362,7 +362,7 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* hook billing details display on admin, to show eWAY transaction number and authcode
+	* hook billing details display on admin, to show Eway transaction number and authcode
 	*/
 	public static function actionBillingDetailsBottom() {
 		global $purchlogitem;

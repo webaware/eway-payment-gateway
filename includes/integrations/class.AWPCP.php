@@ -38,8 +38,8 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 		parent::__construct(
 			/* slug */			self::PAYMENT_METHOD,
-			/* name */			esc_html_x('eWAY Payment Gateway', 'AWPCP payment method name', 'eway-payment-gateway'),
-			/* description */	esc_html_x('Credit card payment via eWAY', 'AWPCP payment method description', 'eway-payment-gateway'),
+			/* name */			esc_html_x('Eway Payment Gateway', 'AWPCP payment method name', 'eway-payment-gateway'),
+			/* description */	esc_html_x('Credit card payment via Eway', 'AWPCP payment method description', 'eway-payment-gateway'),
 			/* icon */			apply_filters('awpcp_eway_icon', $icon)
 		);
 	}
@@ -94,14 +94,14 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 		$settings->add_settings_subgroup([
 			'id'       => $subgroup,
-			'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
+			'name'     => esc_html_x('Eway Settings', 'settings field', 'eway-payment-gateway'),
 			'priority' => 100,
 			'parent'   => 'payment-settings',
 		]);
 
 		$settings->add_settings_section([
 			'id'       => 'eway',
-			'name'     => esc_html_x('eWAY Settings', 'settings field', 'eway-payment-gateway'),
+			'name'     => esc_html_x('Eway Settings', 'settings field', 'eway-payment-gateway'),
 			'priority' => 10,
 			'subgroup' => $subgroup,
 		]);
@@ -109,10 +109,10 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		$settings->add_setting([
 			'section'		=> $section,
 			'id'			=> 'activateeway',
-			'name'			=> esc_html_x('Activate eWAY?', 'settings field', 'eway-payment-gateway'),
+			'name'			=> esc_html_x('Activate Eway?', 'settings field', 'eway-payment-gateway'),
 			'type'			=> 'checkbox',
 			'default'		=> 1,
-			'description'	=> esc_html_x('Activate eWAY?', 'settings label', 'eway-payment-gateway'),
+			'description'	=> esc_html_x('Activate Eway?', 'settings label', 'eway-payment-gateway'),
 		]);
 
 		$settings->add_setting([
@@ -121,7 +121,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			'name'			=> esc_html_x('API key', 'settings field', 'eway-payment-gateway'),
 			'type'			=> 'textfield',
 			'default'		=> '',
-			'description'	=> esc_html_x('Rapid API key from your live eWAY account', 'settings label', 'eway-payment-gateway'),
+			'description'	=> esc_html_x('Rapid API key from your live Eway account', 'settings label', 'eway-payment-gateway'),
 		]);
 
 		$settings->add_setting([
@@ -130,7 +130,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			'name'			=> esc_html_x('API password', 'settings field', 'eway-payment-gateway'),
 			'type'			=> 'password',
 			'default'		=> '',
-			'description'	=> esc_html_x('Rapid API key from your live eWAY account', 'settings label', 'eway-payment-gateway'),
+			'description'	=> esc_html_x('Rapid API key from your live Eway account', 'settings label', 'eway-payment-gateway'),
 		]);
 
 		$settings->add_setting([
@@ -139,13 +139,13 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			'name'			=> esc_html_x('Client Side Encryption key', 'settings field', 'eway-payment-gateway'),
 			'type'			=> 'textarea',
 			'default'		=> '',
-			'description'	=> esc_html_x('Client Side Encryption key from your live eWAY account', 'settings label', 'eway-payment-gateway'),
+			'description'	=> esc_html_x('Client Side Encryption key from your live Eway account', 'settings label', 'eway-payment-gateway'),
 		]);
 
 		$settings->add_setting([
 			'section'		=> $section,
 			'id'			=> 'eway_customerid',
-			'name'			=> esc_html_x('eWAY customer ID', 'settings field', 'eway-payment-gateway'),
+			'name'			=> esc_html_x('Eway customer ID', 'settings field', 'eway-payment-gateway'),
 			'type'			=> 'textfield',
 			'default'		=> '',
 			'description'	=> esc_html__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'),
@@ -222,11 +222,11 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		]);
 
 		$description = sprintf('<a href="https://www.eway.com.au/features/tools/tools-site-seal/" rel="noopener" target="_blank">%s</a>',
-			esc_html__('Generate your site seal on the eWAY website, and paste it here', 'eway-payment-gateway'));
+			esc_html__('Generate your site seal on the Eway website, and paste it here', 'eway-payment-gateway'));
 		$settings->add_setting([
 			'section'		=> $section,
 			'id'			=> 'eway_site_seal_code',
-			'name'			=> esc_html_x('eWAY Site Seal', 'settings field', 'eway-payment-gateway'),
+			'name'			=> esc_html_x('Eway Site Seal', 'settings field', 'eway-payment-gateway'),
 			'type'			=> 'textarea',
 			'default'		=> '',
 			'description'	=> $description,
@@ -269,7 +269,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 		$checkoutURL = $payments->get_return_url($transaction);
 
 		$checkout_message = eway_payment_gateway_external_link(
-			__('Please enter your credit card details for secure payment via {{a}}eWAY{{/a}}.', 'eway-payment-gateway'), 'https://www.eway.com.au/'
+			__('Please enter your credit card details for secure payment via {{a}}Eway{{/a}}.', 'eway-payment-gateway'), 'https://www.eway.com.au/'
 		);
 		$checkout_message = apply_filters('awpcp_eway_checkout_message', $checkout_message, false, $transaction);
 
@@ -306,7 +306,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* enqueue the eWAY ecrypt script for client-side encryption
+	* enqueue the Eway ecrypt script for client-side encryption
 	*/
 	public function ecryptEnqueue() {
 		wp_enqueue_script('eway-payment-gateway-ecrypt');
@@ -423,7 +423,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* process transaction against eWAY
+	* process transaction against Eway
 	* @param AWPCP_Payment_Transaction $transaction
 	* @return $response
 	* @throws EwayPaymentsException
@@ -440,7 +440,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 
 		if (!$eway) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
-			throw new EwayPaymentsException(__('eWAY payments is not configured for payments yet', 'eway-payment-gateway'));
+			throw new EwayPaymentsException(__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
 		}
 
 		$postdata = new FormPost();
@@ -865,7 +865,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 				'zimbabwe'									=> 'zw',
 				'åland islands'								=> 'ax',
 
-				// some abbreviated names and common names for frequently used eWAY countries
+				// some abbreviated names and common names for frequently used Eway countries
 				'aust'										=> 'au',
 				'aust.'										=> 'au',
 				'n.z.'										=> 'nz',
