@@ -200,7 +200,7 @@
 				}
 				catch (e) {
 					SPCO.form_is_valid = false;
-					event.preventDefault();
+					window.event.preventDefault();
 					e.field.focus();
 					window.alert(e.message);
 				}
