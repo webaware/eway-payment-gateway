@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * ask browsers to stop with the autocorrupt already
  */

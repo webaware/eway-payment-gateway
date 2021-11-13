@@ -1,6 +1,4 @@
-"use strict";
-
-// script supporting eWAY's Client Side Encryption
+// script supporting Eway's Client Side Encryption
 (function ($) {
   var fields = eway_ecrypt_vars.fields;
   var checkout = $(eway_ecrypt_vars.form);
@@ -198,7 +196,7 @@
           maybeEncryptField(selector, fields[selector]);
         } catch (e) {
           SPCO.form_is_valid = false;
-          event.preventDefault();
+          window.event.preventDefault();
           e.field.focus();
           window.alert(e.message);
         }

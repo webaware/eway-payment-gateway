@@ -1,5 +1,3 @@
-"use strict";
-
 (function ($) {
   function display(element, visible) {
     if (visible) element.show();else element.hide();
@@ -18,7 +16,7 @@
   setVisibility();
   $("#mainform").on("change", "#woocommerce_eway_payments_eway_sandbox", setVisibility);
   /**
-  * enable the eWAY site seal code input
+  * enable the Eway site seal code input
   */
 
   $("#woocommerce_eway_payments_eway_site_seal").on("change", function () {

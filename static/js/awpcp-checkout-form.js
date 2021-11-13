@@ -1,5 +1,3 @@
-"use strict";
-
 (function ($) {
   $("#awpcp-eway-checkout").submit(function (event) {
     var errors = [];

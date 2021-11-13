@@ -1,5 +1,3 @@
-"use strict";
-
 (function ($) {
   function display(element, visible) {
     if (visible) element.show();else element.hide();
