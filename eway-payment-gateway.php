@@ -3,12 +3,12 @@
 Plugin Name: Eway Payment Gateway
 Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Description: Take credit card payments via Eway in some popular WordPress plugins
-Version: 4.5.0-dev
+Version: 4.5.0
 Author: WebAware
 Author URI: https://shop.webaware.com.au/
 Text Domain: eway-payment-gateway
 WC requires at least: 2.6
-WC tested up to: 5.3
+WC tested up to: 5.9
 */
 
 /*
@@ -37,7 +37,7 @@ define('EWAY_PAYMENTS_PLUGIN_FILE', __FILE__);
 define('EWAY_PAYMENTS_PLUGIN_ROOT', dirname(__FILE__) . '/');
 define('EWAY_PAYMENTS_PLUGIN_NAME', basename(dirname(__FILE__)) . '/' . basename(__FILE__));
 define('EWAY_PAYMENTS_MIN_PHP', '5.6');
-define('EWAY_PAYMENTS_VERSION', '4.5.0-dev');
+define('EWAY_PAYMENTS_VERSION', '4.5.0');
 
 require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/functions-global.php';
 require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.Requires.php';

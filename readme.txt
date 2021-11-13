@@ -8,7 +8,7 @@ Tags: eway, payment, credit cards, woocommerce, wp e-commerce, event espresso, e
 Requires at least: 4.9
 Tested up to: 5.8
 Requires PHP: 5.6
-Stable tag: 4.4.0
+Stable tag: 4.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -240,18 +240,17 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.4.0
+### 4.5.0
 
-Another WordPress Classifieds Plugin settings fixed; use masked password fields for API passwords in settings; tested to WooCommerce 5.3
+updated eWAY to Eway and replaced logo images for new Eway branding; tested up to WooCommerce 5.9
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.4.0
+### 4.5.0
 
-Released 2021-05-10
+Released 2021-11-14
 
-* fixed: settings no longer displaying on Another WordPress Classifieds Plugin
-* changed: use masked password fields for API passwords in settings
-* changed: marked as tested up to WooCommerce 5.3
+* changed: update eWAY to Eway and replaced logo images for new Eway branding
+* changed: marked as tested up to WooCommerce 5.9
