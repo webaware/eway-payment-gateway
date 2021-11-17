@@ -12,7 +12,7 @@ SRC_PHP				= $(shell $(FIND_PHP) -print)
 all:
 	@echo please see Makefile for available builds / commands
 
-.PHONY: all lint lint-js lint-php sniff-php zip wpsvn js
+.PHONY: all lint lint-js lint-php zip wpsvn js pot
 
 # release product
 
@@ -40,7 +40,7 @@ js:
 
 # code linters
 
-lint: lint-js lint-php sniff-php
+lint: lint-js lint-php
 
 lint-js:
 	@echo ES lint...
@@ -49,8 +49,5 @@ lint-js:
 lint-php:
 	@echo PHP lint...
 	@$(LINT_PHP)
-
-sniff-php:
-	@echo PHP code sniffer...
 	@$(SNIFF_PHP)
 	@$(SNIFF_PHP_5)
