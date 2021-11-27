@@ -1,7 +1,7 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
-use webaware\eway_payment_gateway\woocommerce\CompatibleOrder;
+use WC_Payment_Gateway_CC;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -681,43 +681,29 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* get order object for order, maybe wrapping it up for legacy WooCommerce versions
-	* @param int|object|WC_Order $order
-	* @return WC_Order|CompatibleOrder
-	*/
+	 * get order object for order
+	 * @param int|object|WC_Order $order
+	 * @return WC_Order
+	 */
 	protected static function getOrder($order) {
 		if (is_numeric($order)) {
 			// convert order number to order object
 			$order = wc_get_order($order);
 		}
 
-		if (!method_exists($order, 'get_id')) {
-			// wrap legacy order to provide accessor methods
-			$order = new CompatibleOrder($order);
-		}
-
 		return $order;
 	}
 
 	/**
-	* update order meta, handling WC 3.0 as well as legacy versions
-	* @param WC_Order|CompatibleOrder $order
-	* @param array $meta
-	*/
+	 * update order meta
+	 * @param WC_Order $order
+	 * @param array $meta
+	 */
 	protected static function updateOrderMeta($order, $meta) {
-		if (!method_exists($order, 'update_meta_data')) {
-			// legacy order object does not have meta handling, so do it the old way
-			foreach ($meta as $key => $value) {
-				update_post_meta($order->id, $key, $value);
-			}
+		foreach ($meta as $key => $value) {
+			$order->update_meta_data($key, $value);
 		}
-		else {
-			// record custom meta against order
-			foreach ($meta as $key => $value) {
-				$order->update_meta_data($key, $value);
-			}
-			$order->save_meta_data();
-		}
+		$order->save_meta_data();
 	}
 
 }

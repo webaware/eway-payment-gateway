@@ -126,7 +126,6 @@ class Plugin {
 			return;
 		}
 
-		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/wc-compatibility.php';
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.WooCommerce.php';
 		MethodWooCommerce::register_eway();
 	}

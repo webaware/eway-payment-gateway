@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 const EWAY_PAYMENTS_TEST_CUSTOMER		= '87654321';
 
 // prerequisites
-const MIN_VERSION_WOOCOMMERCE	= '2.6';
+const MIN_VERSION_WOOCOMMERCE			= '3.0';
 
 /**
 * custom exceptons
@@ -42,7 +42,6 @@ spl_autoload_register(function($class_name) {
 		'Logging'							=> 'includes/class.Logging.php',
 
 		'event_espresso\\BillingInfo'		=> 'includes/integrations/event_espresso_eway/class.BillingInfo.php',
-		'woocommerce\\CompatibleOrder'		=> 'includes/integrations/class.WooCommerce.CompatibleOrder.php',
 	];
 
 	if (strpos($class_name, __NAMESPACE__) === 0) {
