@@ -1,23 +1,28 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
+use AWPCP_Ad;
+use AWPCP_Exception;
+use AWPCP_PaymentGateway;
+use AWPCP_Payment_Transaction;
+
 if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
-* payment gateway integration for Another WordPress Classifieds Plugin since v3.0
-* @link http://awpcp.com/
-*/
-class MethodAWPCP extends \AWPCP_PaymentGateway {
+ * payment gateway integration for Another WordPress Classifieds Plugin since v3.0
+ * @link http://awpcp.com/
+ */
+class MethodAWPCP extends AWPCP_PaymentGateway {
 
 	protected $logger;
 
 	const PAYMENT_METHOD = 'eway';
 
 	/**
-	* set up hooks for the integration
-	*/
+	 * set up hooks for the integration
+	 */
 	public static function register_eway() {
 		add_filter('awpcp-register-payment-methods', [__CLASS__, 'awpcpRegisterPaymentMethods'], 20);
 		add_action('awpcp_register_settings', [__CLASS__, 'awpcpRegisterSettings']);
@@ -26,8 +31,8 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* initialise payment gateway
-	*/
+	 * initialise payment gateway
+	 */
 	public function __construct() {
 		$this->logger		= new Logging('awpcp', get_awpcp_option('eway_logging', 'off'));
 
@@ -45,8 +50,8 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* customise styles for settings page
-	*/
+	 * customise styles for settings page
+	 */
 	public static function settingsStyles() {
 		if (empty($_GET['sg']) || $_GET['sg'] !== 'eway-settings') {
 			return;
@@ -57,8 +62,8 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* load scripts for settings page
-	*/
+	 * load scripts for settings page
+	 */
 	public static function settingsScripts() {
 		if (empty($_GET['sg']) || $_GET['sg'] !== 'eway-settings') {
 			return;
@@ -70,9 +75,9 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* register new payment gateway with front end (NB: admin side never calls this!)
-	* @param AWPCP_PaymentsAPI $payments
-	*/
+	 * register new payment gateway with front end (NB: admin side never calls this!)
+	 * @param AWPCP_PaymentsAPI $payments
+	 */
 	public static function awpcpRegisterPaymentMethods($payments) {
 		if (get_awpcp_option('activateeway')) {
 			$payments->register_payment_method(new self());
@@ -80,9 +85,9 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* register settings for this payment method
-	* @param AWPCP_SettingsManager $settings
-	*/
+	 * register settings for this payment method
+	 * @param AWPCP_SettingsManager $settings
+	 */
 	public static function awpcpRegisterSettings($settings) {
 		if (!method_exists($settings, 'add_settings_subgroup')) {
 			return;
@@ -243,18 +248,18 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* declare type of integration as showing a custom form for credit card details
-	* @return string
-	*/
+	 * declare type of integration as showing a custom form for credit card details
+	 * @return string
+	 */
 	public function get_integration_type() {
 		return self::INTEGRATION_CUSTOM_FORM;
 	}
 
 	/**
-	* process payment of a transaction -- show the checkout form
-	* @param AWPCP_Payment_Transaction $transaction
-	* @return string
-	*/
+	 * process payment of a transaction -- show the checkout form
+	 * @param AWPCP_Payment_Transaction $transaction
+	 * @return string
+	 */
 	public function process_payment($transaction) {
 		if ($transaction->get('payment-method') !== self::PAYMENT_METHOD) {
 			return '';
@@ -306,15 +311,15 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* enqueue the Eway ecrypt script for client-side encryption
-	*/
+	 * enqueue the Eway ecrypt script for client-side encryption
+	 */
 	public function ecryptEnqueue() {
 		wp_enqueue_script('eway-payment-gateway-ecrypt');
 	}
 
 	/**
-	* configure the scripts for client-side encryption
-	*/
+	 * configure the scripts for client-side encryption
+	 */
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
 
@@ -332,16 +337,16 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* process payment notification
-	* @param AWPCP_Payment_Transaction $transaction
-	*/
+	 * process payment notification
+	 * @param AWPCP_Payment_Transaction $transaction
+	 */
 	public function process_payment_notification($transaction) {
 	}
 
 	/**
-	* process completed transaction
-	* @param AWPCP_Payment_Transaction $transaction
-	*/
+	 * process completed transaction
+	 * @param AWPCP_Payment_Transaction $transaction
+	 */
 	public function process_payment_completed($transaction) {
 		$postdata		= new FormPost();
 
@@ -380,11 +385,11 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 					/* TODO: stored payments in AWPCP, when plugin workflow supports it
 					if ($eway_stored) {
 						// payment hasn't happened yet, so record status as 'on-hold' in anticipation
-						$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_PENDING;
+						$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_PENDING;
 					}
 					else {
 					*/
-						$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_COMPLETED;
+						$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_COMPLETED;
 					/*
 					}
 					*/
@@ -399,7 +404,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 					// transaction was unsuccessful, so record transaction number and the error
 					$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
 					$transaction->set('txn-id', $response->TransactionID);
-					$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
+					$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
 					$transaction->errors['validation'] = $error_msg;
 					$success = false;
 
@@ -411,7 +416,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			}
 			catch (EwayPaymentsException $e) {
 				// an exception occured, so record the error
-				$transaction->payment_status = \AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
+				$transaction->payment_status = AWPCP_Payment_Transaction::PAYMENT_STATUS_FAILED;
 				$transaction->errors['validation'] = nl2br(esc_html($e->getMessage()) . "\n" . __("use your browser's back button to try again.", 'eway-payment-gateway'));
 				$success = false;
 
@@ -423,11 +428,11 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* process transaction against Eway
-	* @param AWPCP_Payment_Transaction $transaction
-	* @return $response
-	* @throws EwayPaymentsException
-	*/
+	 * process transaction against Eway
+	 * @param AWPCP_Payment_Transaction $transaction
+	 * @return $response
+	 * @throws EwayPaymentsException
+	 */
 	protected function processTransaction($transaction) {
 		$item		= $transaction->get_item(0); // no support for multiple items
 		$ad			= self::getAdByID($transaction->get('ad-id'));
@@ -480,17 +485,17 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* process payment cancellation
-	* @param AWPCP_Payment_Transaction $transaction
-	*/
+	 * process payment cancellation
+	 * @param AWPCP_Payment_Transaction $transaction
+	 */
 	public function process_payment_canceled($transaction) {
 		// TODO: process_payment_canceled
 	}
 
 	/**
-	* get API credentials based on settings
-	* @return array
-	*/
+	 * get API credentials based on settings
+	 * @return array
+	 */
 	protected function getApiCredentials() {
 		$useSandbox	= (bool) get_awpcp_option('paylivetestmode');
 
@@ -515,12 +520,12 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* get contact name from available data
-	* @param AWPCP_Ad $ad
-	* @param WP_User $user
-	* @param string $cardHoldersName
-	* @return array two elements: first name, last name
-	*/
+	 * get contact name from available data
+	 * @param AWPCP_Ad $ad
+	 * @param WP_User $user
+	 * @param string $cardHoldersName
+	 * @return array two elements: first name, last name
+	 */
 	protected static function getContactNames($ad, $user, $cardHoldersName) {
 		$names = ['', ''];
 
@@ -541,10 +546,10 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* attempt to split name into parts, and hope to not offend anyone!
-	* @param string $compoundName
-	* @return array two elements: first name, last name
-	*/
+	 * attempt to split name into parts, and hope to not offend anyone!
+	 * @param string $compoundName
+	 * @return array two elements: first name, last name
+	 */
 	protected static function splitCompoundName($compoundName) {
 		$names = explode(' ', $compoundName);
 
@@ -555,12 +560,12 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* attempt to get meaningful contact details from available data
-	* @param object $eway
-	* @param AWPCP_Ad $ad
-	* @param WP_User $user
-	* @return string
-	*/
+	 * attempt to get meaningful contact details from available data
+	 * @param object $eway
+	 * @param AWPCP_Ad $ad
+	 * @param WP_User $user
+	 * @return string
+	 */
 	protected static function setTxContactDetails($eway, $ad, $user) {
 		$profile = $user ? get_user_meta($user->ID, 'awpcp-profile', true) : false;
 
@@ -589,7 +594,7 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 			$eway->countryName		= $ad_region['country'];
 		}
 		elseif (method_exists('AWPCP_Ad', 'get_ad_regions')) {
-			$regions = \AWPCP_Ad::get_ad_regions($ad->ad_id);
+			$regions = AWPCP_Ad::get_ad_regions($ad->ad_id);
 			if (!empty($regions[0])) {
 				$eway->suburb		= $regions[0]['city'];
 				$eway->state		= $regions[0]['state'];
@@ -896,14 +901,15 @@ class MethodAWPCP extends \AWPCP_PaymentGateway {
 	}
 
 	/**
-	* retreive an advertisement by ID
-	* @param string $ad_id
-	* @return object
-	*/
+	 * retreive an advertisement by ID
+	 * @param string $ad_id
+	 * @return object
+	 */
 	protected static function getAdByID($ad_id) {
 		try {
 			$ad = awpcp_listings_collection()->get($ad_id);
-		} catch (\AWPCP_Exception $e) {
+		}
+		catch (AWPCP_Exception $e) {
 			$ad = null;
 		}
 

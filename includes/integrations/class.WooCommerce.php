@@ -8,33 +8,33 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* payment gateway integration for WooCommerce
-* @link https://docs.woothemes.com/document/payment-gateway-api/
-*/
-class MethodWooCommerce extends \WC_Payment_Gateway_CC {
+ * payment gateway integration for WooCommerce
+ * @link https://docs.woothemes.com/document/payment-gateway-api/
+ */
+class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 	protected $logger;
 
 	/**
-	* hook WooCommerce to register gateway integration
-	*/
+	 * hook WooCommerce to register gateway integration
+	 */
 	public static function register_eway() {
 		add_filter('woocommerce_payment_gateways', [__CLASS__, 'register']);
 	}
 
 	/**
-	* register new payment gateway
-	* @param array $gateways array of registered gateways
-	* @return array
-	*/
+	 * register new payment gateway
+	 * @param array $gateways array of registered gateways
+	 * @return array
+	 */
 	public static function register($gateways) {
 		$gateways[] = __CLASS__;
 		return $gateways;
 	}
 
 	/**
-	* initialise gateway with custom settings
-	*/
+	 * initialise gateway with custom settings
+	 */
 	public function __construct() {
 		// NB: no parent constructor (yet!)
 
@@ -89,8 +89,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* initialise settings form fields
-	*/
+	 * initialise settings form fields
+	 */
 	public function initFormFields() {
 		// get recorded settings, so we can determine sane defaults when upgrading
 		$settings = get_option('woocommerce_eway_payments_settings');
@@ -296,8 +296,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* extend parent method for initialising settings, so that new settings can receive defaults
-	*/
+	 * extend parent method for initialising settings, so that new settings can receive defaults
+	 */
 	public function init_settings() {
 		parent::init_settings();
 
@@ -313,8 +313,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* show the admin panel for setting plugin options
-	*/
+	 * show the admin panel for setting plugin options
+	 */
 	public function admin_options() {
 		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-woocommerce.php';
 
@@ -322,8 +322,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* add page script for admin options
-	*/
+	 * add page script for admin options
+	 */
 	public function adminSettingsScript() {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
@@ -333,11 +333,11 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* add Name field to WooCommerce credit card form
-	* @param array $fields
-	* @param string $gateway
-	* @return array
-	*/
+	 * add Name field to WooCommerce credit card form
+	 * @param array $fields
+	 * @param string $gateway
+	 * @return array
+	 */
 	public function wooCcFormFields($fields, $gateway) {
 		if ($gateway === $this->id) {
 			ob_start();
@@ -351,9 +351,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* show message before fields in standard WooCommerce credit card form
-	* @param string $gateway
-	*/
+	 * show message before fields in standard WooCommerce credit card form
+	 * @param string $gateway
+	 */
 	public function wooCcFormStart($gateway) {
 		if ($gateway === $this->id) {
 			if (!empty($this->settings['eway_card_msg'])) {
@@ -365,8 +365,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* maybe enqueue the Client Side Encryption scripts for encrypting credit card details
-	*/
+	 * maybe enqueue the Client Side Encryption scripts for encrypting credit card details
+	 */
 	protected function maybeEnqueueCSE() {
 		$creds = $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
@@ -376,8 +376,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* configure the scripts for client-side encryption
-	*/
+	 * configure the scripts for client-side encryption
+	 */
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
 
@@ -397,9 +397,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* show site seal after fields in standard WooCommerce credit card form, if entered
-	* @param string $gateway
-	*/
+	 * show site seal after fields in standard WooCommerce credit card form, if entered
+	 * @param string $gateway
+	 */
 	public function wooCcFormEnd($gateway) {
 		if ($gateway === $this->id) {
 			if (!empty($this->settings['eway_site_seal']) && !empty($this->settings['eway_site_seal_code']) && $this->settings['eway_site_seal'] === 'yes') {
@@ -409,8 +409,8 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* display payment form on checkout page
-	*/
+	 * display payment form on checkout page
+	 */
 	public function payment_fields() {
 		if ($this->eway_card_form === 'yes') {
 			// use standard WooCommerce credit card form
@@ -429,9 +429,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* get field values from credit card form -- either WooCommerce standard, or the old template
-	* @return array
-	*/
+	 * get field values from credit card form -- either WooCommerce standard, or the old template
+	 * @return array
+	 */
 	protected function getCardFields() {
 		$postdata = new FormPost();
 
@@ -471,9 +471,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* validate entered data for errors / omissions
-	* @return bool
-	*/
+	 * validate entered data for errors / omissions
+	 * @return bool
+	 */
 	public function validate_fields() {
 		$postdata		= new FormPost();
 		$fields			= $this->getCardFields();
@@ -489,10 +489,10 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* process the payment and return the result
-	* @param int $order_id
-	* @return array
-	*/
+	 * process the payment and return the result
+	 * @param int $order_id
+	 * @return array
+	 */
 	public function process_payment($order_id) {
 		$order		= self::getOrder($order_id);
 		$ccfields	= $this->getCardFields();
@@ -633,10 +633,9 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* get API credentials based on settings
-	* @return array
-	*/
-	protected function getApiCredentials() {
+	 * get API credentials based on settings
+	 */
+	protected function getApiCredentials() : array {
 		$useSandbox	= ($this->eway_sandbox === 'yes');
 
 		if (!$useSandbox) {
@@ -660,12 +659,12 @@ class MethodWooCommerce extends \WC_Payment_Gateway_CC {
 	}
 
 	/**
-	* add the successful transaction ID to WooCommerce order emails
-	* @param array $keys
-	* @param bool $sent_to_admin
-	* @param mixed $order
-	* @return array
-	*/
+	 * add the successful transaction ID to WooCommerce order emails
+	 * @param array $keys
+	 * @param bool $sent_to_admin
+	 * @param mixed $order
+	 * @return array
+	 */
 	public function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
 		if (apply_filters('woocommerce_eway_email_show_trans_number', $this->eway_emails_show_txid === 'yes', $order)) {
 			$order			= self::getOrder($order);

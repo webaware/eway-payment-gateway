@@ -511,7 +511,7 @@ class EwayResponseLegacyDirect extends EwayResponse {
 	* get 'invalid response' message for this response class
 	* @return string
 	*/
-	protected function getMessageInvalid() {
+	protected function getMessageInvalid() : string {
 		return __('Invalid response from Eway for legacy XML Direct payment', 'eway-payment-gateway');
 	}
 

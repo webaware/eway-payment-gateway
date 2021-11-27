@@ -2,35 +2,37 @@
 namespace webaware\eway_payment_gateway\event_espresso;
 
 use webaware\eway_payment_gateway\FormPost;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
-* extract billing information from Event Espresso
-*/
+ * extract billing information from Event Espresso
+ */
 class BillingInfo {
 
-	public $card_name;
-	public $card_number;
-	public $expiry_month;
-	public $expiry_year;
-	public $cvn;
-	public $first_name;
-	public $last_name;
-	public $email;
-	public $phone;
-	public $address;
-	public $address2;
-	public $city;
-	public $state;
-	public $zip;
-	public $country;
+	public string $card_name		= '';
+	public string $card_number		= '';
+	public string $expiry_month		= '';
+	public string $expiry_year		= '';
+	public string $cvn				= '';
+	public string $first_name		= '';
+	public string $last_name		= '';
+	public string $email			= '';
+	public string $phone			= '';
+	public string $address			= '';
+	public string $address2			= '';
+	public string $city				= '';
+	public string $state			= '';
+	public string $zip				= '';
+	public string $country			= '';
 
 	/**
-	* @param array $billing_info
-	*/
+	 * @param array $billing_info
+	 */
 	public function __construct($billing_info) {
 		// collect raw post data, to access CSE encrypted fields
 		$postdata = new FormPost();
@@ -61,14 +63,13 @@ class BillingInfo {
 	}
 
 	/**
-	* get country code from billing details posted by checkout
-	* -- because Event Espresso has converted it to a country name to pass to the checkout ¯\_(ツ)_/¯
-	* @return string
-	*/
-	protected function getPostedCountry() {
+	 * get country code from billing details posted by checkout
+	 * -- because Event Espresso has converted it to a country name to pass to the checkout ¯\_(ツ)_/¯
+	 */
+	protected function getPostedCountry() : string {
 		$billing_form = false;
 
-		$iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($_POST), \RecursiveIteratorIterator::SELF_FIRST);
+		$iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($_POST), RecursiveIteratorIterator::SELF_FIRST);
 		foreach ($iterator as $key => $value) {
 			if ($key === 'billing_form') {
 				$billing_form = $value;

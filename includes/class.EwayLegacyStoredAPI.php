@@ -477,9 +477,8 @@ class EwayResponseLegacyStored extends EwayResponse {
 
 	/**
 	* get 'invalid response' message for this response class
-	* @return string
 	*/
-	protected function getMessageInvalid() {
+	protected function getMessageInvalid() : string {
 		return __('Invalid response from Eway for legacy XML Stored payment', 'eway-payment-gateway');
 	}
 

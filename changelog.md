@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 5.0.0, soon...
+
+* changed: requires minimum PHP version 7.4 (recommend version 8.0 or greater)
+* changed: requires minimum WooCommerce version 3.0
+* changed: major code refresh, developers with customisations will need to test their customisations
+
 ### 4.5.0, 2021-11-14
 
 * changed: update eWAY to Eway and replaced logo images for new Eway branding
@@ -15,7 +21,7 @@
 
 ### 4.3.16, 2021-03-04
 
-* changed: don't call `libxml_disable_entity_loader()` in PHP 8.0 (now deprecated)
+* changed: don't call deprecated function `libxml_disable_entity_loader()` in PHP 8.0
 * changed: marked as tested up to WooCommerce 5.1
 
 ### 4.3.15, 2021-02-12

@@ -7,14 +7,14 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* Event Espresso payment method
-* @link https://github.com/eventespresso/event-espresso-core/blob/master/docs/L--Payment-Methods-and-Gateways/creating-a-payment-method.md
-*/
-class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
+ * Event Espresso payment method
+ * @link https://github.com/eventespresso/event-espresso-core/blob/master/docs/L--Payment-Methods-and-Gateways/creating-a-payment-method.md
+ */
+class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 
 	/**
-	* @param EE_Payment_Method $pm_instance
-	*/
+	 * @param EE_Payment_Method $pm_instance
+	 */
 	public function __construct($pm_instance = null) {
 		require_once __DIR__ . '/class.Gateway.php';
 
@@ -30,10 +30,10 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	}
 
 	/**
-	* Adds the help tab
-	* @see EE_PMT_Base::help_tabs_config()
-	* @return array
-	*/
+	 * Adds the help tab
+	 * @see EE_PMT_Base::help_tabs_config()
+	 * @return array
+	 */
 	public function help_tabs_config() {
 		return [
 			// TODO: add help tab content
@@ -41,9 +41,9 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	}
 
 	/**
-	* @param \EE_Transaction $transaction
-	* @return \EE_Billing_Attendee_Info_Form
-	*/
+	 * @param EE_Transaction $transaction
+	 * @return EE_Billing_Attendee_Info_Form
+	 */
 	public function generate_new_billing_form(EE_Transaction $transaction = null) {
 		$creds = $this->getApiCredentials();
 
@@ -81,7 +81,7 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 			];
 		}
 
-		$form = new \EE_Billing_Attendee_Info_Form($this->_pm_instance, [
+		$form = new EE_Billing_Attendee_Info_Form($this->_pm_instance, [
 
 			'name'        => 'event_espresso_eway_form',
 			'subsections' => $subsections,
@@ -92,13 +92,13 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	}
 
 	/**
-	* Gets the form for all the settings related to this payment method type
-	* @return EE_Payment_Method_Form
-	*/
+	 * Gets the form for all the settings related to this payment method type
+	 * @return EE_Payment_Method_Form
+	 */
 	public function generate_new_settings_form() {
 		// NB: class names have a trailing space because EE appends additional classes without a space!
 
-		$form = new \EE_Payment_Method_Form([
+		$form = new EE_Payment_Method_Form([
 
 			'extra_meta_inputs'	=> [
 
@@ -153,8 +153,8 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	}
 
 	/**
-	* enqueue admin scripts for settings fields
-	*/
+	 * enqueue admin scripts for settings fields
+	 */
 	public function adminEnqueueScripts() {
 		global $plugin_page;
 
@@ -166,8 +166,8 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	}
 
 	/**
-	* maybe enqueue the Client Side Encryption scripts for encrypting credit card details
-	*/
+	 * maybe enqueue the Client Side Encryption scripts for encrypting credit card details
+	 */
 	public function maybeEnqueueCSE() {
 		$creds = $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
@@ -177,10 +177,10 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	}
 
 	/**
-	* configure the scripts for client-side encryption
-	*/
+	 * configure the scripts for client-side encryption
+	 */
 	public function ecryptScript() {
-		$creds	= $this->getApiCredentials();
+		$creds = $this->getApiCredentials();
 
 		$vars = [
 			'mode'		=> 'event-espresso',
@@ -196,10 +196,9 @@ class EE_PMT_event_espresso_eway extends \EE_PMT_Base {
 	}
 
 	/**
-	* get API credentials based on settings
-	* @return array
-	*/
-	protected function getApiCredentials() {
+	 * get API credentials based on settings
+	 */
+	protected function getApiCredentials() : array {
 		static $creds = false;
 
 		if ($creds === false) {

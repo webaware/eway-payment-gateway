@@ -6,15 +6,15 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* wrapper for form post data
-*/
+ * wrapper for form post data
+ */
 class FormPost {
 
 	protected static $postdata = null;
 
 	/**
-	* maybe unslash the post data and store for access
-	*/
+	 * maybe unslash the post data and store for access
+	 */
 	public function __construct() {
 		if (is_null(self::$postdata)) {
 			self::$postdata = wp_unslash($_POST);
@@ -29,11 +29,10 @@ class FormPost {
 	}
 
 	/**
-	* get field value (trimmed if it's a string), or return null if not found
-	* @param string $field_name
-	* @return mixed|null
-	*/
-	public function getValue($field_name) {
+	 * get field value (trimmed if it's a string), or return null if not found
+	 * @return mixed|null
+	 */
+	public function getValue(string $field_name) {
 		if (!isset(self::$postdata[$field_name])) {
 			return null;
 		}
@@ -44,12 +43,10 @@ class FormPost {
 	}
 
 	/**
-	* get array field subkey value (trimmed if it's a string), or return null if not found
-	* @param string $field_name
-	* @param string $subkey
-	* @return mixed|null
-	*/
-	public function getSubkey($field_name, $subkey) {
+	 * get array field subkey value (trimmed if it's a string), or return null if not found
+	 * @return mixed|null
+	 */
+	public function getSubkey(string $field_name, string $subkey) {
 		if (!isset(self::$postdata[$field_name][$subkey])) {
 			return null;
 		}
@@ -60,20 +57,18 @@ class FormPost {
 	}
 
 	/**
-	* clean up a credit card number value, removing common extraneous characters
-	* @param string $value
-	* @return string
-	*/
-	public function cleanCardnumber($value) {
+	 * clean up a credit card number value, removing common extraneous characters
+	 */
+	public function cleanCardnumber(string $value) : string {
 		return strtr($value, [' ' => '', '-' => '']);
 	}
 
 	/**
-	* verify credit card details
-	* @param array $ map of field names to values, using standardised field names
-	* @return array an array of error messages
-	*/
-	public function verifyCardDetails($fields) {
+	 * verify credit card details
+	 * @param array $fields map of field names to values, using standardised field names
+	 * @return array an array of error messages
+	 */
+	public function verifyCardDetails(array $fields) : array {
 		$errors = [];
 		$expiryError = false;
 

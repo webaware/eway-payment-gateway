@@ -6,8 +6,8 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* simple logging for plugin
-*/
+ * simple logging for plugin
+ */
 class Logging {
 
 	protected $logFolder;
@@ -17,11 +17,9 @@ class Logging {
 	protected $handle;
 
 	/**
-	* initialise logging
-	* @param string $integration
-	* @param string $level
-	*/
-	public function __construct($integration, $level) {
+	 * initialise logging
+	 */
+	public function __construct(string $integration, string $level) {
 		$this->integration = $integration;
 		$this->min_level   = $level;
 		$this->status	   = 'new';
@@ -42,7 +40,7 @@ class Logging {
 						// phpcs:disable Generic.PHP.NoSilencedErrors.Discouraged
 						@file_put_contents($base . '/.htaccess', "Options -Indexes\n");
 						@touch($base . '/index.html');
-						// phpcs:enable Generic.PHP.NoSilencedErrors.Discouraged
+						// phpcs:enable
 					}
 				}
 				// create log folder if parent folder was created OK
@@ -55,8 +53,8 @@ class Logging {
 	}
 
 	/**
-	* close any files we opened
-	*/
+	 * close any files we opened
+	 */
 	public function __destruct() {
 		if ($this->status === 'opened') {
 			fclose($this->handle);
@@ -64,11 +62,11 @@ class Logging {
 	}
 
 	/**
-	* write to the log
-	* @param string $level
-	* @param string $msg
-	*/
-	public function log($level, $msg) {
+	 * write to the log
+	 * @param string $level
+	 * @param string $msg
+	 */
+	public function log(string $level, string $msg) {
 		if (empty($this->logFolder)) {
 			// no log folder (e.g. error creating folder)
 			return;
@@ -104,11 +102,9 @@ class Logging {
 	}
 
 	/**
-	* sanitise a logging message to obfuscate credit card details before storing in plain text!
-	* @param string $message
-	* @return string
-	*/
-	protected static function sanitiseLog($message) {
+	 * sanitise a logging message to obfuscate credit card details before storing in plain text!
+	 */
+	protected static function sanitiseLog(string $message) : string {
 		// obfuscate anything that looks like credit card number: a string of at least 12 numeric digits
 		$message = preg_replace('#[0-9]{8,}([0-9]{4})#', '************$1', $message);
 
@@ -119,10 +115,9 @@ class Logging {
 	}
 
 	/**
-	* get indiscoverable folder name for log files
-	* @return string
-	*/
-	public static function getLogFolder() {
+	 * get indiscoverable folder name for log files
+	 */
+	public static function getLogFolder() : string {
 		static $logFolder = null;
 
 		if (is_null($logFolder)) {
@@ -140,10 +135,9 @@ class Logging {
 	}
 
 	/**
-	* get relative path to log folder
-	* @return string
-	*/
-	public static function getLogFolderRelative() {
+	 * get relative path to log folder
+	 */
+	public static function getLogFolderRelative() : string {
 		return substr(self::getLogFolder(), strlen(ABSPATH));
 	}
 

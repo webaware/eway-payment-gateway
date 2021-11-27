@@ -6,20 +6,19 @@ if (!defined('ABSPATH')) {
 }
 
 /**
-* Class for dealing with an Eway Rapid API response
-* @link https://eway.io/api-v3/
-*/
+ * Class for dealing with an Eway Rapid API response
+ * @link https://eway.io/api-v3/
+ */
 abstract class EwayResponse {
 
 	/**
-	* load Eway response data as JSON string
-	* @param string $json Eway response as a string (hopefully of JSON data)
-	* @throws EwayPaymentsException
-	*/
-	public function loadResponse($json) {
+	 * load Eway response data as JSON string
+	 * @throws EwayPaymentsException
+	 */
+	public function loadResponse(string $json) : void {
 		$response = json_decode($json);
 
-		if (is_null($response)) {
+		if ($response === null) {
 			throw new EwayPaymentsException($this->getMessageInvalid());
 		}
 
@@ -42,23 +41,20 @@ abstract class EwayResponse {
 
 		// if we got an amount, convert it back into dollars.cents from just cents
 		// but not if it's in JPY which is already at the target format
-		if (isset($this->Payment) && !empty($this->Payment->TotalAmount) && $this->Payment->CurrencyCode !== 'JPY') {
+		if (isset($this->Payment) && !empty($this->Payment->TotalAmount) && currency_has_decimals($this->Payment->CurrencyCode)) {
 			$this->Payment->TotalAmount = floatval($this->Payment->TotalAmount) / 100.0;
 		}
 	}
 
 	/**
-	* get 'invalid response' message for specific response class
-	* @return string
-	*/
-	abstract protected function getMessageInvalid();
+	 * get 'invalid response' message for specific response class
+	 */
+	abstract protected function getMessageInvalid() : string;
 
 	/**
-	* separate response codes into individual errors
-	* @param string $codes
-	* @return array
-	*/
-	protected function getResponseDetails($codes) {
+	 * separate response codes into individual errors
+	 */
+	protected function getResponseDetails($codes) : array {
 		$responses = [];
 
 		if (!empty($codes)) {
@@ -72,11 +68,9 @@ abstract class EwayResponse {
 	}
 
 	/**
-	* get formatted error message for front end, with Eway errors or response codes appended
-	* @param string $error_msg
-	* @return string
-	*/
-	public function getErrorMessage($error_msg) {
+	 * get formatted error message for front end, with Eway errors or response codes appended
+	 */
+	public function getErrorMessage(string $error_msg) : string {
 		$errors = [];
 
 		if (!empty($this->Errors)) {
@@ -96,19 +90,16 @@ abstract class EwayResponse {
 	}
 
 	/**
-	* get errors and response messages as a string, for logging
-	* @return string
-	*/
-	public function getErrorsForLog() {
+	 * get errors and response messages as a string, for logging
+	 */
+	public function getErrorsForLog() : string {
 		return implode('; ', array_merge((array) $this->Errors, (array) $this->ResponseMessage));
 	}
 
 	/**
-	* get description for response code
-	* @param string $code
-	* @return string
-	*/
-	protected function getCodeDescription($code) {
+	 * get description for response code
+	 */
+	protected function getCodeDescription(string $code) : string {
 		// source @link https://github.com/eWAYPayment/eway-rapid-php/blob/master/resource/lang/en.ini
 		// NB: translated into en_US for consistency with base locale
 		switch ($code) {

@@ -47,8 +47,8 @@ class EwayPaymentGatewayRequires {
 	}
 
 	/**
-	* show plugin page row with requires notices
-	*/
+	 * show plugin page row with requires notices
+	 */
 	public static function showPluginRowNotices() {
 		global $wp_list_table;
 
@@ -61,9 +61,9 @@ class EwayPaymentGatewayRequires {
 	}
 
 	/**
-	* test whether we can show admin-related notices
-	* @return bool
-	*/
+	 * test whether we can show admin-related notices
+	 * @return bool
+	 */
 	protected static function canShowAdminNotices() {
 		global $hook_suffix;
 

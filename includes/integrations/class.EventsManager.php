@@ -1,30 +1,34 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
+use EM_Event;
+use EM_Gateway;
+use EM_Gateways;
+
 if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
-* payment gateway integration for Events Manager
-* with thanks to EM_Gateway_Authorize_AIM for showing the way...
-*/
-class MethodEventsManager extends \EM_Gateway {
+ * payment gateway integration for Events Manager
+ * with thanks to EM_Gateway_Authorize_AIM for showing the way...
+ */
+class MethodEventsManager extends EM_Gateway {
 
 	protected $logger;
 
 	private $registered_timer = 0;
 
 	/**
-	* register gateway integration
-	*/
+	 * register gateway integration
+	 */
 	public static function register_eway() {
-		\EM_Gateways::register_gateway('eway', __CLASS__);
+		EM_Gateways::register_gateway('eway', __CLASS__);
 	}
 
 	/**
-	* Set up gateaway and add relevant actions/filters
-	*/
+	 * Set up gateaway and add relevant actions/filters
+	 */
 	public function __construct() {
 		$this->gateway						= 'eway';
 		$this->title						= _x('Eway', 'Events Manager payment method title', 'eway-payment-gateway');
@@ -79,8 +83,8 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* load custom styles for settings page
-	*/
+	 * load custom styles for settings page
+	 */
 	public function adminSettingsStyles() {
 		// only for Eway settings page
 		if (empty($_GET['gateway']) || $_GET['gateway'] !== $this->gateway) {
@@ -93,8 +97,8 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* add page script for admin options
-	*/
+	 * add page script for admin options
+	 */
 	public function adminSettingsScript() {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
@@ -104,10 +108,10 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* attempt to map country code to name
-	* @param string $countryCode
-	* @return string
-	*/
+	 * attempt to map country code to name
+	 * @param string $countryCode
+	 * @return string
+	 */
 	protected static function getCountryName($countryCode) {
 		$name = '';
 
@@ -124,17 +128,17 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/*
-	* --------------------------------------------------
-	* Booking Interception - functions that modify booking object behaviour
-	* --------------------------------------------------
-	*/
+	 * --------------------------------------------------
+	 * Booking Interception - functions that modify booking object behaviour
+	 * --------------------------------------------------
+	 */
 
 	/**
-	* perform additional booking form post validation, to check for required credit card fields
-	* @param boolean $result
-	* @param object $EM_Booking
-	* @return boolean
-	*/
+	 * perform additional booking form post validation, to check for required credit card fields
+	 * @param boolean $result
+	 * @param object $EM_Booking
+	 * @return boolean
+	 */
 	public function emBookingValidate($result, $EM_Booking) {
 		// only perform validation if this payment method has been selected
 		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] === $this->gateway) {
@@ -162,20 +166,20 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* This function intercepts the previous booking form url from the javascript localized array of EM variables and forces it to be an HTTPS url.
-	* @param array $localized_array
-	* @return array
-	*/
+	 * This function intercepts the previous booking form url from the javascript localized array of EM variables and forces it to be an HTTPS url.
+	 * @param array $localized_array
+	 * @return array
+	 */
 	public static function forceBookingAjaxSSL($localized_array) {
 		$localized_array['bookingajaxurl'] = self::force_ssl($localized_array['bookingajaxurl']);
 		return $localized_array;
 	}
 
 	/**
-	* Turns any url into an HTTPS url.
-	* @param string $url
-	* @return string
-	*/
+	 * Turns any url into an HTTPS url.
+	 * @param string $url
+	 * @return string
+	 */
 	public static function force_ssl($url) {
 		// only fix if source URL starts with http://
 		if (stripos($url, 'http://') === 0) {
@@ -186,8 +190,8 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* if page is an event and it has a booking form, make sure it's on SSL
-	*/
+	 * if page is an event and it has a booking form, make sure it's on SSL
+	 */
 	public static function redirect_ssl() {
 		global $post;
 
@@ -195,7 +199,7 @@ class MethodEventsManager extends \EM_Gateway {
 		if (!empty($post->post_type) && $post->post_type === EM_POST_TYPE_EVENT && !is_ssl()) {
 			try {
 				// create event object, check that it has bookings
-				$event = new \EM_Event($post);
+				$event = new EM_Event($post);
 				if ($event->event_rsvp) {
 					// redirect to SSL
 					$url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -209,12 +213,12 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* Triggered by the em_booking_add_yourgateway action, modifies the booking status if the event isn't free and also adds a filter
-	* to modify user feedback returned.
-	* @param EM_Event $EM_Event
-	* @param EM_Booking $EM_Booking
-	* @param boolean $post_validation
-	*/
+	 * Triggered by the em_booking_add_yourgateway action, modifies the booking status if the event isn't free and also adds a filter
+	 * to modify user feedback returned.
+	 * @param EM_Event $EM_Event
+	 * @param EM_Booking $EM_Booking
+	 * @param boolean $post_validation
+	 */
 	public function booking_add($EM_Event, $EM_Booking, $post_validation = false) {
 		$this->registered_timer = current_time('timestamp', 1);
 
@@ -231,12 +235,12 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* Added to filters once a booking is added. Once booking is saved, we capture payment, and approve the booking (saving a second time).
-	* If payment isn't approved, just delete the booking and return false for save.
-	* @param bool $result
-	* @param EM_Booking $EM_Booking
-	* @return bool
-	*/
+	 * Added to filters once a booking is added. Once booking is saved, we capture payment, and approve the booking (saving a second time).
+	 * If payment isn't approved, just delete the booking and return false for save.
+	 * @param bool $result
+	 * @param EM_Booking $EM_Booking
+	 * @return bool
+	 */
 	public function em_booking_save($result, $EM_Booking) {
 		// make sure booking save was successful before we try anything
 		if ($result) {
@@ -285,11 +289,11 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* Intercepts return data after a booking has been made and adds eway vars, modifies feedback message.
-	* @param array $return
-	* @param EM_Booking $EM_Booking
-	* @return array
-	*/
+	 * Intercepts return data after a booking has been made and adds eway vars, modifies feedback message.
+	 * @param array $return
+	 * @param EM_Booking $EM_Booking
+	 * @return array
+	 */
 	public function booking_form_feedback( $return, $EM_Booking = false ) {
 		// Double check $EM_Booking is an EM_Booking object and that we have a booking awaiting payment.
 		if (!empty($return['result'])) {
@@ -311,8 +315,8 @@ class MethodEventsManager extends \EM_Gateway {
 	 */
 
 	/**
-	* Outputs custom content and credit card information.
-	*/
+	 * Outputs custom content and credit card information.
+	 */
 	public function booking_form() {
 		$card_msg	= esc_html(get_option("em_{$this->gateway}_card_msg"));
 
@@ -330,8 +334,8 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* maybe set up Client Side Encryption
-	*/
+	 * maybe set up Client Side Encryption
+	 */
 	public function maybeEnqueueEcrypt() {
 		$creds	= $this->getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
@@ -341,8 +345,8 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* maybe set up Client Side Encryption
-	*/
+	 * maybe set up Client Side Encryption
+	 */
 	public function ecryptScript() {
 		$creds	= $this->getApiCredentials();
 
@@ -363,10 +367,10 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* attempt to process payment
-	* @param EM_Booking $EM_Booking
-	* @return boolean
-	*/
+	 * attempt to process payment
+	 * @param EM_Booking $EM_Booking
+	 * @return boolean
+	 */
 	public function processPayment($EM_Booking) {
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('em_eway_trans_number', $EM_Booking->booking_id);
@@ -383,18 +387,18 @@ class MethodEventsManager extends \EM_Gateway {
 		$eway->transactionNumber			= $transactionID;
 		$eway->amount						= $EM_Booking->get_price(false, false, true);
 		$eway->currencyCode					= get_option('dbem_bookings_currency', 'AUD');
-		$eway->cardHoldersName				= $postdata->getValue('x_card_name');
-		$eway->cardNumber					= $postdata->cleanCardnumber($postdata->getValue('x_card_num'));
-		$eway->cardExpiryMonth				= $postdata->getValue('x_exp_date_month');
-		$eway->cardExpiryYear				= $postdata->getValue('x_exp_date_year');
-		$eway->cardVerificationNumber		= $postdata->getValue('x_card_code');
+		$eway->cardHoldersName				= (string) $postdata->getValue('x_card_name');
+		$eway->cardNumber					= (string) $postdata->cleanCardnumber($postdata->getValue('x_card_num'));
+		$eway->cardExpiryMonth				= (string) $postdata->getValue('x_exp_date_month');
+		$eway->cardExpiryYear				= (string) $postdata->getValue('x_exp_date_year');
+		$eway->cardVerificationNumber		= (string) $postdata->getValue('x_card_code');
 		$eway->emailAddress					= $EM_Booking->get_person()->user_email;
-		$eway->address1						= \EM_Gateways::get_customer_field('address', $EM_Booking);
-		$eway->address2						= \EM_Gateways::get_customer_field('address_2', $EM_Booking);
-		$eway->suburb						= \EM_Gateways::get_customer_field('city', $EM_Booking);
-		$eway->state						= \EM_Gateways::get_customer_field('state', $EM_Booking);
-		$eway->postcode						= $postdata->getValue('zip');
-		$eway->country						= \EM_Gateways::get_customer_field('country', $EM_Booking);
+		$eway->address1						= EM_Gateways::get_customer_field('address', $EM_Booking);
+		$eway->address2						= EM_Gateways::get_customer_field('address_2', $EM_Booking);
+		$eway->suburb						= EM_Gateways::get_customer_field('city', $EM_Booking);
+		$eway->state						= EM_Gateways::get_customer_field('state', $EM_Booking);
+		$eway->postcode						= (string) $postdata->getValue('zip');
+		$eway->country						= EM_Gateways::get_customer_field('country', $EM_Booking);
 		$eway->countryName					= $eway->country;
 
 		// convert Events Manager country code into country name
@@ -480,14 +484,14 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/*
-	* --------------------------------------------------
-	* Gateway Settings Functions
-	* --------------------------------------------------
-	*/
+	 * --------------------------------------------------
+	 * Gateway Settings Functions
+	 * --------------------------------------------------
+	 */
 
 	/**
-	* Outputs custom fields in the settings page
-	*/
+	 * Outputs custom fields in the settings page
+	 */
 	public function mysettings() {
 		add_action('admin_print_footer_scripts', [$this, 'adminSettingsScript']);
 
@@ -495,9 +499,9 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* Run when saving settings, saves the settings available in self::mysettings()
-	* return boolean
-	*/
+	 * Run when saving settings, saves the settings available in self::mysettings()
+	 * return boolean
+	 */
 	public function update() {
 		$options = [
 			"em_{$this->gateway}_mode",
@@ -541,10 +545,9 @@ class MethodEventsManager extends \EM_Gateway {
 	}
 
 	/**
-	* get API credentials based on settings
-	* @return array
-	*/
-	protected function getApiCredentials() {
+	 * get API credentials based on settings
+	 */
+	protected function getApiCredentials() : array {
 		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
 
 		if (!$useSandbox) {

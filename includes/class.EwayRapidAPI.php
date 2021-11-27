@@ -1,14 +1,16 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
+use JsonSerializable;
+
 if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
-* Class for dealing with an Eway Rapid API payment
-* @link https://eway.io/api-v3/
-*/
+ * Class for dealing with an Eway Rapid API payment
+ * @link https://eway.io/api-v3/
+ */
 class EwayRapidAPI {
 
 	#region "constants"
@@ -16,30 +18,6 @@ class EwayRapidAPI {
 	// API hosts
 	const API_HOST_LIVE						= 'https://api.ewaypayments.com';
 	const API_HOST_SANDBOX					= 'https://api.sandbox.ewaypayments.com';
-
-	// API endpoints for REST/JSON
-	const API_DIRECT_PAYMENT				= 'Transaction';
-
-	// valid actions
-	const METHOD_PAYMENT					= 'ProcessPayment';
-	const METHOD_AUTHORISE					= 'Authorise';
-
-	// valid transaction types
-	const TRANS_PURCHASE					= 'Purchase';
-	const TRANS_RECURRING					= 'Recurring';
-	const TRANS_MOTO						= 'MOTO';
-
-	// valid shipping methods
-	const SHIP_METHOD_UNKNOWN				= 'Unknown';
-	const SHIP_METHOD_LOWCOST				= 'LowCost';
-	const SHIP_METHOD_CUSTOMER				= 'DesignatedByCustomer';
-	const SHIP_METHOD_INTERNATIONAL			= 'International';
-	const SHIP_METHOD_MILITARY				= 'Military';
-	const SHIP_METHOD_NEXTDAY				= 'NextDay';
-	const SHIP_METHOD_PICKUP				= 'StorePickup';
-	const SHIP_METHOD_2DAY					= 'TwoDayService';
-	const SHIP_METHOD_3DAY					= 'ThreeDayService';
-	const SHIP_METHOD_OTHER					= 'Other';
 
 	const PARTNER_ID						= '4577fd8eb9014c7188d7be672c0e0d88';
 
@@ -50,348 +28,281 @@ class EwayRapidAPI {
 	#region "connection specific members"
 
 	/**
-	* use Eway sandbox
-	* @var boolean
-	*/
-	public $useSandbox;
+	 * use Eway sandbox
+	 */
+	public bool $useSandbox;
 
 	/**
-	* capture payment (alternative is just authorise, no capture)
-	* @var boolean
-	*/
-	public $capture;
+	 * capture payment (alternative is just authorise, no capture)
+	 */
+	public bool $capture = true;
 
 	/**
-	* default TRUE, whether to validate the remote SSL certificate
-	* @var boolean
-	*/
-	public $sslVerifyPeer;
+	 * whether to validate the remote SSL certificate
+	 */
+	public bool $sslVerifyPeer = true;
 
 	/**
-	* API key
-	* @var string
-	*/
-	public $apiKey;
+	 * connection timeout in seconds
+	 */
+	public int $timeout = 15;
 
 	/**
-	* API password
-	* @var string
-	*/
-	public $apiPassword;
+	 * API key
+	 */
+	public string $apiKey;
 
 	/**
-	* ID of device or application processing the transaction
-	* @var string max. 50 characters
-	*/
-	public $deviceID;
+	 * API password
+	 */
+	public string $apiPassword;
 
 	/**
-	* HTTP user agent string identifying plugin, perhaps for debugging
-	* @var string
-	*/
-	public $httpUserAgent;
+	 * ID of device or application processing the transaction
+	 */
+	public string $deviceID;
+
+	/**
+	 * HTTP user agent string identifying plugin, perhaps for debugging
+	 */
+	public string $httpUserAgent;
 
 	#endregion // "connection specific members"
 
 	#region "payment specific members"
 
 	/**
-	* action to perform: one of the METHOD_* values
-	* @var string
-	*/
-	public $method;
+	 * a unique transaction number from your site (NB: see transactionNumber which is intended for invoice number or similar)
+	 */
+	public string $transactionNumber;
 
 	/**
-	* a unique transaction number from your site (NB: see transactionNumber which is intended for invoice number or similar)
-	* @var string max. 50 characters
-	*/
-	public $transactionNumber;
+	 * an invoice reference to track by
+	 */
+	public string $invoiceReference;
 
 	/**
-	* an invoice reference to track by
-	* @var string max. 12 characters
-	*/
-	public $invoiceReference;
+	 * description of what is being purchased / paid for
+	 */
+	public string $invoiceDescription;
 
 	/**
-	* description of what is being purchased / paid for
-	* @var string max. 64 characters
-	*/
-	public $invoiceDescription;
-
-	/**
-	* total amount of payment, in dollars and cents as a floating-point number (will be converted to just cents for transmission)
-	* @var float
-	*/
+	 * total amount of payment, in dollars and cents as a floating-point number (will be converted to just cents for transmission)
+	 * @var float
+	 */
 	public $amount;
 
 	/**
-	* ISO 4217 currency code
-	* @var string 3 characters in uppercase
-	*/
-	public $currencyCode;
+	 * ISO 4217 currency code
+	 */
+	public string $currencyCode;
 
 	// customer and billing details
 
 	/**
-	* customer's title
-	* @var string max. 5 characters
-	*/
-	public $title;
+	 * customer's title
+	 */
+	public string $title = '';
 
 	/**
-	* customer's first name
-	* @var string max. 50 characters
-	*/
-	public $firstName;
+	 * customer's first name
+	 */
+	public string $firstName = '';
 
 	/**
-	* customer's last name
-	* @var string max. 50 characters
-	*/
-	public $lastName;
+	 * customer's last name
+	 */
+	public string $lastName = '';
 
 	/**
-	* customer's company name
-	* @var string max. 50 characters
-	*/
-	public $companyName;
+	 * customer's company name
+	 */
+	public string $companyName = '';
 
 	/**
-	* customer's job description (e.g. position)
-	* @var string max. 50 characters
-	*/
-	public $jobDescription;
+	 * customer's job description (e.g. position)
+	 */
+	public string $jobDescription = '';
 
 	/**
-	* customer's address line 1
-	* @var string max. 50 characters
-	*/
-	public $address1;
+	 * customer's address line 1
+	 */
+	public string $address1 = '';
 
 	/**
-	* customer's address line 2
-	* @var string max. 50 characters
-	*/
-	public $address2;
+	 * customer's address line 2
+	 */
+	public string $address2 = '';
 
 	/**
-	* customer's suburb/city/town
-	* @var string max. 50 characters
-	*/
-	public $suburb;
+	 * customer's suburb/city/town
+	 */
+	public string $suburb = '';
 
 	/**
-	* customer's state/province
-	* @var string max. 50 characters
-	*/
-	public $state;
+	 * customer's state/province
+	 */
+	public string $state = '';
 
 	/**
-	* customer's postcode
-	* @var string max. 30 characters
-	*/
-	public $postcode;
+	 * customer's postcode
+	 */
+	public string $postcode = '';
 
 	/**
-	* customer's country code
-	* @var string 2 characters lowercase
-	*/
-	public $country;
+	 * customer's country code
+	 */
+	public string $country = '';
 
 	/**
-	* customer's email address
-	* @var string max. 50 characters
-	*/
-	public $emailAddress;
+	 * customer's email address
+	 */
+	public string $emailAddress = '';
 
 	/**
-	* customer's phone number
-	* @var string max. 32 characters
-	*/
-	public $phone;
+	 * customer's phone number
+	 */
+	public string $phone = '';
 
 	/**
-	* customer's mobile phone number
-	* @var string max. 32 characters
-	*/
-	public $mobile;
+	 * customer's mobile phone number
+	 */
+	public string $mobile = '';
 
 	/**
-	* customer's fax number
-	* @var string max. 32 characters
-	*/
-	public $fax;
+	 * customer's fax number
+	 */
+	public string $fax = '';
 
 	/**
-	* customer's website URL
-	* @var string max. 512 characters
-	*/
-	public $website;
+	 * customer's website URL
+	 */
+	public string $website = '';
 
 	/**
-	* comments about the customer
-	* @var string max. 255 characters
-	*/
-	public $comments;
+	 * comments about the customer
+	 */
+	public string $comments = '';
 
 	// card details
 
 	/**
-	* name on credit card
-	* @var string max. 50 characters
-	*/
-	public $cardHoldersName;
+	 * name on credit card
+	 */
+	public string $cardHoldersName;
 
 	/**
-	* credit card number, with no spaces
-	* @var string max. 50 characters
-	*/
-	public $cardNumber;
+	 * credit card number, with no spaces
+	 */
+	public string $cardNumber;
 
 	/**
-	* month of expiry, numbered from 1=January
-	* @var integer max. 2 digits
-	*/
-	public $cardExpiryMonth;
+	 * month of expiry, numbered from 1=January
+	 */
+	public int $cardExpiryMonth;
 
 	/**
-	* year of expiry
-	* @var integer will be truncated to 2 digits, can accept 4 digits
-	*/
-	public $cardExpiryYear;
+	 * year of expiry
+	 */
+	public int $cardExpiryYear;
 
 	/**
-	* start month, numbered from 1=January
-	* @var integer max. 2 digits
-	*/
-	public $cardStartMonth;
+	 * CVN (Creditcard Verification Number) for verifying physical card is held by buyer
+	 */
+	public string $cardVerificationNumber;
 
 	/**
-	* start year
-	* @var integer will be truncated to 2 digits, can accept 4 digits
-	*/
-	public $cardStartYear;
+	 * true when there is shipping information
+	 */
+	public bool $hasShipping = false;
 
 	/**
-	* card issue number
-	* @var string
-	*/
-	public $cardIssueNumber;
+	 * shipping method: one of the SHIP_METHOD_* values
+	 */
+	public string $shipMethod = '';
 
 	/**
-	* CVN (Creditcard Verification Number) for verifying physical card is held by buyer
-	* @var string max. 3 or 4 characters (depends on type of card)
-	*/
-	public $cardVerificationNumber;
+	 * shipping first name
+	 */
+	public string $shipFirstName = '';
 
 	/**
-	* true when there is shipping information
-	* @var bool
-	*/
-	public $hasShipping;
+	 * shipping last name
+	 */
+	public string $shipLastName = '';
 
 	/**
-	* shipping method: one of the SHIP_METHOD_* values
-	* @var string max. 30 characters
-	*/
-	public $shipMethod;
+	 * shipping address line 1
+	 */
+	public string $shipAddress1 = '';
 
 	/**
-	* shipping first name
-	* @var string max. 50 characters
-	*/
-	public $shipFirstName;
+	 * shipping address line 2
+	 */
+	public string $shipAddress2 = '';
 
 	/**
-	* shipping last name
-	* @var string max. 50 characters
-	*/
-	public $shipLastName;
+	 * shipping suburb/city/town
+	 */
+	public string $shipSuburb = '';
 
 	/**
-	* shipping address line 1
-	* @var string max. 50 characters
-	*/
-	public $shipAddress1;
+	 * shipping state/province
+	 */
+	public string $shipState = '';
 
 	/**
-	* shipping address line 2
-	* @var string max. 50 characters
-	*/
-	public $shipAddress2;
+	 * shipping postcode
+	 */
+	public string $shipPostcode = '';
 
 	/**
-	* shipping suburb/city/town
-	* @var string max. 50 characters
-	*/
-	public $shipSuburb;
+	 * shipping country code
+	 */
+	public string $shipCountry = '';
 
 	/**
-	* shipping state/province
-	* @var string max. 50 characters
-	*/
-	public $shipState;
+	 * shipping email address
+	 */
+	public string $shipEmailAddress = '';
 
 	/**
-	* shipping postcode
-	* @var string max. 30 characters
-	*/
-	public $shipPostcode;
+	 * shipping phone number
+	 */
+	public string $shipPhone = '';
 
 	/**
-	* shipping country code
-	* @var string 2 characters lowercase
-	*/
-	public $shipCountry;
+	 * shipping fax number
+	 */
+	public string $shipFax = '';
 
 	/**
-	* shipping email address
-	* @var string max. 50 characters
-	*/
-	public $shipEmailAddress;
-
-	/**
-	* shipping phone number
-	* @var string max. 32 characters
-	*/
-	public $shipPhone;
-
-	/**
-	* shipping fax number
-	* @var string max. 32 characters
-	*/
-	public $shipFax;
-
-	/**
-	* optional additional information for use in shopping carts, etc.
-	* @var array[string] max. 254 characters each
-	*/
-	public $options = [];
+	 * optional additional information for use in shopping carts, etc.
+	 * @var array[string] max. 254 characters each
+	 */
+	public array $options = [];
 
 	#endregion "payment specific members"
 
 	#endregion "members"
 
 	/**
-	* populate members with defaults, and set account and environment information
-	* @param string $apiKey Eway API key
-	* @param string $apiPassword Eway API password
-	* @param boolean $useSandbox use Eway sandbox
-	*/
-	public function __construct($apiKey, $apiPassword, $useSandbox = true) {
+	 * populate members with defaults, and set account and environment information
+	 * @param string $apiKey Eway API key
+	 * @param string $apiPassword Eway API password
+	 * @param boolean $useSandbox use Eway sandbox
+	 */
+	public function __construct(string $apiKey, string $apiPassword, bool $useSandbox) {
 		$this->apiKey			= $apiKey;
 		$this->apiPassword		= $apiPassword;
 		$this->useSandbox		= $useSandbox;
-		$this->capture			= true;
-		$this->sslVerifyPeer	= true;
 		$this->httpUserAgent	= 'Eway Payment Gateway v' . EWAY_PAYMENTS_VERSION;
 	}
 
 	/**
-	* process a payment against Eway; throws exception on error with error described in exception message.
-	* @throws EwayPaymentsException
-	*/
+	 * process a payment against Eway; throws exception on error with error described in exception message.
+	 * @throws EwayPaymentsException
+	 */
 	public function processPayment() {
 		$errors = $this->validateAmount();
 
@@ -400,7 +311,7 @@ class EwayRapidAPI {
 		}
 
 		$request = $this->getPaymentDirect();
-		$responseJSON = $this->apiPostRequest(self::API_DIRECT_PAYMENT, $request);
+		$responseJSON = $this->apiPostRequest('Transaction', $request);
 
 		$response = new EwayResponseDirectPayment();
 		$response->loadResponse($responseJSON);
@@ -409,9 +320,9 @@ class EwayRapidAPI {
 	}
 
 	/**
-	* validate the amount for processing
-	* @return array list of errors in validation
-	*/
+	 * validate the amount for processing
+	 * @return array list of errors in validation
+	 */
 	protected function validateAmount() {
 		$errors = [];
 
@@ -426,26 +337,15 @@ class EwayRapidAPI {
 	}
 
 	/**
-	* create JSON request document for direct payment
-	* @return string
-	*/
-	public function getPaymentDirect() {
-		$request = new \stdClass();
+	 * create JSON request document for direct payment
+	 * @return string
+	 */
+	public function getPaymentDirect() : string {
+		$is_live_site = !$this->useSandbox;
 
-		$request->Customer				= $this->getCustomerRecord(true);
+		$request = new TransactionRequest($is_live_site, self::PARTNER_ID, TransactionRequest::TRANS_PURCHASE, $this->capture);
+		$request->Customer				= $this->getCustomerRecord();
 		$request->Payment				= $this->getPaymentRecord();
-		$request->TransactionType		= self::TRANS_PURCHASE;
-		$request->PartnerID				= self::PARTNER_ID;
-		$request->CustomerIP			= get_customer_IP(!$this->useSandbox);
-
-		if (!$this->capture) {
-			// just authorise the transaction;
-			$request->Method = self::METHOD_AUTHORISE;
-		}
-		else {
-			// capture transaction for non-token payment
-			$request->Method = self::METHOD_PAYMENT;
-		}
 
 		if ($this->hasShipping) {
 			$request->ShippingAddress	= $this->getShippingAddressRecord();
@@ -456,155 +356,91 @@ class EwayRapidAPI {
 		}
 
 		if (!empty($this->deviceID)) {
-			$request->DeviceID 			= substr($this->deviceID, 0, 50);
+			$request->setDeviceID($this->deviceID);
 		}
 
 		return wp_json_encode($request);
 	}
 
 	/**
-	* build Customer record for request
-	* @return stdClass
-	*/
-	protected function getCustomerRecord() {
-		$record = new \stdClass;
+	 * build Customer record for request
+	 */
+	protected function getCustomerRecord() : CustomerDetails {
+		$record = new CustomerDetails;
 
-		$record->Title				= $this->title				? self::sanitiseTitle($this->title) : '';
-		$record->FirstName			= $this->firstName			? substr($this->firstName, 0, 50) : '';
-		$record->LastName			= $this->lastName			? substr($this->lastName, 0, 50) : '';
-		$record->Street1			= $this->address1			? substr($this->address1, 0, 50) : '';
-		$record->Street2			= $this->address2			? substr($this->address2, 0, 50) : '';
-		$record->City				= $this->suburb				? substr($this->suburb, 0, 50) : '';
-		$record->State				= $this->state				? substr($this->state, 0, 50) : '';
-		$record->PostalCode			= $this->postcode			? substr($this->postcode, 0, 30) : '';
-		$record->Country			= $this->country			? strtolower($this->country) : '';
-		$record->Email				= $this->emailAddress		? substr($this->emailAddress, 0, 50) : '';
-		$record->CardDetails		= $this->getCardDetailsRecord();
+		$record->setTitle($this->title);
+		$record->setFirstName($this->firstName);
+		$record->setLastName($this->lastName);
+		$record->setStreet1($this->address1);
+		$record->setStreet2($this->address2);
+		$record->setCity($this->suburb);
+		$record->setState($this->state);
+		$record->setPostalCode($this->postcode);
+		$record->setCountry($this->country);
+		$record->setEmail($this->emailAddress);
+		$record->setCompanyName($this->companyName);
+		$record->setJobDescription($this->jobDescription);
+		$record->setPhone($this->phone);
+		$record->setMobile($this->mobile);
+		$record->setFax($this->fax);
+		$record->setUrl($this->website);
+		$record->setComments($this->comments);
 
-		if (!empty($this->companyName)) {
-			$record->CompanyName	= substr($this->companyName, 0, 50);
-		}
-
-		if (!empty($this->jobDescription)) {
-			$record->JobDescription	= substr($this->jobDescription, 0, 50);
-		}
-
-		if (!empty($this->phone)) {
-			$record->Phone			= substr($this->phone, 0, 32);
-		}
-
-		if (!empty($this->mobile)) {
-			$record->Mobile			= substr($this->mobile, 0, 32);
-		}
-
-		if (!empty($this->fax)) {
-			$record->Fax			= substr($this->fax, 0, 32);
-		}
-
-		if (!empty($this->website)) {
-			$record->Url			= substr($this->website, 0, 512);
-		}
-
-		if (!empty($this->comments)) {
-			$record->Comments		= substr($this->comments, 0, 255);
-		}
+		$record->CardDetails = new CardDetails(
+			$this->cardHoldersName,
+			$this->cardNumber,
+			$this->cardExpiryMonth,
+			$this->cardExpiryYear,
+			$this->cardVerificationNumber,
+		);
 
 		return $record;
 	}
 
 	/**
-	* build ShippindAddress record for request
-	* @return stdClass
-	*/
-	protected function getShippingAddressRecord() {
-		$record = new \stdClass;
+	 * build ShippindAddress record for request
+	 */
+	protected function getShippingAddressRecord() : ShippingAddress {
+		$record = new ShippingAddress;
 
-		if ($this->shipMethod) {
-			$record->ShippingMethod	= $this->shipMethod;
-		}
-		if ($this->shipFirstName) {
-			$record->FirstName		= substr($this->shipFirstName, 0, 50);
-		}
-		if ($this->shipLastName) {
-			$record->LastName		= substr($this->shipLastName, 0, 50);
-		}
-		if ($this->shipEmailAddress) {
-			$record->Email			= substr($this->shipEmailAddress, 0, 50);
-		}
-		if ($this->shipPhone) {
-			$record->Phone			= substr($this->shipPhone, 0, 32);
-		}
-		if ($this->shipFax) {
-			$record->Fax			= substr($this->shipFax, 0, 32);
-		}
-
-		$record->Street1			= $this->shipAddress1		? substr($this->shipAddress1, 0, 50) : '';
-		$record->Street2			= $this->shipAddress2		? substr($this->shipAddress2, 0, 50) : '';
-		$record->City				= $this->shipSuburb			? substr($this->shipSuburb, 0, 50) : '';
-		$record->State				= $this->shipState			? substr($this->shipState, 0, 50) : '';
-		$record->PostalCode			= $this->shipPostcode		? substr($this->shipPostcode, 0, 30) : '';
-		$record->Country			= $this->shipCountry		? strtolower($this->shipCountry) : '';
+		$record->setShippingMethod($this->shipMethod);
+		$record->setFirstName($this->shipFirstName);
+		$record->setLastName($this->shipLastName);
+		$record->setStreet1($this->shipAddress1);
+		$record->setStreet2($this->shipAddress2);
+		$record->setCity($this->shipSuburb);
+		$record->setState($this->shipState);
+		$record->setPostalCode($this->shipPostcode);
+		$record->setCountry($this->shipCountry);
+		$record->setEmail($this->shipEmailAddress);
+		$record->setPhone($this->shipPhone);
+		$record->setFax($this->shipFax);
 
 		return $record;
 	}
 
 	/**
-	* build CardDetails record for request
-	* NB: TODO: does not currently handle StartMonth, StartYear, IssueNumber (used in UK)
-	* NB: card number and CVN can be very lengthy encrypted values
-	* @return stdClass
-	*/
-	protected function getCardDetailsRecord() {
-		$record = new \stdClass;
+	 * build Payment record for request
+	 */
+	protected function getPaymentRecord() : PaymentDetails {
+		$record = new PaymentDetails;
 
-		if (!empty($this->cardHoldersName)) {
-			$record->Name				= substr($this->cardHoldersName, 0, 50);
-		}
-
-		if (!empty($this->cardNumber)) {
-			$record->Number				= $this->cardNumber;
-		}
-
-		if (!empty($this->cardExpiryMonth)) {
-			$record->ExpiryMonth		= sprintf('%02d', $this->cardExpiryMonth);
-		}
-
-		if (!empty($this->cardExpiryYear)) {
-			$record->ExpiryYear			= sprintf('%02d', $this->cardExpiryYear % 100);
-		}
-
-		if (!empty($this->cardVerificationNumber)) {
-			$record->CVN				= $this->cardVerificationNumber;
-		}
-
-		return $record;
-	}
-
-	/**
-	* build Payment record for request
-	* @return stdClass
-	*/
-	protected function getPaymentRecord() {
-		$record = new \stdClass;
-
+		// only populate if there's an amount value, but still return a PaymentDetails record
 		if ($this->amount > 0) {
-			$record->TotalAmount		= self::formatCurrency($this->amount, $this->currencyCode);
-			$record->InvoiceReference	= $this->transactionNumber	? substr($this->transactionNumber, 0, 50) : '';
-			$record->InvoiceDescription	= $this->invoiceDescription	? substr($this->invoiceDescription, 0, 64) : '';
-			$record->InvoiceNumber		= $this->invoiceReference	? substr($this->invoiceReference, 0, 12) : '';
-			$record->CurrencyCode		= $this->currencyCode		? substr($this->currencyCode, 0, 3) : '';
-		}
-		else {
-			$record->TotalAmount		= 0;
+			$record->setTotalAmount($this->amount, $this->currencyCode);
+			$record->setInvoiceReference($this->transactionNumber);
+			$record->setInvoiceDescription($this->invoiceDescription);
+			$record->setInvoiceNumber($this->invoiceReference);
+			$record->setCurrencyCode($this->currencyCode);
 		}
 
 		return $record;
 	}
 
 	/**
-	* build Options record for request
-	* @return array
-	*/
+	 * build Options record for request
+	 * @return array
+	 */
 	protected function getOptionsRecord() {
 		$options = [];
 
@@ -618,13 +454,10 @@ class EwayRapidAPI {
 	}
 
 	/**
-	* generalise an API post request
-	* @param string $endpoint
-	* @param string $request
-	* @return string JSON response
-	* @throws EwayPaymentsException
-	*/
-	protected function apiPostRequest($endpoint, $request) {
+	 * generalise an API post request
+	 * @throws EwayPaymentsException
+	 */
+	protected function apiPostRequest(string $endpoint, string $request) : string {
 		// select host and endpoint
 		$host = $this->useSandbox ? self::API_HOST_SANDBOX : self::API_HOST_LIVE;
 		$url = "$host/$endpoint";
@@ -633,11 +466,11 @@ class EwayRapidAPI {
 		$response = wp_remote_post($url, [
 			'user-agent'	=> $this->httpUserAgent,
 			'sslverify'		=> $this->sslVerifyPeer,
-			'timeout'		=> 30,
+			'timeout'		=> $this->timeout,
 			'headers'		=> [
-									'Content-Type'		=> 'application/json',
-									'Authorization'		=> $this->getBasicAuthentication(),
-							   ],
+				'Content-Type'		=> 'application/json',
+				'Authorization'		=> $this->getBasicAuthentication(),
+			],
 			'body'			=> $request,
 		]);
 
@@ -648,13 +481,10 @@ class EwayRapidAPI {
 	}
 
 	/**
-	* generalise an API get request
-	* @param string $endpoint
-	* @param string $request
-	* @return string JSON response
-	* @throws EwayPaymentsException
-	*/
-	protected function apiGetRequest($endpoint, $request) {
+	 * generalise an API get request
+	 * @throws EwayPaymentsException
+	 */
+	protected function apiGetRequest(string $endpoint, string $request) : string {
 		// select host and endpoint
 		$host = $this->useSandbox ? self::API_HOST_SANDBOX : self::API_HOST_LIVE;
 		$url = sprintf('%s/%s/%s', $host, urlencode($endpoint), urlencode($request));
@@ -663,11 +493,11 @@ class EwayRapidAPI {
 		$response = wp_remote_get($url, [
 			'user-agent'	=> $this->httpUserAgent,
 			'sslverify'		=> $this->sslVerifyPeer,
-			'timeout'		=> 30,
+			'timeout'		=> $this->timeout,
 			'headers'		=> [
-									'Content-Type'		=> 'application/json',
-									'Authorization'		=> $this->getBasicAuthentication(),
-							   ],
+				'Content-Type'		=> 'application/json',
+				'Authorization'		=> $this->getBasicAuthentication(),
+			],
 		]);
 
 		// check for http error
@@ -677,18 +507,17 @@ class EwayRapidAPI {
 	}
 
 	/**
-	* get encoded authorisation information for request
-	* @return string
-	*/
-	protected function getBasicAuthentication() {
+	 * get encoded authorisation information for request
+	 */
+	protected function getBasicAuthentication() : string {
 		return 'Basic ' . base64_encode("{$this->apiKey}:{$this->apiPassword}");
 	}
 
 	/**
-	* check http get/post response, throw exception if an error occurred
-	* @param array $response
-	* @throws EwayPaymentsException
-	*/
+	 * check http get/post response, throw exception if an error occurred
+	 * @param array|object $response
+	 * @throws EwayPaymentsException
+	 */
 	protected function checkHttpResponse($response) {
 		// failure to handle the http request
 		if (is_wp_error($response)) {
@@ -712,52 +541,301 @@ class EwayRapidAPI {
 		}
 	}
 
+}
+
+/**
+ * implement jsonSerialize() that removes null/uninitialised properties
+ */
+trait SerialiseWithoutNull {
+
 	/**
-	* format amount per currency
-	* @param float $amount
-	* @param string $currencyCode
-	* @return string
-	*/
-	protected static function formatCurrency($amount, $currencyCode) {
-		switch ($currencyCode) {
-
-			// Japanese Yen already has no decimal fraction
-			case 'JPY':
-				$value = number_format($amount, 0, '', '');
-				break;
-
-			default:
-				$value = number_format($amount * 100, 0, '', '');
-				break;
-
-		}
-
-		return $value;
+	 * convert object properties to array (stripping uninitialised properties)
+	 * and then filter out null properties
+	 */
+	public function jsonSerialize() : mixed {
+		return array_filter((array) $this, static function($var) {
+			return !is_null($var);
+		});
 	}
 
-	/**
-	* sanitise the customer title, to avoid error V6058: Invalid Customer Title
-	* @param string $title
-	* @return string
-	*/
-	protected static function sanitiseTitle($title) {
-		$valid = [
-			'mr'			=> 'Mr.',
-			'master'		=> 'Mr.',
-			'ms'			=> 'Ms.',
-			'mrs'			=> 'Mrs.',
-			'missus'		=> 'Mrs.',
-			'miss'			=> 'Miss',
-			'dr'			=> 'Dr.',
-			'doctor'		=> 'Dr.',
-			'sir'			=> 'Sir',
-			'prof'			=> 'Prof.',
-			'professor'		=> 'Prof.',
-		];
+}
 
-		$simple = rtrim(strtolower(trim($title)), '.');
+/**
+ * card details record
+ */
+class CardDetails implements JsonSerializable {
 
-		return isset($valid[$simple]) ? $valid[$simple] : '';
+	use SerialiseWithoutNull;
+
+	public ?string				$Name;
+	public ?string				$Number;
+	public ?string				$ExpiryMonth;
+	public ?string				$ExpiryYear;
+	public ?string				$StartMonth;	// UK
+	public ?string				$StartYear;		// UK
+	public ?string				$IssueNumber;	// UK
+	public ?string				$CVN;
+
+	public function __construct(?string $name, ?string $card_number, ?string $expiry_month, ?string $expiry_year, ?string $cvn) {
+		$this->Name				= $name ? substr($name, 0, 50) : null;
+		$this->ExpiryMonth		= $expiry_month ? sprintf('%02d', $expiry_month) : null;
+		$this->ExpiryYear		= $expiry_year ? sprintf('%02d', $expiry_year % 100) : null;
+
+		// these may be long encrypted strings from CSE (Client Side Encryption)
+		$this->Number			= $card_number ?: null;
+		$this->CVN				= $cvn ?: null;
+	}
+
+}
+
+/**
+ * Customer Details record
+ */
+class CustomerDetails implements JsonSerializable {
+
+	use SerialiseWithoutNull;
+
+	public ?string				$Title;
+	public ?string				$FirstName;
+	public ?string				$LastName;
+	public ?string				$Street1;
+	public ?string				$Street2;
+	public ?string				$City;
+	public ?string				$State;
+	public ?string				$PostalCode;
+	public ?string				$Country;
+	public ?string				$Email;
+	public ?string				$CompanyName;
+	public ?string				$JobDescription;
+	public ?string				$Phone;
+	public ?string				$Mobile;
+	public ?string				$Comments;
+	public ?string				$Fax;
+	public ?string				$Url;
+	public ?CardDetails			$CardDetails;
+
+	public function setTitle(?string $title) {
+		$this->Title = $title ? sanitise_customer_title($title) : null;
+	}
+
+	public function setFirstName(?string $first_name) {
+		$this->FirstName = $first_name ? substr($first_name, 0, 50) : null;
+	}
+
+	public function setLastName(?string $last_name) {
+		$this->LastName = $last_name ? substr($last_name, 0, 50) : null;
+	}
+
+	public function setStreet1(?string $address1) {
+		$this->Street1 = $address1 ? substr($address1, 0, 50) : null;
+	}
+
+	public function setStreet2(?string $address2) {
+		$this->Street2 = $address2 ? substr($address2, 0, 50) : null;
+	}
+
+	public function setCity(?string $suburb) {
+		$this->City = $suburb ? substr($suburb, 0, 50) : null;
+	}
+
+	public function setState(?string $state) {
+		$this->State = $state ? substr($state, 0, 50) : null;
+	}
+
+	public function setPostalCode(?string $postcode) {
+		$this->PostalCode = $postcode ? substr($postcode, 0, 30) : null;
+	}
+
+	public function setCountry(?string $country) {
+		$this->Country = $country ? substr(strtolower($country), 0, 2) : null;
+	}
+
+	public function setEmail(?string $email_address) {
+		$this->Email = $email_address ? substr($email_address, 0, 50) : null;
+	}
+
+	public function setCompanyName(?string $company_name) {
+		$this->CompanyName = $company_name ? substr($company_name, 0, 50) : null;
+	}
+
+	public function setJobDescription(?string $job_description) {
+		$this->JobDescription = $job_description ? substr($job_description, 0, 50) : null;
+	}
+
+	public function setPhone(?string $phone) {
+		$this->Phone = $phone ? substr($phone, 0, 32) : null;
+	}
+
+	public function setMobile(?string $mobile) {
+		$this->Mobile = $mobile ? substr($mobile, 0, 32) : null;
+	}
+
+	public function setComments(?string $comments) {
+		$this->Comments = $comments ? substr($comments, 0, 255) : null;
+	}
+
+	public function setFax(?string $fax) {
+		$this->Fax = $fax ? substr($fax, 0, 32) : null;
+	}
+
+	public function setUrl(?string $website) {
+		$this->Url = $website ? substr($website, 0, 512) : null;
+	}
+
+}
+
+/**
+ * Shipping Address record
+ */
+class ShippingAddress implements JsonSerializable {
+
+	use SerialiseWithoutNull;
+
+	// valid shipping methods
+	const SHIP_METHOD_UNKNOWN			= 'Unknown';
+	const SHIP_METHOD_LOWCOST			= 'LowCost';
+	const SHIP_METHOD_CUSTOMER			= 'DesignatedByCustomer';
+	const SHIP_METHOD_INTERNATIONAL		= 'International';
+	const SHIP_METHOD_MILITARY			= 'Military';
+	const SHIP_METHOD_NEXTDAY			= 'NextDay';
+	const SHIP_METHOD_PICKUP			= 'StorePickup';
+	const SHIP_METHOD_2DAY				= 'TwoDayService';
+	const SHIP_METHOD_3DAY				= 'ThreeDayService';
+	const SHIP_METHOD_OTHER				= 'Other';
+
+	public ?string				$ShippingMethod;
+	public ?string				$FirstName;
+	public ?string				$LastName;
+	public ?string				$Street1;
+	public ?string				$Street2;
+	public ?string				$City;
+	public ?string				$State;
+	public ?string				$PostalCode;
+	public ?string				$Country;
+	public ?string				$Email;
+	public ?string				$Phone;
+	public ?string				$Fax;
+
+	public function setShippingMethod(?string $method) {
+		$this->ShippingMethod = $method ? substr($method, 0, 30) : null;
+	}
+
+	public function setFirstName(?string $first_name) {
+		$this->FirstName = $first_name ? substr($first_name, 0, 50) : null;
+	}
+
+	public function setLastName(?string $last_name) {
+		$this->LastName = $last_name ? substr($last_name, 0, 50) : null;
+	}
+
+	public function setStreet1(?string $street1) {
+		$this->Street1 = $street1 ? substr($street1, 0, 50) : null;
+	}
+
+	public function setStreet2(?string $street2) {
+		$this->Street2 = $street2 ? substr($street2, 0, 50) : null;
+	}
+
+	public function setCity(?string $city) {
+		$this->City = $city ? substr($city, 0, 50) : null;
+	}
+
+	public function setState(?string $state) {
+		$this->State = $state ? substr($state, 0, 50) : null;
+	}
+
+	public function setPostalCode(?string $postcode) {
+		$this->PostalCode = $postcode ? substr($postcode, 0, 30) : null;
+	}
+
+	public function setCountry(?string $country) {
+		$this->Country = $country ? substr(strtolower($country), 0, 2) : null;
+	}
+
+	public function setEmail(?string $email) {
+		$this->Email = $email ? substr($email, 0, 50) : null;
+	}
+
+	public function setPhone(?string $phone) {
+		$this->Phone = $phone ? substr($phone, 0, 32) : null;
+	}
+
+	public function setFax(?string $fax) {
+		$this->Fax = $fax ? substr($fax, 0, 32) : null;
+	}
+
+}
+
+/**
+ * Payment record
+ */
+class PaymentDetails implements JsonSerializable {
+
+	use SerialiseWithoutNull;
+
+	public string				$TotalAmount = '0';		// must be '0' for CreateTokenCustomer, UpdateTokenCustomer
+	public ?string				$InvoiceNumber;
+	public ?string				$InvoiceDescription;
+	public ?string				$InvoiceReference;
+	public ?string				$CurrencyCode;
+
+	public function setTotalAmount($amount, string $currency_code) {
+		$this->TotalAmount = $amount ? format_currency($amount, $currency_code) : '0';
+	}
+
+	public function setInvoiceNumber(?string $invoice_number) {
+		$this->InvoiceNumber = $invoice_number ? substr($invoice_number, 0, 64) : null;
+	}
+
+	public function setInvoiceDescription(?string $description) {
+		$this->InvoiceDescription = $description ? substr($description, 0, 64) : null;
+	}
+
+	public function setInvoiceReference(?string $reference) {
+		$this->InvoiceReference	= $reference ? substr($reference, 0, 50) : null;
+	}
+
+	public function setCurrencyCode(?string $currency_code) {
+		$this->CurrencyCode = $currency_code ? substr($currency_code, 0, 3) : null;
+	}
+
+}
+
+/**
+ * Direct Connection Transaction Request record
+ */
+class TransactionRequest implements JsonSerializable {
+
+	use SerialiseWithoutNull;
+
+	// valid transaction types
+	const TRANS_PURCHASE		= 'Purchase';
+	const TRANS_RECURRING		= 'Recurring';
+	const TRANS_MOTO			= 'MOTO';
+
+	// valid actions
+	const METHOD_PAYMENT		= 'ProcessPayment';
+	const METHOD_AUTHORISE		= 'Authorise';
+
+	public CustomerDetails		$Customer;
+	public ?PaymentDetails		$Payment;
+	public ?ShippingAddress		$ShippingAddress;
+	public ?array				$Options;
+	public string				$CustomerIP;
+	public string				$Method;
+	public string				$TransactionType;
+	public ?string				$DeviceID;
+	public string				$PartnerID;
+
+	public function __construct(bool $is_live_site, string $partner_id, string $transaction_type, bool $is_capture) {
+		$this->CustomerIP		= get_customer_IP($is_live_site);
+		$this->PartnerID		= $partner_id;
+		$this->TransactionType	= $transaction_type;
+		$this->Method			= $is_capture ? self::METHOD_PAYMENT : self::METHOD_AUTHORISE;
+	}
+
+	public function setDeviceID(?string $device_id) {
+		$this->DeviceID = $device_id ? substr($device_id, 0, 50) : null;
 	}
 
 }

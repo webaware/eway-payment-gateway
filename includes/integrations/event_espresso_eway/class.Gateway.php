@@ -2,15 +2,20 @@
 namespace webaware\eway_payment_gateway\event_espresso;
 
 use webaware\eway_payment_gateway\Logging;
+use EE_Onsite_Gateway;
+use EEI_Payment;
+use EEI_Transaction;
+
+use function webaware\eway_payment_gateway\get_api_wrapper;
 
 if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
-* Event Espresso gateway functionality
-*/
-class Gateway extends \EE_Onsite_Gateway {
+ * Event Espresso gateway functionality
+ */
+class Gateway extends EE_Onsite_Gateway {
 
 	protected $logger;
 
@@ -18,7 +23,7 @@ class Gateway extends \EE_Onsite_Gateway {
 	 *
 	 * @param EEI_Payment $payment
 	 * @param array $billing_info
-	 * @return \EE_Payment|\EEI_Payment
+	 * @return EE_Payment|EEI_Payment
 	 */
 	public function do_direct_payment($payment, $billing_info = null) {
 		// create a logger
@@ -28,19 +33,19 @@ class Gateway extends \EE_Onsite_Gateway {
 
 		try {
 
-			if (!$payment instanceof \EEI_Payment) {
+			if (!$payment instanceof EEI_Payment) {
 				throw new EwayPaymentsException(__('Error. No associated payment was found.', 'eway-payment-gateway'));
 			}
 
 			$transaction = $payment->transaction();
-			if (!$transaction instanceof \EEI_Transaction) {
+			if (!$transaction instanceof EEI_Transaction) {
 				throw new EwayPaymentsException(__('Could not process this payment because it has no associated transaction.', 'eway-payment-gateway'));
 			}
 
 			$capture	= true;		// TODO: maybe support stored payment for EE
 			$useSandbox	= $this->_debug_mode;
 			$creds		= $this->getApiCredentials();
-			$eway		= \webaware\eway_payment_gateway\get_api_wrapper($creds, $capture, $useSandbox);
+			$eway		= get_api_wrapper($creds, $capture, $useSandbox);
 
 			if (!$eway) {
 				throw new EwayPaymentsException(__('Eway payments is not configured for payments yet.', 'eway-payment-gateway'));
@@ -146,9 +151,8 @@ class Gateway extends \EE_Onsite_Gateway {
 
 	/**
 	* get API credentials based on settings
-	* @return array
 	*/
-	protected function getApiCredentials() {
+	protected function getApiCredentials() : array {
 		static $creds = false;
 
 		if ($creds === false) {

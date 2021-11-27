@@ -1,15 +1,18 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
+use wpsc_merchant;
+use WPSC_Purchase_Log;
+
 if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
-* payment gateway integration for WP eCommerce
-* @link http://docs.wpecommerce.org/category/payment-gateways/
-*/
-class MethodWPeCommerce extends \wpsc_merchant {
+ * payment gateway integration for WP eCommerce
+ * @link http://docs.wpecommerce.org/category/payment-gateways/
+ */
+class MethodWPeCommerce extends wpsc_merchant {
 
 	public $name = 'eway';
 
@@ -18,10 +21,10 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	const WPSC_GATEWAY_NAME = 'wpsc_merchant_eway';
 
 	/**
-	* register new payment gateway
-	* @param array $gateways array of registered gateways
-	* @return array
-	*/
+	 * register new payment gateway
+	 * @param array $gateways array of registered gateways
+	 * @return array
+	 */
 	public static function register_eway($gateways) {
 		// register the gateway class and additional functions
 		$gateways[] = [
@@ -56,10 +59,10 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* initialise class
-	* @param int $purchase_id
-	* @param bool $is_receiving
-	*/
+	 * initialise class
+	 * @param int $purchase_id
+	 * @param bool $is_receiving
+	 */
 	public function __construct($purchase_id = null, $is_receiving = false) {
 		// create logger
 		$this->logger = new Logging('wp-ecommerce', get_option('eway_logging', 'off'));
@@ -68,8 +71,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* grab the gateway-specific data from the checkout form post
-	*/
+	 * grab the gateway-specific data from the checkout form post
+	 */
 	public function construct_value_array() {
 		$postdata = new FormPost();
 
@@ -83,30 +86,28 @@ class MethodWPeCommerce extends \wpsc_merchant {
 		}
 
 		$this->collected_gateway_data = [
-			'card_number'	=> $postdata->cleanCardnumber($postdata->getValue('card_number')),
-			'card_name'		=> $postdata->getValue('card_name'),
-			'expiry_month'	=> $postdata->getValue('expiry_month'),
-			'expiry_year'	=> $postdata->getValue('expiry_year'),
-			'c_v_n'			=> $postdata->getValue('cvn'),
+			'card_number'	=> (string) $postdata->cleanCardnumber($postdata->getValue('card_number')),
+			'card_name'		=> (string) $postdata->getValue('card_name'),
+			'expiry_month'	=> (string) $postdata->getValue('expiry_month'),
+			'expiry_year'	=> (string) $postdata->getValue('expiry_year'),
+			'c_v_n'			=> (string) $postdata->getValue('cvn'),
 
 			// additional fields from checkout
-			'first_name'	=> $postdata->getSubkey('collected_data', get_option('eway_form_first_name')),
-			'last_name'		=> $postdata->getSubkey('collected_data', get_option('eway_form_last_name')),
-			'address'		=> $postdata->getSubkey('collected_data', get_option('eway_form_address')),
-			'city'			=> $postdata->getSubkey('collected_data', get_option('eway_form_city')),
-			'state'			=> $postdata->getSubkey('collected_data', get_option('eway_form_state')),
+			'first_name'	=> (string) $postdata->getSubkey('collected_data', get_option('eway_form_first_name')),
+			'last_name'		=> (string) $postdata->getSubkey('collected_data', get_option('eway_form_last_name')),
+			'address'		=> (string) $postdata->getSubkey('collected_data', get_option('eway_form_address')),
+			'city'			=> (string) $postdata->getSubkey('collected_data', get_option('eway_form_city')),
+			'state'			=> (string) $postdata->getSubkey('collected_data', get_option('eway_form_state')),
 			'country'		=> $country,
-			'post_code'		=> $postdata->getSubkey('collected_data', get_option('eway_form_post_code')),
-			'email'			=> $postdata->getSubkey('collected_data', get_option('eway_form_email')),
+			'post_code'		=> (string) $postdata->getSubkey('collected_data', get_option('eway_form_post_code')),
+			'email'			=> (string) $postdata->getSubkey('collected_data', get_option('eway_form_email')),
 		];
 	}
 
 	/**
-	* submit to gateway
-	*/
+	 * submit to gateway
+	 */
 	public function submit() {
-		global $wpdb;
-
 		// check for missing or invalid values
 		$errors = $this->validateData();
 
@@ -118,10 +119,10 @@ class MethodWPeCommerce extends \wpsc_merchant {
 
 		// get purchase logs
 		if ($this->purchase_id > 0) {
-			$purchase_logs = new \WPSC_Purchase_Log($this->purchase_id);
+			$purchase_logs = new WPSC_Purchase_Log($this->purchase_id);
 		}
 		elseif (!empty($this->session_id)) {
-			$purchase_logs = new \WPSC_Purchase_Log($this->session_id, 'sessionid');
+			$purchase_logs = new WPSC_Purchase_Log($this->session_id, 'sessionid');
 
 			$this->purchase_id = $purchase_logs->get('id');
 		}
@@ -243,34 +244,34 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* parse gateway notification, recieves and converts the notification to an array, if possible
-	* @return boolean
-	*/
+	 * parse gateway notification, recieves and converts the notification to an array, if possible
+	 * @return boolean
+	 */
 	public function parse_gateway_notification() {
 		return false;
 	}
 
 	/**
-	* process gateway notification, checks and decides what to do with the data from the gateway
-	* @return boolean
-	*/
+	 * process gateway notification, checks and decides what to do with the data from the gateway
+	 * @return boolean
+	 */
 	public function process_gateway_notification() {
 		return false;
 	}
 
 	/**
-	* validate entered data for errors / omissions
-	* @return int number of errors found
-	*/
+	 * validate entered data for errors / omissions
+	 * @return int number of errors found
+	 */
 	protected function validateData() {
 		$postdata		= new FormPost();
 
 		$fields			= [
-			'card_number'	=> $postdata->getValue('card_number'),
-			'card_name'		=> $postdata->getValue('card_name'),
-			'expiry_month'	=> $postdata->getValue('expiry_month'),
-			'expiry_year'	=> $postdata->getValue('expiry_year'),
-			'cvn'			=> $postdata->getValue('cvn'),
+			'card_number'	=> (string) $postdata->getValue('card_number'),
+			'card_name'		=> (string) $postdata->getValue('card_name'),
+			'expiry_month'	=> (string) $postdata->getValue('expiry_month'),
+			'expiry_year'	=> (string) $postdata->getValue('expiry_year'),
+			'cvn'			=> (string) $postdata->getValue('cvn'),
 		];
 
 		$errors			= $postdata->verifyCardDetails($fields);
@@ -285,8 +286,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* add page script for admin options
-	*/
+	 * add page script for admin options
+	 */
 	public static function adminSettingsScript() {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
@@ -296,8 +297,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* tell wp-e-commerce about fields we require on the checkout form
-	*/
+	 * tell wp-e-commerce about fields we require on the checkout form
+	 */
 	protected static function setCheckoutFields() {
 		global $gateway_checkout_form_fields;
 
@@ -320,9 +321,9 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* display additional fields for gateway config form
-	* return string
-	*/
+	 * display additional fields for gateway config form
+	 * return string
+	 */
 	public static function configForm() {
 		ob_start();
 		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-wpsc.php';
@@ -330,8 +331,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* save config details from payment gateway admin
-	*/
+	 * save config details from payment gateway admin
+	 */
 	public static function saveConfig() {
 		if (empty($_POST['wpsc_merchant_eway_settings'])) {
 			return true;
@@ -362,8 +363,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* hook billing details display on admin, to show Eway transaction number and authcode
-	*/
+	 * hook billing details display on admin, to show Eway transaction number and authcode
+	 */
 	public static function actionBillingDetailsBottom() {
 		global $purchlogitem;
 
@@ -377,9 +378,9 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* show select list options for checkout form fields
-	* @param int $selected
-	*/
+	 * show select list options for checkout form fields
+	 * @param int $selected
+	 */
 	public static function showCheckoutFormFields($selected) {
 		static $fields = false;
 
@@ -395,8 +396,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* maybe enqueue client side encryption for the checkout form
-	*/
+	 * maybe enqueue client side encryption for the checkout form
+	 */
 	public static function enqueueCheckoutScript($gateway) {
 		$creds = self::getApiCredentials();
 		if (!empty($creds['ecrypt_key'])) {
@@ -406,8 +407,8 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* configure the scripts for client-side encryption
-	*/
+	 * configure the scripts for client-side encryption
+	 */
 	public static function ecryptScript() {
 		$creds	= self::getApiCredentials();
 
@@ -425,10 +426,9 @@ class MethodWPeCommerce extends \wpsc_merchant {
 	}
 
 	/**
-	* get API credentials based on settings
-	* @return array
-	*/
-	protected static function getApiCredentials() {
+	 * get API credentials based on settings
+	 */
+	protected static function getApiCredentials() : array {
 		$useSandbox	= (bool) get_option('eway_test');
 
 		if (!$useSandbox) {

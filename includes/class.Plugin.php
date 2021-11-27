@@ -1,22 +1,21 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
-use \EwayPaymentGatewayRequires as Requires;
+use EwayPaymentGatewayRequires as Requires;
 
 if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
-* plugin controller class
-*/
+ * plugin controller class
+ */
 class Plugin {
 
 	/**
-	* static method for getting the instance of this singleton object
-	* @return self
-	*/
-	public static function getInstance() {
+	 * static method for getting the instance of this singleton object
+	 */
+	public static function getInstance() : self {
 		static $instance = null;
 
 		if (is_null($instance)) {
@@ -27,13 +26,13 @@ class Plugin {
 	}
 
 	/**
-	* hide constructor
-	*/
+	 * hide constructor
+	 */
 	private function __construct() {}
 
 	/**
-	* initialise plugin, hooked on plugins_loaded at priority 0
-	*/
+	 * initialise plugin, hooked on plugins_loaded at priority 0
+	 */
 	public function pluginStart() {
 		add_action('init', 'eway_payment_gateway_load_text_domain');
 		add_filter('plugin_row_meta', [$this, 'addPluginDetailsLinks'], 10, 2);
@@ -53,11 +52,11 @@ class Plugin {
 	}
 
 	/**
-	* check for required PHP extensions, tell admin if any are missing
-	*/
-	protected function checkPrerequisites() {
+	 * check for required PHP extensions, tell admin if any are missing
+	 */
+	protected function checkPrerequisites() : bool {
 		// need these PHP extensions
-		$missing = array_filter(['json', 'libxml', 'pcre', 'SimpleXML', 'xmlwriter'], function($ext) {
+		$missing = array_filter(['json', 'libxml', 'pcre', 'SimpleXML', 'xmlwriter'], static function($ext) {
 			return !extension_loaded($ext);
 		});
 
@@ -74,8 +73,8 @@ class Plugin {
 	}
 
 	/**
-	* register required scripts
-	*/
+	 * register required scripts
+	 */
 	public function registerScripts() {
 		$min = SCRIPT_DEBUG ? '' : '.min';
 		$ver = SCRIPT_DEBUG ? time() : EWAY_PAYMENTS_VERSION;
@@ -89,18 +88,18 @@ class Plugin {
 	}
 
 	/**
-	* register new WP eCommerce payment gateway
-	* @param array $gateways array of registered gateways
-	* @return array
-	*/
+	 * register new WP eCommerce payment gateway
+	 * @param array $gateways array of registered gateways
+	 * @return array
+	 */
 	public function registerWPeCommerce($gateways) {
 		require_once EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.WPeCommerce.php';
 		return MethodWPeCommerce::register_eway($gateways);
 	}
 
 	/**
-	* register with Event Espresso
-	*/
+	 * register with Event Espresso
+	 */
 	public function registerEventEspresso() {
 		remove_action('AHEE__EE_System__load_espresso_addons', [$this, __FUNCTION__]);
 		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EventEspresso.php';
@@ -108,8 +107,8 @@ class Plugin {
 	}
 
 	/**
-	* maybe load WooCommerce payment gateway
-	*/
+	 * maybe load WooCommerce payment gateway
+	 */
 	public function maybeRegisterWooCommerce() {
 		if (!function_exists('WC')) {
 			return;
@@ -131,8 +130,8 @@ class Plugin {
 	}
 
 	/**
-	* maybe register with Events Manager
-	*/
+	 * maybe register with Events Manager
+	 */
 	public function maybeRegisterEventsManager() {
 		if (class_exists('EM_Gateways')) {
 			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EventsManager.php';
@@ -141,8 +140,8 @@ class Plugin {
 	}
 
 	/**
-	* maybe register with Another WordPress Classifieds Plugin (AWPCP)
-	*/
+	 * maybe register with Another WordPress Classifieds Plugin (AWPCP)
+	 */
 	public function maybeRegisterAWPCP() {
 		if (function_exists('awpcp')) {
 			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.AWPCP.php';
@@ -151,8 +150,8 @@ class Plugin {
 	}
 
 	/**
-	* action hook for adding plugin details links
-	*/
+	 * action hook for adding plugin details links
+	 */
 	public function addPluginDetailsLinks($links, $file) {
 		if ($file === EWAY_PAYMENTS_PLUGIN_NAME) {
 			$links[] = sprintf('<a href="https://wordpress.org/support/plugin/eway-payment-gateway" rel="noopener" target="_blank">%s</a>', _x('Get help', 'plugin details links', 'eway-payment-gateway'));
