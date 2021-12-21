@@ -28,29 +28,29 @@ class WooCommerceTest extends TestCase {
 	/**
 	 * ensure that environment has been specified
 	 */
-	public function testEnvironment() {
-		global $plugin_main_env;
+	public function testEnvironment() : void {
+		global $plugin_test_env;
 
-		$this->assertArrayHasKey('testbed_woocommerce', $plugin_main_env);
+		$this->assertArrayHasKey('url_woo_shop', $plugin_test_env);
+		$this->assertArrayHasKey('url_woo_checkout', $plugin_test_env);
 	}
 
 	/**
 	 * add a product to the cart and try to checkout
 	 * @depends testEnvironment
 	 */
-	public function testPurchase() {
-		global $plugin_main_env;
+	public function testPurchase() : void {
+		global $plugin_test_env;
 
 		$driver = self::$web_driver;
-		$url_base = rtrim($plugin_main_env['testbed_woocommerce'], '/');
 
-		$driver->get("$url_base/shop/");
+		$driver->get($plugin_test_env['url_woo_shop']);
 		$driver->executeScript('jQuery(".add_to_cart_button").first().click()');
 		$driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
 
-		$driver->get("$url_base/checkout/");
+		$driver->get($plugin_test_env['url_woo_checkout']);
 		$driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id('place_order'))
 		);
@@ -88,21 +88,20 @@ class WooCommerceTest extends TestCase {
 	 * add a product to the cart and try to checkout, failing due to bad card number
 	 * @depends testEnvironment
 	 */
-	public function testFailCardnumber() {
-		global $plugin_main_env;
+	public function testFailCardnumber() : void {
+		global $plugin_test_env;
 
 		$this->expectException(UnexpectedAlertOpenException::class);
 
 		$driver = self::$web_driver;
-		$url_base = rtrim($plugin_main_env['testbed_woocommerce'], '/');
 
-		$driver->get("$url_base/shop/");
+		$driver->get($plugin_test_env['url_woo_shop']);
 		$driver->executeScript('jQuery(".add_to_cart_button").first().click()');
 		$driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
 
-		$driver->get("$url_base/checkout/");
+		$driver->get($plugin_test_env['url_woo_checkout']);
 		$driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id('place_order'))
 		);
@@ -140,19 +139,18 @@ class WooCommerceTest extends TestCase {
 	 * add a product to the cart and try to checkout, failing due to missing CVN
 	 * @depends testEnvironment
 	 */
-	public function testFailCVN() {
-		global $plugin_main_env;
+	public function testFailCVN() : void {
+		global $plugin_test_env;
 
 		$driver = self::$web_driver;
-		$url_base = rtrim($plugin_main_env['testbed_woocommerce'], '/');
 
-		$driver->get("$url_base/shop/");
+		$driver->get($plugin_test_env['url_woo_shop']);
 		$driver->executeScript('jQuery(".add_to_cart_button").first().click()');
 		$driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
 
-		$driver->get("$url_base/checkout/");
+		$driver->get($plugin_test_env['url_woo_checkout']);
 		$driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id('place_order'))
 		);

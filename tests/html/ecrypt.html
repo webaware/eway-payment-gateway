@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+
+<head>
+	<title>Test Eway client-side encryption</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		form {
+			display: grid;
+			grid-template-columns: 15em 25em;
+			grid-gap: .8em;
+		}
+		label {
+			text-align: right;
+		}
+		#submit_button {
+			grid-column: 2/3;
+			width: fit-content;
+		}
+	</style>
+</head>
+
+<body>
+	<form method="POST" id="card_form">
+
+		<label for="card_number">Card number</label>
+		<input type="text" name="card_number" id="card_number" autocomplete="cc-number">
+
+		<label for="card_cvn">CVN/CVV</label>
+		<input type="text" name="card_cvn" id="card_cvn" autocomplete="cc-csc">
+
+		<button id="submit_button">Submit</button>
+		<input type="hidden" id="cse_key">
+
+	</form>
+
+	<script src="https://secure.ewaypayments.com/scripts/eCrypt.js"></script>
+	<script>
+		(function(doc) {
+
+			function getByID(id) {
+				return doc.getElementById(id);
+			}
+
+			function encryptFields(event) {
+				const key			= getByID("cse_key").value;
+				const number_field	= getByID("card_number");
+				const cvn_field		= getByID("card_cvn");
+
+				event.preventDefault();
+
+				if (key) {
+					if (number_field.value) {
+						number_field.value = eCrypt.encryptValue(number_field.value, key);
+					}
+					if (cvn_field.value) {
+						cvn_field.value = eCrypt.encryptValue(cvn_field.value, key);
+					}
+				}
+			}
+
+			getByID("card_form").addEventListener("submit", encryptFields, false);
+
+		})(document);
+	</script>
+
+</body>
+
+</html>

@@ -2,29 +2,48 @@
 namespace webaware\eway_payment_gateway\Tests;
 
 use Yoast\WPTestUtils\BrainMonkey\TestCase;
+use Facebook\WebDriver\WebDriverBy;
 use webaware\eway_payment_gateway\Plugin;
+use webaware\eway_payment_gateway\EwayRapidAPI;
 
 use function webaware\eway_payment_gateway\get_api_wrapper;
 
 class PluginTest extends TestCase {
 
+	private static $web_driver;
+
+	/**
+	 * create a web driver for testing
+	 */
+	public static function setUpBeforeClass() : void {
+		self::$web_driver = webdriver_get_driver();
+	}
+
+	/**
+	 * close the web driver after tests complete
+	 */
+	public static function tearDownAfterClass() : void {
+		self::$web_driver->close();
+		self::$web_driver = null;
+	}
+
 	/**
 	 * ensure that environment has been specified
 	 */
-	public function testEnvironment() {
-		global $plugin_main_env;
+	public function testEnvironment() : void {
+		global $plugin_test_env;
 
-		$this->assertArrayHasKey('eway_api_key', $plugin_main_env);
-		$this->assertArrayHasKey('eway_api_password', $plugin_main_env);
-		$this->assertArrayHasKey('eway_ecrypt_key', $plugin_main_env);
-		$this->assertArrayHasKey('eway_customerid', $plugin_main_env);
+		$this->assertArrayHasKey('eway_api_key', $plugin_test_env);
+		$this->assertArrayHasKey('eway_api_password', $plugin_test_env);
+		$this->assertArrayHasKey('eway_ecrypt_key', $plugin_test_env);
+		$this->assertArrayHasKey('eway_customerid', $plugin_test_env);
 	}
 
 	/**
 	 * can get instance of plugin
 	 * @depends testEnvironment
 	 */
-	public function testPlugin() {
+	public function testPlugin() : void {
 		$this->assertTrue(Plugin::getInstance() instanceof Plugin);
 	}
 
@@ -32,7 +51,7 @@ class PluginTest extends TestCase {
 	 * fully-populated transaction generates correct JSON
 	 * @depends testPlugin
 	 */
-	public function testJsonTxFull() {
+	public function testJsonTxFull() : void {
 		$eway							= $this->getAPI();
 
 		$eway->invoiceDescription		= __FUNCTION__;
@@ -80,7 +99,7 @@ class PluginTest extends TestCase {
 	 * partially-populated transaction generates correct JSON
 	 * @depends testPlugin
 	 */
-	public function testJsonTxPartial() {
+	public function testJsonTxPartial() : void {
 		$eway							= $this->getAPI();
 
 		$eway->invoiceDescription		= __FUNCTION__;
@@ -107,20 +126,95 @@ class PluginTest extends TestCase {
 	}
 
 	/**
+	 * test client-side encryption, generically
+	 * @depends testPlugin
+	 */
+	public function testClientSideEncryption() : void {
+		global $plugin_test_env;
+
+		$driver	= self::$web_driver;
+
+		$driver->get($this->getPageCSE());
+		$driver->executeScript('document.getElementById("cse_key").value = arguments[0]', [$plugin_test_env['eway_ecrypt_key']]);
+		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_number')), '4444333322221111');
+		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_cvn')), '123');
+		$driver->findElement(WebDriverBy::id('submit_button'))->click();
+
+		$card_number = $driver->findElement(WebDriverBy::id('card_number'))->getDomProperty('value');
+		$card_cvn = $driver->findElement(WebDriverBy::id('card_cvn'))->getDomProperty('value');
+
+		$this->assertStringStartsWith('eCrypted:', $card_number);
+		$this->assertStringStartsWith('eCrypted:', $card_cvn);
+	}
+
+	/**
+	 * test end-to-end transaction
+	 * @depends testClientSideEncryption
+	 */
+	public function testTransaction() : void {
+		global $plugin_test_env;
+
+		$driver	= self::$web_driver;
+
+		$driver->get($this->getPageCSE());
+		$driver->executeScript('document.getElementById("cse_key").value = arguments[0]', [$plugin_test_env['eway_ecrypt_key']]);
+		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_number')), '4444333322221111');
+		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_cvn')), '123');
+		$driver->findElement(WebDriverBy::id('submit_button'))->click();
+
+		$card_number = $driver->findElement(WebDriverBy::id('card_number'))->getDomProperty('value');
+		$card_cvn = $driver->findElement(WebDriverBy::id('card_cvn'))->getDomProperty('value');
+
+		$this->assertStringStartsWith('eCrypted:', $card_number);
+		$this->assertStringStartsWith('eCrypted:', $card_cvn);
+
+		$eway							= $this->getAPI();
+
+		$eway->invoiceDescription		= __FUNCTION__;
+		$eway->invoiceReference			= '5554321';
+		$eway->transactionNumber		= '5554321';
+		$eway->cardHoldersName			= 'Test Only';
+		$eway->cardNumber				= $card_number;
+		$eway->cardExpiryMonth			= 12;
+		$eway->cardExpiryYear			= 2030;
+		$eway->cardVerificationNumber	= $card_cvn;
+		$eway->amount					= 100.00;
+		$eway->currencyCode				= 'AUD';
+		$eway->firstName				= 'Test';
+		$eway->lastName					= 'Only';
+		$eway->emailAddress				= 'test@example.com';
+		$eway->country					= 'AU';
+		$eway->comments					= 'End-to-end test transaction';
+
+		$response = $eway->processPayment();
+
+		$this->assertTrue($response->TransactionStatus);
+	}
+
+	/**
 	 * get an API wrapper
 	 * @return EwayRapidAPI
 	 */
-	private function getAPI() {
-		global $plugin_main_env;
+	private function getAPI() : EwayRapidAPI {
+		global $plugin_test_env;
+
 		$capture	= true;
 		$useSandbox	= true;
 		$creds = [
-			'api_key'		=> $plugin_main_env['eway_api_key'],
-			'password'		=> $plugin_main_env['eway_api_password'],
-			'ecrypt_key'	=> $plugin_main_env['eway_ecrypt_key'],
-			'customerid'	=> $plugin_main_env['eway_customerid'],
+			'api_key'		=> $plugin_test_env['eway_api_key'],
+			'password'		=> $plugin_test_env['eway_api_password'],
+			'ecrypt_key'	=> $plugin_test_env['eway_ecrypt_key'],
+			'customerid'	=> $plugin_test_env['eway_customerid'],
 		];
 		return get_api_wrapper($creds, $capture, $useSandbox);
+	}
+
+	/**
+	 * get file URL for client-side encryption test form
+	 * @return string
+	 */
+	private function getPageCSE() : string {
+		return 'file://' . __DIR__ . '/html/ecrypt.html';
 	}
 
 }

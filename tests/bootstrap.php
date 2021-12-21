@@ -38,5 +38,5 @@ if (!defined('WP_PLUGIN_DIR') || file_exists($plugin_main_file) === false) {
 /**
  * read testing environment configuration from .env file
  */
-global $plugin_main_env;
-$plugin_main_env = parse_ini_file(__DIR__ . '/.env');
+global $plugin_test_env;
+$plugin_test_env = parse_ini_file(__DIR__ . '/.env');
