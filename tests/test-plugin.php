@@ -10,21 +10,31 @@ use function webaware\eway_payment_gateway\get_api_wrapper;
 
 class PluginTest extends TestCase {
 
-	private static $web_driver;
+	public WebDriverRunner $web;
+
+	private static $web_runner;
 
 	/**
 	 * create a web driver for testing
 	 */
 	public static function setUpBeforeClass() : void {
-		self::$web_driver = webdriver_get_driver();
+		self::$web_runner = new WebDriverRunner();
 	}
 
 	/**
 	 * close the web driver after tests complete
 	 */
 	public static function tearDownAfterClass() : void {
-		self::$web_driver->close();
-		self::$web_driver = null;
+		self::$web_runner->close();
+	}
+
+	/**
+	 * make the web driver runner available to a test instance
+	 */
+	protected function setUp() : void {
+		parent::setUp();
+
+		$this->web = self::$web_runner;
 	}
 
 	/**
@@ -132,16 +142,14 @@ class PluginTest extends TestCase {
 	public function testClientSideEncryption() : void {
 		global $plugin_test_env;
 
-		$driver	= self::$web_driver;
+		$this->web->driver->get($this->getPageCSE());
+		$this->web->setFieldValue('#cse_key', $plugin_test_env['eway_ecrypt_key']);
+		$this->web->sendKeys('#card_number', '4444333322221111');
+		$this->web->sendKeys('#card_cvn', '123');
+		$this->web->driver->findElement(WebDriverBy::id('submit_button'))->click();
 
-		$driver->get($this->getPageCSE());
-		$driver->executeScript('document.getElementById("cse_key").value = arguments[0]', [$plugin_test_env['eway_ecrypt_key']]);
-		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_number')), '4444333322221111');
-		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_cvn')), '123');
-		$driver->findElement(WebDriverBy::id('submit_button'))->click();
-
-		$card_number = $driver->findElement(WebDriverBy::id('card_number'))->getDomProperty('value');
-		$card_cvn = $driver->findElement(WebDriverBy::id('card_cvn'))->getDomProperty('value');
+		$card_number = $this->web->driver->findElement(WebDriverBy::id('card_number'))->getDomProperty('value');
+		$card_cvn = $this->web->driver->findElement(WebDriverBy::id('card_cvn'))->getDomProperty('value');
 
 		$this->assertStringStartsWith('eCrypted:', $card_number);
 		$this->assertStringStartsWith('eCrypted:', $card_cvn);
@@ -154,16 +162,14 @@ class PluginTest extends TestCase {
 	public function testTransaction() : void {
 		global $plugin_test_env;
 
-		$driver	= self::$web_driver;
+		$this->web->driver->get($this->getPageCSE());
+		$this->web->setFieldValue('#cse_key', $plugin_test_env['eway_ecrypt_key']);
+		$this->web->sendKeys('#card_number', '4444333322221111');
+		$this->web->sendKeys('#card_cvn', '123');
+		$this->web->driver->findElement(WebDriverBy::id('submit_button'))->click();
 
-		$driver->get($this->getPageCSE());
-		$driver->executeScript('document.getElementById("cse_key").value = arguments[0]', [$plugin_test_env['eway_ecrypt_key']]);
-		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_number')), '4444333322221111');
-		webdriver_replace_value($driver->findElement(WebDriverBy::id('card_cvn')), '123');
-		$driver->findElement(WebDriverBy::id('submit_button'))->click();
-
-		$card_number = $driver->findElement(WebDriverBy::id('card_number'))->getDomProperty('value');
-		$card_cvn = $driver->findElement(WebDriverBy::id('card_cvn'))->getDomProperty('value');
+		$card_number = $this->web->driver->findElement(WebDriverBy::id('card_number'))->getDomProperty('value');
+		$card_cvn = $this->web->driver->findElement(WebDriverBy::id('card_cvn'))->getDomProperty('value');
 
 		$this->assertStringStartsWith('eCrypted:', $card_number);
 		$this->assertStringStartsWith('eCrypted:', $card_cvn);
