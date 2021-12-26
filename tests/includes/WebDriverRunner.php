@@ -31,7 +31,7 @@ class WebDriverRunner {
 	}
 
 	/**
-	 * set a field field value, clearing any previous value it might have
+	 * set a field value, clearing any previous value it might have
 	 * @param string $selector
 	 * @param string $value
 	 */
@@ -42,7 +42,7 @@ class WebDriverRunner {
 	}
 
 	/**
-	 * set a field value and trigger a change event to register the value change
+	 * set a field value via JavaScript, and trigger a change event to register the value change
 	 * @param string $selector
 	 * @param string $value
 	 */
@@ -52,7 +52,7 @@ class WebDriverRunner {
 	}
 
 	/**
-	 * set a select element value by value
+	 * set a select element selected option by value
 	 * @param string $selector
 	 * @param string $value
 	 */
@@ -62,7 +62,7 @@ class WebDriverRunner {
 	}
 
 	/**
-	 * set a select element value by the text label of an option
+	 * set a select element selected option by the text label of an option
 	 * @param string $selector
 	 * @param string $text
 	 */
