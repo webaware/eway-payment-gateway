@@ -70,7 +70,7 @@ class PluginTest extends TestCase {
 		$eway->cardHoldersName			= 'Test Only';
 		$eway->cardNumber				= '4444333322221111';
 		$eway->cardExpiryMonth			= 12;
-		$eway->cardExpiryYear			= 2030;
+		$eway->cardExpiryYear			= date('Y') + 9;
 		$eway->cardVerificationNumber	= '123';
 		$eway->amount					= 100.00;
 		$eway->currencyCode				= 'AUD';
@@ -118,7 +118,7 @@ class PluginTest extends TestCase {
 		$eway->cardHoldersName			= 'Test Only';
 		$eway->cardNumber				= '4444333322221111';
 		$eway->cardExpiryMonth			= 12;
-		$eway->cardExpiryYear			= 2030;
+		$eway->cardExpiryYear			= date('Y') + 9;
 		$eway->cardVerificationNumber	= '123';
 		$eway->amount					= 100.00;
 		$eway->currencyCode				= 'AUD';
@@ -182,7 +182,7 @@ class PluginTest extends TestCase {
 		$eway->cardHoldersName			= 'Test Only';
 		$eway->cardNumber				= $card_number;
 		$eway->cardExpiryMonth			= 12;
-		$eway->cardExpiryYear			= 2030;
+		$eway->cardExpiryYear			= date('Y') + 9;
 		$eway->cardVerificationNumber	= $card_cvn;
 		$eway->amount					= 100.00;
 		$eway->currencyCode				= 'AUD';

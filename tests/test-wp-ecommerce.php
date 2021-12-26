@@ -93,7 +93,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221111');
 		$this->web->setFieldValue('#eway_expiry_month', '12');
-		$this->web->setFieldValue('#eway_expiry_year', '2030');
+		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_cvn', '123');
 
 		$this->web->driver->executeScript('jQuery(".make_purchase").click()');
@@ -155,7 +155,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221112');
 		$this->web->setFieldValue('#eway_expiry_month', '12');
-		$this->web->setFieldValue('#eway_expiry_year', '2030');
+		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_cvn', '123');
 
 		$this->web->driver->executeScript('jQuery(".make_purchase").click()');
@@ -215,7 +215,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221111');
 		$this->web->setFieldValue('#eway_expiry_month', '12');
-		$this->web->setFieldValue('#eway_expiry_year', '2030');
+		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
 
 		$this->web->driver->executeScript('jQuery(".make_purchase").click()');
 

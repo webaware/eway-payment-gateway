@@ -80,7 +80,7 @@ class WooCommerceTest extends TestCase {
 		);
 		$this->web->sendKeys('#eway_payments-card-name', 'Test Only');
 		$this->web->setFieldValue('#eway_payments-card-number', '4444333322221111');
-		$this->web->setFieldValue('#eway_payments-card-expiry', '1230');
+		$this->web->setFieldValue('#eway_payments-card-expiry', '12' . (date('y') + 9));
 		$this->web->setFieldValue('#eway_payments-card-cvc', '123');
 
 		$this->web->driver->executeScript('jQuery("#place_order").click()');
@@ -129,7 +129,7 @@ class WooCommerceTest extends TestCase {
 		);
 		$this->web->sendKeys('#eway_payments-card-name', 'Test Only');
 		$this->web->setFieldValue('#eway_payments-card-number', '4444333322221112');
-		$this->web->setFieldValue('#eway_payments-card-expiry', '1230');
+		$this->web->setFieldValue('#eway_payments-card-expiry', '12' . (date('y') + 9));
 		$this->web->setFieldValue('#eway_payments-card-cvc', '123');
 
 		$this->web->driver->executeScript('jQuery("#place_order").click()');
@@ -176,7 +176,7 @@ class WooCommerceTest extends TestCase {
 		);
 		$this->web->sendKeys('#eway_payments-card-name', 'Test Only');
 		$this->web->setFieldValue('#eway_payments-card-number', '4444333322221111');
-		$this->web->setFieldValue('#eway_payments-card-expiry', '1230');
+		$this->web->setFieldValue('#eway_payments-card-expiry', '12' . (date('y') + 9));
 
 		$this->web->driver->executeScript('jQuery("#place_order").click()');
 
