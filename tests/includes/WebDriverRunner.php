@@ -30,7 +30,7 @@ class WebDriverRunner {
 	}
 
 	/**
-	 * set a checkout field value in a way that triggers WP eCommerce to update the customer meta via Ajax
+	 * set a field field value, clearing any previous value it might have
 	 * @param string $selector
 	 * @param string $value
 	 */
