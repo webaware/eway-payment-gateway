@@ -8,7 +8,7 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 
 /**
  * - WooCommerce webdriver tests require JavaScript to click buttons, due to delegated event listeners
- * - dropdown lists must also be set via JavaScript due to event listeners
+ * - some credit card fields must also be set via JavaScript due to event listeners
  */
 class WooCommerceTest extends TestCase {
 
@@ -70,11 +70,11 @@ class WooCommerceTest extends TestCase {
 		$this->web->sendKeys('#billing_first_name', 'Test');
 		$this->web->sendKeys('#billing_last_name', 'Only');
 		$this->web->sendKeys('#billing_company', 'Testers, Inc.');
-		$this->web->setFieldValue('#billing_country', 'AU');
+		$this->web->selectByValue('#billing_country', 'AU');
 		$this->web->sendKeys('#billing_address_1', '123 Example Street');
 		$this->web->sendKeys('#billing_city', 'Sometown');
 		$this->web->sendKeys('#billing_postcode', '2000');
-		$this->web->setFieldValue('#billing_state', 'NSW');
+		$this->web->selectByValue('#billing_state', 'NSW');
 		$this->web->sendKeys('#billing_phone', '0123456789');
 		$this->web->sendKeys('#billing_email', 'test@example.com');
 
@@ -119,11 +119,11 @@ class WooCommerceTest extends TestCase {
 		$this->web->sendKeys('#billing_first_name', 'Test');
 		$this->web->sendKeys('#billing_last_name', 'Only');
 		$this->web->sendKeys('#billing_company', 'Testers, Inc.');
-		$this->web->setFieldValue('#billing_country', 'AU');
+		$this->web->selectByValue('#billing_country', 'AU');
 		$this->web->sendKeys('#billing_address_1', '123 Example Street');
 		$this->web->sendKeys('#billing_city', 'Sometown');
 		$this->web->sendKeys('#billing_postcode', '2000');
-		$this->web->setFieldValue('#billing_state', 'NSW');
+		$this->web->selectByValue('#billing_state', 'NSW');
 		$this->web->sendKeys('#billing_phone', '0123456789');
 		$this->web->sendKeys('#billing_email', 'test@example.com');
 
@@ -166,11 +166,11 @@ class WooCommerceTest extends TestCase {
 		$this->web->sendKeys('#billing_first_name', 'Test');
 		$this->web->sendKeys('#billing_last_name', 'Only');
 		$this->web->sendKeys('#billing_company', 'Testers, Inc.');
-		$this->web->setFieldValue('#billing_country', 'AU');
+		$this->web->selectByValue('#billing_country', 'AU');
 		$this->web->sendKeys('#billing_address_1', '123 Example Street');
 		$this->web->sendKeys('#billing_city', 'Sometown');
 		$this->web->sendKeys('#billing_postcode', '2000');
-		$this->web->setFieldValue('#billing_state', 'NSW');
+		$this->web->selectByValue('#billing_state', 'NSW');
 		$this->web->sendKeys('#billing_phone', '0123456789');
 		$this->web->sendKeys('#billing_email', 'test@example.com');
 

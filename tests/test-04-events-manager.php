@@ -2,7 +2,6 @@
 namespace webaware\eway_payment_gateway\Tests;
 
 use Yoast\WPTestUtils\BrainMonkey\TestCase;
-use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
@@ -65,7 +64,7 @@ class EventsManagerTest extends TestCase {
 		$this->web->sendKeys('#dbem_city', 'Sometown');
 		$this->web->sendKeys('#dbem_state', 'NSW');
 		$this->web->sendKeys('#dbem_zip', '2000');
-		$this->web->setFieldValue('select[name="dbem_country"]', 'AU');
+		$this->web->selectByValue('select[name="dbem_country"]', 'AU');
 		$this->web->sendKeys('#dbem_phone', '0123456789');
 		$this->web->sendKeys('#dbem_fax', '9876543210');
 		$this->web->sendKeys('#booking_comment', 'Automated testing: ' . __FUNCTION__);
@@ -77,8 +76,8 @@ class EventsManagerTest extends TestCase {
 
 		$this->web->sendKeys('#eway_card_num', '4444333322221111');
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
-		$this->web->setFieldValue('#eway_exp_date_month', '12');
-		$this->web->setFieldValue('#eway_exp_date_year', date('Y') + 9);
+		$this->web->selectByValue('#eway_exp_date_month', '12');
+		$this->web->selectByValue('#eway_exp_date_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_card_code', '123');
 
 		$this->web->driver->findElement(WebDriverBy::id('em-booking-submit'))->click();

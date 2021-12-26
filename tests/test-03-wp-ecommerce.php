@@ -71,7 +71,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="billingaddress"]:not([type="hidden"])', '123 Example Street');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingcity"]:not([type="hidden"])', 'Sometown');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingstate"]:not([type="hidden"])', 'New South Wales');
-		$this->web->setFieldValue('select[data-wpsc-meta-key="billingcountry"]', 'AU');
+		$this->web->selectByValue('select[data-wpsc-meta-key="billingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingpostcode"]:not([type="hidden"])', '2000');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingphone"]:not([type="hidden"])', '0123456789');
 
@@ -85,15 +85,15 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingaddress"]:not([type="hidden"])', '123 Example Street');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingcity"]:not([type="hidden"])', 'Sometown');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingstate"]:not([type="hidden"])', 'New South Wales');
-		$this->web->setFieldValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
+		$this->web->selectByValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingpostcode"]:not([type="hidden"])', '2000');
 
 		$this->web->driver->findElement(WebDriverBy::cssSelector('input.custom_gateway[value="wpsc_merchant_eway"]'))->click();
 
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221111');
-		$this->web->setFieldValue('#eway_expiry_month', '12');
-		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
+		$this->web->selectByValue('#eway_expiry_month', '12');
+		$this->web->selectByValue('#eway_expiry_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_cvn', '123');
 
 		$this->web->driver->findElement(WebDriverBy::cssSelector('.make_purchase'))->click();
@@ -133,7 +133,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="billingaddress"]:not([type="hidden"])', '123 Example Street');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingcity"]:not([type="hidden"])', 'Sometown');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingstate"]:not([type="hidden"])', 'New South Wales');
-		$this->web->setFieldValue('select[data-wpsc-meta-key="billingcountry"]', 'AU');
+		$this->web->selectByValue('select[data-wpsc-meta-key="billingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingpostcode"]:not([type="hidden"])', '2000');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingphone"]:not([type="hidden"])', '0123456789');
 
@@ -147,15 +147,15 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingaddress"]:not([type="hidden"])', '123 Example Street');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingcity"]:not([type="hidden"])', 'Sometown');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingstate"]:not([type="hidden"])', 'New South Wales');
-		$this->web->setFieldValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
+		$this->web->selectByValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingpostcode"]:not([type="hidden"])', '2000');
 
 		$this->web->driver->findElement(WebDriverBy::cssSelector('input.custom_gateway[value="wpsc_merchant_eway"]'))->click();
 
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221112');
-		$this->web->setFieldValue('#eway_expiry_month', '12');
-		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
+		$this->web->selectByValue('#eway_expiry_month', '12');
+		$this->web->selectByValue('#eway_expiry_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_cvn', '123');
 
 		$this->web->driver->findElement(WebDriverBy::cssSelector('.make_purchase'))->click();
@@ -193,7 +193,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="billingaddress"]:not([type="hidden"])', '123 Example Street');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingcity"]:not([type="hidden"])', 'Sometown');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingstate"]:not([type="hidden"])', 'New South Wales');
-		$this->web->setFieldValue('select[data-wpsc-meta-key="billingcountry"]', 'AU');
+		$this->web->selectByValue('select[data-wpsc-meta-key="billingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingpostcode"]:not([type="hidden"])', '2000');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingphone"]:not([type="hidden"])', '0123456789');
 
@@ -207,15 +207,15 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingaddress"]:not([type="hidden"])', '123 Example Street');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingcity"]:not([type="hidden"])', 'Sometown');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingstate"]:not([type="hidden"])', 'New South Wales');
-		$this->web->setFieldValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
+		$this->web->selectByValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingpostcode"]:not([type="hidden"])', '2000');
 
 		$this->web->driver->findElement(WebDriverBy::cssSelector('input.custom_gateway[value="wpsc_merchant_eway"]'))->click();
 
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221111');
-		$this->web->setFieldValue('#eway_expiry_month', '12');
-		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
+		$this->web->selectByValue('#eway_expiry_month', '12');
+		$this->web->selectByValue('#eway_expiry_year', date('Y') + 9);
 
 		$this->web->driver->findElement(WebDriverBy::cssSelector('.make_purchase'))->click();
 
