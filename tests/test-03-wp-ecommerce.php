@@ -54,7 +54,7 @@ class WPeCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_wpsc_shop']);
-		$this->web->driver->executeScript('jQuery(".wpsc_buy_button").first().click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('.wpsc_buy_button'))->click();
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.gocheckout'))
@@ -88,7 +88,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->setFieldValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingpostcode"]:not([type="hidden"])', '2000');
 
-		$this->web->driver->executeScript('jQuery("input.custom_gateway[value=\'wpsc_merchant_eway\']").click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('input.custom_gateway[value="wpsc_merchant_eway"]'))->click();
 
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221111');
@@ -96,7 +96,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_cvn', '123');
 
-		$this->web->driver->executeScript('jQuery(".make_purchase").click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('.make_purchase'))->click();
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.wpsc-transaction-results-wrap'))
@@ -116,7 +116,7 @@ class WPeCommerceTest extends TestCase {
 		$this->expectException(UnexpectedAlertOpenException::class);
 
 		$this->web->driver->get($plugin_test_env['url_wpsc_shop']);
-		$this->web->driver->executeScript('jQuery(".wpsc_buy_button").first().click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('.wpsc_buy_button'))->click();
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.gocheckout'))
@@ -150,7 +150,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->setFieldValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingpostcode"]:not([type="hidden"])', '2000');
 
-		$this->web->driver->executeScript('jQuery("input.custom_gateway[value=\'wpsc_merchant_eway\']").click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('input.custom_gateway[value="wpsc_merchant_eway"]'))->click();
 
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221112');
@@ -158,7 +158,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_cvn', '123');
 
-		$this->web->driver->executeScript('jQuery(".make_purchase").click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('.make_purchase'))->click();
 
 		// should never get here, because of an UnexpectedAlertOpenException, but need to wait...
 		$this->web->driver->wait()->until(
@@ -176,7 +176,7 @@ class WPeCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_wpsc_shop']);
-		$this->web->driver->executeScript('jQuery(".wpsc_buy_button").first().click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('.wpsc_buy_button'))->click();
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.gocheckout'))
@@ -210,14 +210,14 @@ class WPeCommerceTest extends TestCase {
 		$this->web->setFieldValue('select[data-wpsc-meta-key="shippingcountry"]', 'AU');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingpostcode"]:not([type="hidden"])', '2000');
 
-		$this->web->driver->executeScript('jQuery("input.custom_gateway[value=\'wpsc_merchant_eway\']").click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('input.custom_gateway[value="wpsc_merchant_eway"]'))->click();
 
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
 		$this->web->sendKeys('#eway_card_number', '4444333322221111');
 		$this->web->setFieldValue('#eway_expiry_month', '12');
 		$this->web->setFieldValue('#eway_expiry_year', date('Y') + 9);
 
-		$this->web->driver->executeScript('jQuery(".make_purchase").click()');
+		$this->web->driver->findElement(WebDriverBy::cssSelector('.make_purchase'))->click();
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::elementTextContains(

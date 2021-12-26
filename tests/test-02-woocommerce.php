@@ -6,6 +6,10 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
+/**
+ * - WooCommerce webdriver tests require JavaScript to click buttons, due to delegated event listeners
+ * - dropdown lists must also be set via JavaScript due to event listeners
+ */
 class WooCommerceTest extends TestCase {
 
 	public WebDriverRunner $web;
@@ -53,7 +57,7 @@ class WooCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('jQuery(".add_to_cart_button").first().click()');
+		$this->web->driver->executeScript('document.querySelector(".add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
@@ -74,7 +78,7 @@ class WooCommerceTest extends TestCase {
 		$this->web->sendKeys('#billing_phone', '0123456789');
 		$this->web->sendKeys('#billing_email', 'test@example.com');
 
-		$this->web->driver->executeScript('jQuery("#payment_method_eway_payments").click()');
+		$this->web->driver->executeScript('document.getElementById("payment_method_eway_payments").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id('payment_method_eway_payments'))
 		);
@@ -83,7 +87,7 @@ class WooCommerceTest extends TestCase {
 		$this->web->setFieldValue('#eway_payments-card-expiry', '12' . (date('y') + 9));
 		$this->web->setFieldValue('#eway_payments-card-cvc', '123');
 
-		$this->web->driver->executeScript('jQuery("#place_order").click()');
+		$this->web->driver->executeScript('document.getElementById("place_order").click()');
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.woocommerce-order-received'))
@@ -102,7 +106,7 @@ class WooCommerceTest extends TestCase {
 		$this->expectException(UnexpectedAlertOpenException::class);
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('jQuery(".add_to_cart_button").first().click()');
+		$this->web->driver->executeScript('document.querySelector(".add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
@@ -123,7 +127,7 @@ class WooCommerceTest extends TestCase {
 		$this->web->sendKeys('#billing_phone', '0123456789');
 		$this->web->sendKeys('#billing_email', 'test@example.com');
 
-		$this->web->driver->executeScript('jQuery("#payment_method_eway_payments").click()');
+		$this->web->driver->executeScript('document.getElementById("payment_method_eway_payments").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id('payment_method_eway_payments'))
 		);
@@ -132,7 +136,7 @@ class WooCommerceTest extends TestCase {
 		$this->web->setFieldValue('#eway_payments-card-expiry', '12' . (date('y') + 9));
 		$this->web->setFieldValue('#eway_payments-card-cvc', '123');
 
-		$this->web->driver->executeScript('jQuery("#place_order").click()');
+		$this->web->driver->executeScript('document.getElementById("place_order").click()');
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.woocommerce-order-received'))
@@ -149,7 +153,7 @@ class WooCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('jQuery(".add_to_cart_button").first().click()');
+		$this->web->driver->executeScript('document.querySelector(".add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
@@ -170,7 +174,7 @@ class WooCommerceTest extends TestCase {
 		$this->web->sendKeys('#billing_phone', '0123456789');
 		$this->web->sendKeys('#billing_email', 'test@example.com');
 
-		$this->web->driver->executeScript('jQuery("#payment_method_eway_payments").click()');
+		$this->web->driver->executeScript('document.getElementById("payment_method_eway_payments").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id('payment_method_eway_payments'))
 		);
@@ -178,7 +182,7 @@ class WooCommerceTest extends TestCase {
 		$this->web->setFieldValue('#eway_payments-card-number', '4444333322221111');
 		$this->web->setFieldValue('#eway_payments-card-expiry', '12' . (date('y') + 9));
 
-		$this->web->driver->executeScript('jQuery("#place_order").click()');
+		$this->web->driver->executeScript('document.getElementById("place_order").click()');
 
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::elementTextContains(
