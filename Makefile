@@ -57,8 +57,12 @@ lint-php:
 
 # tests
 
-test: /tmp/wordpress-tests-lib
-	vendor/bin/phpunit
+test: /tmp/wordpress-tests-lib /tmp/.web-driver
+	php8.0 vendor/bin/phpunit
 
 /tmp/wordpress-tests-lib:
 	bin/install-wp-tests.sh wp_test website website localhost nightly
+	sed -i "2i define('WP_DEBUG_LOG', __DIR__ . '/debug.log');" /tmp/wordpress-tests-lib/wp-tests-config.php
+
+/tmp/.web-driver:
+	chromedriver --port=4444 & touch $@
