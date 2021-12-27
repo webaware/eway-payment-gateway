@@ -46,7 +46,7 @@ if (!defined('ABSPATH')) {
 			<option value=""><?= esc_html_x('Month', 'credit card field', 'eway-payment-gateway'); ?></option>
 			<?= $optMonths; ?>
 		</select>
-		<select name="eway_expiry_year" title="<?php esc_html_e('credit card expiry year', 'eway-payment-gateway'); ?>">
+		<select name="eway_expiry_year" id="eway_expiry_year" title="<?php esc_html_e('credit card expiry year', 'eway-payment-gateway'); ?>">
 			<option value=""><?= esc_html_x('Year', 'credit card field', 'eway-payment-gateway'); ?></option>
 			<?= $optYears; ?>
 		</select>

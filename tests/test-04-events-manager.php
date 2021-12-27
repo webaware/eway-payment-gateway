@@ -69,10 +69,7 @@ class EventsManagerTest extends TestCase {
 		$this->web->sendKeys('#dbem_fax', '9876543210');
 		$this->web->sendKeys('#booking_comment', 'Automated testing: ' . __FUNCTION__);
 
-		$consent = $this->web->driver->findElement(WebDriverBy::cssSelector('input[name="data_privacy_consent"]'));
-		if (! $consent->getDomProperty('checked')) {
-			$consent->click();
-		}
+		$this->web->checkboxTickByIndex('input[name="data_privacy_consent"]', 0);
 
 		$this->web->sendKeys('#eway_card_num', '4444333322221111');
 		$this->web->sendKeys('#eway_card_name', 'Test Only');

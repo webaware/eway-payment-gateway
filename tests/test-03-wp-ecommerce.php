@@ -75,11 +75,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="billingpostcode"]:not([type="hidden"])', '2000');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingphone"]:not([type="hidden"])', '0123456789');
 
-		$shipping_same = $this->web->driver->findElement(WebDriverBy::id('shippingSameBilling'));
-		if ($shipping_same->getDomProperty('checked')) {
-			$shipping_same->click();
-		}
-
+		$this->web->checkboxUntickByIndex('#shippingSameBilling', 0);
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingfirstname"]:not([type="hidden"])', 'Test');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippinglastname"]:not([type="hidden"])', 'Only');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingaddress"]:not([type="hidden"])', '123 Example Street');
@@ -137,11 +133,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="billingpostcode"]:not([type="hidden"])', '2000');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingphone"]:not([type="hidden"])', '0123456789');
 
-		$shipping_same = $this->web->driver->findElement(WebDriverBy::id('shippingSameBilling'));
-		if ($shipping_same->getDomProperty('checked')) {
-			$shipping_same->click();
-		}
-
+		$this->web->checkboxUntickByIndex('#shippingSameBilling', 0);
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingfirstname"]:not([type="hidden"])', 'Test');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippinglastname"]:not([type="hidden"])', 'Only');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingaddress"]:not([type="hidden"])', '123 Example Street');
@@ -197,11 +189,7 @@ class WPeCommerceTest extends TestCase {
 		$this->web->sendKeys('[data-wpsc-meta-key="billingpostcode"]:not([type="hidden"])', '2000');
 		$this->web->sendKeys('[data-wpsc-meta-key="billingphone"]:not([type="hidden"])', '0123456789');
 
-		$shipping_same = $this->web->driver->findElement(WebDriverBy::id('shippingSameBilling'));
-		if ($shipping_same->getDomProperty('checked')) {
-			$shipping_same->click();
-		}
-
+		$this->web->checkboxUntickByIndex('#shippingSameBilling', 0);
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingfirstname"]:not([type="hidden"])', 'Test');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippinglastname"]:not([type="hidden"])', 'Only');
 		$this->web->sendKeys('[data-wpsc-meta-key="shippingaddress"]:not([type="hidden"])', '123 Example Street');
