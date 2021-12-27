@@ -6,5 +6,10 @@
 		"yoast/wp-test-utils": "^1.0",
 		"php-webdriver/webdriver": "^1.12"
 	},
-	"prefer-stable" : true
+	"prefer-stable" : true,
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
 }
