@@ -94,7 +94,7 @@ class WPeCommerceTest extends TestCase {
 
 		$this->web->driver->findElement(WebDriverBy::cssSelector('.make_purchase'))->click();
 
-		$this->web->driver->wait()->until(
+		$this->web->driver->wait(90)->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.wpsc-transaction-results-wrap'))
 		);
 
