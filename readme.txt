@@ -16,7 +16,7 @@ Take credit card payments via Eway in some popular WordPress plugins
 
 ## Description
 
-The Eway Payment Gateway adds integrations for the [Eway credit card payment gateway](https://eway.io/) through [Rapid API Direct Payments](https://www.eway.com.au/features/api-rapid-api/), with legacy XML API support. These plugins are supported:
+The Eway Payment Gateway adds integrations for the [Eway credit card payment gateway](https://eway.io/) through [Rapid API Direct Payments](https://www.eway.com.au/features/api-rapid-api/). These plugins are supported:
 
 * [WP eCommerce](https://wordpress.org/plugins/wp-e-commerce/) shopping cart plugin
 * [WooCommerce](https://wordpress.org/plugins/woocommerce/) shopping cart plugin
@@ -128,9 +128,7 @@ Yes. This plugin uses the Direction Connection method to process transactions, s
 
 Capture charges the customer's credit card immediately. This is the default payment method, and is the method most websites will use for credit card payments.
 
-Authorize checks to see that the transaction would be approved, but does not process it. Eway calls this method [PreAuth](https://www.eway.com.au/features/payments/payments-pre-auth/) (or Stored Payments in the old XML API). Once the transaction has been authorized, you can complete it manually in your MyEway console. You cannot complete PreAuth transactions from WordPress.
-
-You need to add your Eway API key and password to see PreAuth transactions in the sandbox, so that the Rapid API is used. The old Stored Payments XML API does not have a sandbox.
+Authorize checks to see that the transaction would be approved, but does not process it. Eway calls this method [PreAuth](https://www.eway.com.au/features/payments/payments-pre-auth/). Once the transaction has been authorized, you can complete it manually in your MyEway console. You cannot complete PreAuth transactions from WordPress.
 
 **NB: PreAuth is currently only available for Australian, Singapore, Malaysian, & Hong Kong merchants. Do not select Authorize if you are a New Zealand merchant!**
 
@@ -178,11 +176,7 @@ This is a common problem in local testing environments. Please [read this post](
 
 ### Can I use this plugin on any shared-hosting environment?
 
-The plugin will run in shared hosting environments, but requires minimum PHP 5.4 with the following modules enabled (talk to your host). They are typically available because they are enabled by default in PHP 5, but may be disabled on some shared hosts.
-
-* libxml
-* XMLWriter
-* SimpleXML
+The plugin will run in shared hosting environments, but requires PHP 7.4 or later.
 
 ### WP eCommerce filter hooks
 

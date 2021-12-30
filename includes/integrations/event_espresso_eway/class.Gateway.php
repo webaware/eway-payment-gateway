@@ -1,12 +1,12 @@
 <?php
 namespace webaware\eway_payment_gateway\event_espresso;
 
-use webaware\eway_payment_gateway\Logging;
 use EE_Onsite_Gateway;
 use EEI_Payment;
 use EEI_Transaction;
-
-use function webaware\eway_payment_gateway\get_api_wrapper;
+use webaware\eway_payment_gateway\Credentials;
+use webaware\eway_payment_gateway\EwayRapidAPI;
+use webaware\eway_payment_gateway\Logging;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -15,9 +15,9 @@ if (!defined('ABSPATH')) {
 /**
  * Event Espresso gateway functionality
  */
-class Gateway extends EE_Onsite_Gateway {
+final class Gateway extends EE_Onsite_Gateway {
 
-	protected $logger;
+	private $logger;
 
 	/**
 	 *
@@ -33,23 +33,26 @@ class Gateway extends EE_Onsite_Gateway {
 
 		try {
 
-			if (!$payment instanceof EEI_Payment) {
+			if (! $payment instanceof EEI_Payment) {
 				throw new EwayPaymentsException(__('Error. No associated payment was found.', 'eway-payment-gateway'));
 			}
 
 			$transaction = $payment->transaction();
-			if (!$transaction instanceof EEI_Transaction) {
+			if (! $transaction instanceof EEI_Transaction) {
 				throw new EwayPaymentsException(__('Could not process this payment because it has no associated transaction.', 'eway-payment-gateway'));
 			}
 
 			$capture	= true;		// TODO: maybe support stored payment for EE
 			$useSandbox	= $this->_debug_mode;
 			$creds		= $this->getApiCredentials();
-			$eway		= get_api_wrapper($creds, $capture, $useSandbox);
 
-			if (!$eway) {
-				throw new EwayPaymentsException(__('Eway payments is not configured for payments yet.', 'eway-payment-gateway'));
+			if ($creds->isMissingCredentials()) {
+				$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
+				throw new EwayPaymentsException(__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
 			}
+
+			$eway		= new EwayRapidAPI($creds->api_key, $creds->password, $useSandbox);
+			$eway->capture = $capture;
 
 			$gateway_formatter		= $this->_get_gateway_formatter();
 			$primary_registration	= $transaction->primary_registration();
@@ -150,25 +153,25 @@ class Gateway extends EE_Onsite_Gateway {
 	}
 
 	/**
-	* get API credentials based on settings
-	*/
-	protected function getApiCredentials() : array {
+	 * get API credentials based on settings
+	 */
+	private function getApiCredentials() : Credentials {
 		static $creds = false;
 
 		if ($creds === false) {
 			if (!$this->_debug_mode) {
-				$creds = array_filter([
-					'api_key'		=> $this->_eway_api_key,
-					'password'		=> $this->_eway_password,
-					'ecrypt_key'	=> $this->_eway_ecrypt_key,
-				]);
+				$creds = new Credentials(
+					$this->_eway_api_key,
+					$this->_eway_password,
+					$this->_eway_ecrypt_key,
+				);
 			}
 			else {
-				$creds = array_filter([
-					'api_key'		=> $this->_eway_sandbox_api_key,
-					'password'		=> $this->_eway_sandbox_password,
-					'ecrypt_key'	=> $this->_eway_sandbox_ecrypt_key,
-				]);
+				$creds = new Credentials(
+					$this->_eway_sandbox_api_key,
+					$this->_eway_sandbox_password,
+					$this->_eway_sandbox_ecrypt_key,
+				);
 			}
 		}
 

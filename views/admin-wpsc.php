@@ -1,18 +1,12 @@
 <?php
-namespace webaware\eway_payment_gateway;
+use webaware\eway_payment_gateway\Logging;
+use webaware\eway_payment_gateway\MethodWPeCommerce;
 
 // custom fields for WP eCommerce admin page
 
 if (!defined('ABSPATH')) {
 	exit;
 }
-
-$eway_stored	= get_option('wpsc_merchant_eway_stored') ? '1' : '0';
-$eway_test		= get_option('eway_test')                 ? '1' : '0';
-$eway_th		= get_option('wpsc_merchant_eway_th')     ? '1' : '0';
-$eway_beagle	= get_option('wpsc_merchant_eway_beagle') ? '1' : '0';
-$eway_logging	= get_option('eway_logging', 'off');
-
 ?>
 
 	<tr valign="top">
@@ -43,16 +37,6 @@ $eway_logging	= get_option('eway_logging', 'off');
 		<td>
 			<textarea name="eway_ecrypt_key" id="eway_ecrypt_key" style="width: 100%; height: 6em" autocorrect="off" autocapitalize="off" spellcheck="false"
 				><?= esc_attr(get_option('eway_ecrypt_key')); ?></textarea>
-		</td>
-	</tr>
-
-	<tr valign="top">
-		<th scope="row">
-			<label for="ewayCustomerID_id"><?= esc_html_x('Customer ID', 'settings field', 'eway-payment-gateway'); ?></label>
-		</th>
-		<td>
-			<input type="text" value="<?= esc_attr(get_option('ewayCustomerID_id')); ?>" name="ewayCustomerID_id" id="ewayCustomerID_id" />
-			<p class="description"><?php esc_html_e('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'); ?></p>
 		</td>
 	</tr>
 
@@ -164,7 +148,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<select name="eway_form[last_name]" id="eway_form_last_name">
-				<?= MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_last_name')); ?>
+				<?php MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_last_name')); ?>
 			</select>
 		</td>
 	</tr>
@@ -175,7 +159,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<select name="eway_form[address]" id="eway_form_address">
-				<?= MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_address')); ?>
+				<?php MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_address')); ?>
 			</select>
 		</td>
 	</tr>
@@ -186,7 +170,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<select name="eway_form[city]" id="eway_form_city">
-				<?= MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_city')); ?>
+				<?php MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_city')); ?>
 			</select>
 		</td>
 	</tr>
@@ -197,7 +181,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<select name="eway_form[state]" id="eway_form_state">
-				<?= MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_state')); ?>
+				<?php MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_state')); ?>
 			</select>
 		</td>
 	</tr>
@@ -208,7 +192,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<select name="eway_form[post_code]" id="eway_form_post_code">
-				<?= MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_post_code')); ?>
+				<?php MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_post_code')); ?>
 			</select>
 		</td>
 	</tr>
@@ -219,7 +203,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<select name="eway_form[country]" id="eway_form_country">
-				<?= MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_country')); ?>
+				<?php MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_country')); ?>
 			</select>
 		</td>
 	</tr>
@@ -230,7 +214,7 @@ $eway_logging	= get_option('eway_logging', 'off');
 		</th>
 		<td>
 			<select name="eway_form[email]" id="eway_form_email">
-				<?= MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_email')); ?>
+				<?php MethodWPeCommerce::showCheckoutFormFields(get_option('eway_form_email')); ?>
 			</select>
 		</td>
 	</tr>

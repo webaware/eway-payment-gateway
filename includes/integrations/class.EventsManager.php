@@ -1,6 +1,7 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
+use EM_Booking;
 use EM_Event;
 use EM_Gateway;
 use EM_Gateways;
@@ -13,16 +14,16 @@ if (!defined('ABSPATH')) {
  * payment gateway integration for Events Manager
  * with thanks to EM_Gateway_Authorize_AIM for showing the way...
  */
-class MethodEventsManager extends EM_Gateway {
+final class MethodEventsManager extends EM_Gateway {
 
-	protected $logger;
+	private $logger;
 
 	private $registered_timer = 0;
 
 	/**
 	 * register gateway integration
 	 */
-	public static function register_eway() {
+	public static function register_eway() : void {
 		EM_Gateways::register_gateway('eway', __CLASS__);
 	}
 
@@ -85,7 +86,7 @@ class MethodEventsManager extends EM_Gateway {
 	/**
 	 * load custom styles for settings page
 	 */
-	public function adminSettingsStyles() {
+	public function adminSettingsStyles() : void {
 		// only for Eway settings page
 		if (empty($_GET['gateway']) || $_GET['gateway'] !== $this->gateway) {
 			return;
@@ -99,7 +100,7 @@ class MethodEventsManager extends EM_Gateway {
 	/**
 	 * add page script for admin options
 	 */
-	public function adminSettingsScript() {
+	public function adminSettingsScript() : void {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		echo '<script>';
@@ -110,9 +111,8 @@ class MethodEventsManager extends EM_Gateway {
 	/**
 	 * attempt to map country code to name
 	 * @param string $countryCode
-	 * @return string
 	 */
-	protected static function getCountryName($countryCode) {
+	private static function getCountryName($countryCode) : string {
 		$name = '';
 
 		// check for country code as non-empty string
@@ -135,13 +135,17 @@ class MethodEventsManager extends EM_Gateway {
 
 	/**
 	 * perform additional booking form post validation, to check for required credit card fields
-	 * @param boolean $result
-	 * @param object $EM_Booking
-	 * @return boolean
 	 */
-	public function emBookingValidate($result, $EM_Booking) {
+	public function emBookingValidate(bool $result, $EM_Booking) : bool {
 		// only perform validation if this payment method has been selected
 		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] === $this->gateway) {
+
+			if ($this->getApiCredentials()->isMissingCredentials()) {
+				$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
+				$EM_Booking->add_error(__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
+				return false;
+			}
+
 			$postdata		= new FormPost();
 
 			$fields			= [
@@ -166,21 +170,17 @@ class MethodEventsManager extends EM_Gateway {
 	}
 
 	/**
-	 * This function intercepts the previous booking form url from the javascript localized array of EM variables and forces it to be an HTTPS url.
-	 * @param array $localized_array
-	 * @return array
+	 * This function intercepts the previous booking form URL from the JavaScript localised array of EM variables and forces it to be an HTTPS url.
 	 */
-	public static function forceBookingAjaxSSL($localized_array) {
+	public static function forceBookingAjaxSSL(array $localized_array) : array {
 		$localized_array['bookingajaxurl'] = self::force_ssl($localized_array['bookingajaxurl']);
 		return $localized_array;
 	}
 
 	/**
 	 * Turns any url into an HTTPS url.
-	 * @param string $url
-	 * @return string
 	 */
-	public static function force_ssl($url) {
+	public static function force_ssl(string $url) : string {
 		// only fix if source URL starts with http://
 		if (stripos($url, 'http://') === 0) {
 			$url = 'https' . substr($url, 4);
@@ -192,7 +192,7 @@ class MethodEventsManager extends EM_Gateway {
 	/**
 	 * if page is an event and it has a booking form, make sure it's on SSL
 	 */
-	public static function redirect_ssl() {
+	public static function redirect_ssl() : void {
 		global $post;
 
 		// only if we're on an event page, and not SSL
@@ -318,6 +318,11 @@ class MethodEventsManager extends EM_Gateway {
 	 * Outputs custom content and credit card information.
 	 */
 	public function booking_form() {
+		if ($this->getApiCredentials()->isMissingCredentials()) {
+			printf('<p class="error"><strong>%s</strong></p>', esc_html__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
+			return;
+		}
+
 		$card_msg	= esc_html(get_option("em_{$this->gateway}_card_msg"));
 
 		$postdata = new FormPost();
@@ -336,9 +341,9 @@ class MethodEventsManager extends EM_Gateway {
 	/**
 	 * maybe set up Client Side Encryption
 	 */
-	public function maybeEnqueueEcrypt() {
+	public function maybeEnqueueEcrypt() : void {
 		$creds	= $this->getApiCredentials();
-		if (!empty($creds['ecrypt_key'])) {
+		if ($creds->hasCSEKey() && ! $creds->isMissingCredentials()) {
 			// hook wp_footer at priority 110, because this function was called on wp_footer at priority 20 or 100
 			add_action('wp_footer', [$this, 'ecryptScript'], 110);
 		}
@@ -347,19 +352,19 @@ class MethodEventsManager extends EM_Gateway {
 	/**
 	 * maybe set up Client Side Encryption
 	 */
-	public function ecryptScript() {
+	public function ecryptScript() : void {
 		$creds	= $this->getApiCredentials();
 
 		wp_enqueue_script('eway-payment-gateway-ecrypt');
 
 		$vars = [
 			'mode'		=> 'events-manager',
-			'key'		=> $creds['ecrypt_key'],
+			'key'		=> $creds->ecrypt_key,
 			'form'		=> 'form.em-booking-form',
 			'fields'	=> [
-							'#eway_card_num'	=> ['name' => 'cse:x_card_num', 'is_cardnum' => true],
-							'#eway_card_code'	=> ['name' => 'cse:x_card_code', 'is_cardnum' => false],
-						],
+				'#eway_card_num'	=> ['name' => 'cse:x_card_num', 'is_cardnum' => true],
+				'#eway_card_code'	=> ['name' => 'cse:x_card_code', 'is_cardnum' => false],
+			],
 		];
 
 		wp_localize_script('eway-payment-gateway-ecrypt', 'eway_ecrypt_vars', $vars);
@@ -368,17 +373,23 @@ class MethodEventsManager extends EM_Gateway {
 
 	/**
 	 * attempt to process payment
-	 * @param EM_Booking $EM_Booking
-	 * @return boolean
 	 */
-	public function processPayment($EM_Booking) {
+	public function processPayment(EM_Booking $EM_Booking) : bool {
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('em_eway_trans_number', $EM_Booking->booking_id);
 
 		$capture	= !get_option("em_{$this->gateway}_stored");
 		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
 		$creds		= apply_filters('em_eway_credentials', $this->getApiCredentials(), $useSandbox, $EM_Booking);
-		$eway		= get_api_wrapper($creds, $capture, $useSandbox);
+
+		if ($creds->isMissingCredentials()) {
+			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
+			$EM_Booking->add_error(__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
+			return false;
+		}
+
+		$eway		= new EwayRapidAPI($creds->api_key, $creds->password, $useSandbox);
+		$eway->capture = $capture;
 
 		$postdata = new FormPost();
 
@@ -476,7 +487,7 @@ class MethodEventsManager extends EM_Gateway {
 			// an exception occured, so record the error
 			$EM_Booking->add_error(nl2br($e->getMessage()));
 			$this->logger->log('error', $e->getMessage());
-			return;
+			return false;
 		}
 
 		// Return status
@@ -495,6 +506,10 @@ class MethodEventsManager extends EM_Gateway {
 	public function mysettings() {
 		add_action('admin_print_footer_scripts', [$this, 'adminSettingsScript']);
 
+		if ($this->getApiCredentials()->isMissingCredentials()) {
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-notice-missing-creds.php';
+		}
+
 		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-events-manager.php';
 	}
 
@@ -508,7 +523,6 @@ class MethodEventsManager extends EM_Gateway {
 			"em_{$this->gateway}_api_key",
 			"em_{$this->gateway}_password",
 			"em_{$this->gateway}_ecrypt_key",
-			"em_{$this->gateway}_cust_id",
 			"em_{$this->gateway}_sandbox_api_key",
 			"em_{$this->gateway}_sandbox_password",
 			"em_{$this->gateway}_sandbox_ecrypt_key",
@@ -523,7 +537,6 @@ class MethodEventsManager extends EM_Gateway {
 
 		// filters for specific data
 		add_filter("gateway_update_em_{$this->gateway}_mode", 'sanitize_text_field');
-		add_filter("gateway_update_em_{$this->gateway}_cust_id", 'sanitize_text_field');
 		add_filter("gateway_update_em_{$this->gateway}_card_msg", 'sanitize_text_field');
 		add_filter("gateway_update_em_{$this->gateway}_logging", 'sanitize_text_field');
 
@@ -547,24 +560,20 @@ class MethodEventsManager extends EM_Gateway {
 	/**
 	 * get API credentials based on settings
 	 */
-	protected function getApiCredentials() : array {
-		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
-
-		if (!$useSandbox) {
-			$creds = [
-				'api_key'		=> get_option("em_{$this->gateway}_api_key"),
-				'password'		=> get_option("em_{$this->gateway}_password"),
-				'ecrypt_key'	=> get_option("em_{$this->gateway}_ecrypt_key"),
-				'customerid'	=> get_option("em_{$this->gateway}_cust_id"),
-			];
+	private function getApiCredentials() : Credentials {
+		if (get_option("em_{$this->gateway}_mode") !== 'sandbox') {
+			$creds = new Credentials(
+				get_option("em_{$this->gateway}_api_key"),
+				get_option("em_{$this->gateway}_password"),
+				get_option("em_{$this->gateway}_ecrypt_key"),
+			);
 		}
 		else {
-			$creds = [
-				'api_key'		=> get_option("em_{$this->gateway}_sandbox_api_key"),
-				'password'		=> get_option("em_{$this->gateway}_sandbox_password"),
-				'ecrypt_key'	=> get_option("em_{$this->gateway}_sandbox_ecrypt_key"),
-				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
-			];
+			$creds = new Credentials(
+				get_option("em_{$this->gateway}_sandbox_api_key"),
+				get_option("em_{$this->gateway}_sandbox_password"),
+				get_option("em_{$this->gateway}_sandbox_ecrypt_key"),
+			);
 		}
 
 		return $creds;

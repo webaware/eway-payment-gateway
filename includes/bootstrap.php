@@ -35,9 +35,8 @@ add_action('plugins_loaded', function() {
  */
 spl_autoload_register(function($class_name) {
 	static $classMap = [
+		'Credentials'						=> 'includes/class.Credentials.php',
 		'FormPost'							=> 'includes/class.FormPost.php',
-		'EwayLegacyAPI'						=> 'includes/class.EwayLegacyAPI.php',
-		'EwayLegacyStoredAPI'				=> 'includes/class.EwayLegacyStoredAPI.php',
 		'EwayRapidAPI'						=> 'includes/class.EwayRapidAPI.php',
 		'EwayResponse'						=> 'includes/class.EwayResponse.php',
 		'EwayResponseDirectPayment'			=> 'includes/class.EwayResponseDirectPayment.php',

@@ -6,8 +6,6 @@ use Facebook\WebDriver\WebDriverBy;
 use webaware\eway_payment_gateway\Plugin;
 use webaware\eway_payment_gateway\EwayRapidAPI;
 
-use function webaware\eway_payment_gateway\get_api_wrapper;
-
 class PluginTest extends TestCase {
 
 	public WebDriverRunner $web;
@@ -204,15 +202,7 @@ class PluginTest extends TestCase {
 	private function getAPI() : EwayRapidAPI {
 		global $plugin_test_env;
 
-		$capture	= true;
-		$useSandbox	= true;
-		$creds = [
-			'api_key'		=> $plugin_test_env['eway_api_key'],
-			'password'		=> $plugin_test_env['eway_api_password'],
-			'ecrypt_key'	=> $plugin_test_env['eway_ecrypt_key'],
-			'customerid'	=> $plugin_test_env['eway_customerid'],
-		];
-		return get_api_wrapper($creds, $capture, $useSandbox);
+		return new EwayRapidAPI($plugin_test_env['eway_api_key'], $plugin_test_env['eway_api_password'], true);
 	}
 
 	/**

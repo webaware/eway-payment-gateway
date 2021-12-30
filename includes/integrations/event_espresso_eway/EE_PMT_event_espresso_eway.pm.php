@@ -1,4 +1,5 @@
 <?php
+use webaware\eway_payment_gateway\Credentials;
 use webaware\eway_payment_gateway\Logging;
 use webaware\eway_payment_gateway\event_espresso\Gateway;
 
@@ -10,7 +11,7 @@ if (!defined('ABSPATH')) {
  * Event Espresso payment method
  * @link https://github.com/eventespresso/event-espresso-core/blob/master/docs/L--Payment-Methods-and-Gateways/creating-a-payment-method.md
  */
-class EE_PMT_event_espresso_eway extends EE_PMT_Base {
+final class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 
 	/**
 	 * @param EE_Payment_Method $pm_instance
@@ -25,8 +26,10 @@ class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 
 		parent::__construct($pm_instance);
 
+		add_action('AHEE__EE_Form_Section_Proper___construct_finalize__end', [$this, 'maybeNotifyCreds'], 10, 3);
 		add_action('AHEE__EED_Single_Page_Checkout__enqueue_styles_and_scripts', [$this, 'maybeEnqueueCSE']);
 		add_action('admin_print_scripts', [$this, 'adminEnqueueScripts']);
+		add_filter('FHEE__EEM_Payment_Method__get_all_for_transaction__payment_methods', [$this, 'maybeDisableMethod']);
 	}
 
 	/**
@@ -47,7 +50,7 @@ class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 	public function generate_new_billing_form(EE_Transaction $transaction = null) {
 		$creds = $this->getApiCredentials();
 
-		if (empty($creds)) {
+		if (empty($creds) || $creds->isMissingCredentials()) {
 			$subsections = [];
 		}
 		else {
@@ -155,7 +158,7 @@ class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 	/**
 	 * enqueue admin scripts for settings fields
 	 */
-	public function adminEnqueueScripts() {
+	public function adminEnqueueScripts() : void {
 		global $plugin_page;
 
 		if ($plugin_page === 'espresso_payment_settings') {
@@ -166,11 +169,49 @@ class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 	}
 
 	/**
+	 * maybe notify admin that some credentials are missing
+	 * NB: payment method instance is not available yet, so need to hit the database for answers
+	 */
+	public function maybeNotifyCreds($form, $parent_section, $name) : void {
+		static $has_checked_creds = false;
+
+		if ($has_checked_creds || $name !== 'event_espresso_eway_settings_form') {
+			return;
+		}
+
+		global $wpdb;
+
+		$sql		= "
+			select PMD_debug_mode
+			from {$wpdb->prefix}esp_payment_method
+			where PMD_slug = 'event_espresso_eway'
+		";
+		$sandbox	= $wpdb->get_var($sql) ? '_sandbox' : '';
+		$api_key	= "eway{$sandbox}_api_key";
+		$password	= "eway{$sandbox}_password";
+
+		$sql		= "
+			select count(EXM_ID)
+			from {$wpdb->prefix}esp_extra_meta
+			where EXM_type = 'Payment_Method'
+			and EXM_key in (%s,%s)
+			and EXM_value > ''
+		";
+		$count = $wpdb->get_var($wpdb->prepare($sql, [$api_key, $password]));
+
+		if ($count < 2) {
+			require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-notice-missing-creds.php';
+		}
+
+		$has_checked_creds = true;
+	}
+
+	/**
 	 * maybe enqueue the Client Side Encryption scripts for encrypting credit card details
 	 */
-	public function maybeEnqueueCSE() {
+	public function maybeEnqueueCSE() : void {
 		$creds = $this->getApiCredentials();
-		if (!empty($creds['ecrypt_key'])) {
+		if ($creds && $creds->hasCSEKey() && ! $creds->isMissingCredentials()) {
 			wp_enqueue_script('eway-payment-gateway-ecrypt');
 			add_action('wp_footer', [$this, 'ecryptScript']);
 		}
@@ -179,12 +220,12 @@ class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 	/**
 	 * configure the scripts for client-side encryption
 	 */
-	public function ecryptScript() {
+	public function ecryptScript() : void {
 		$creds = $this->getApiCredentials();
 
 		$vars = [
 			'mode'		=> 'event-espresso',
-			'key'		=> $creds['ecrypt_key'],
+			'key'		=> $creds->ecrypt_key,
 			'form'		=> '#ee-spco-payment_options-reg-step-form',
 			'fields'	=> [
 							'#event-espresso-eway-form-card-number'	=> ['name' => 'cse:card_number', 'is_cardnum' => true, 'false_fill' => true],
@@ -196,30 +237,43 @@ class EE_PMT_event_espresso_eway extends EE_PMT_Base {
 	}
 
 	/**
+	 * maybe disable this payment method if it is missing some credentials
+	 */
+	public function maybeDisableMethod(array $methods) : array {
+		$creds = $this->getApiCredentials();
+		if ($creds && $creds->isMissingCredentials()) {
+			$methods = array_filter($methods, function($method) {
+				return $method->slug() !== 'event_espresso_eway';
+			});
+		}
+		return $methods;
+	}
+
+	/**
 	 * get API credentials based on settings
 	 */
-	protected function getApiCredentials() : array {
+	private function getApiCredentials() : ?Credentials {
 		static $creds = false;
 
 		if ($creds === false) {
 			$pm = $this->_pm_instance;
 
 			if (empty($pm)) {
-				$creds = [];
+				$creds = null;
 			}
 			elseif (!$pm->debug_mode()) {
-				$creds = array_filter([
-					'api_key'		=> $pm->get_extra_meta('eway_api_key', true),
-					'password'		=> $pm->get_extra_meta('eway_password', true),
-					'ecrypt_key'	=> $pm->get_extra_meta('eway_ecrypt_key', true),
-				]);
+				$creds = new Credentials(
+					$pm->get_extra_meta('eway_api_key', true),
+					$pm->get_extra_meta('eway_password', true),
+					$pm->get_extra_meta('eway_ecrypt_key', true),
+				);
 			}
 			else {
-				$creds = array_filter([
-					'api_key'		=> $pm->get_extra_meta('eway_sandbox_api_key', true),
-					'password'		=> $pm->get_extra_meta('eway_sandbox_password', true),
-					'ecrypt_key'	=> $pm->get_extra_meta('eway_sandbox_ecrypt_key', true),
-				]);
+				$creds = new Credentials(
+					$pm->get_extra_meta('eway_sandbox_api_key', true),
+					$pm->get_extra_meta('eway_sandbox_password', true),
+					$pm->get_extra_meta('eway_sandbox_ecrypt_key', true),
+				);
 			}
 		}
 

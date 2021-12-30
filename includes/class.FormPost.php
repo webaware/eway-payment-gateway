@@ -8,9 +8,9 @@ if (!defined('ABSPATH')) {
 /**
  * wrapper for form post data
  */
-class FormPost {
+final class FormPost {
 
-	protected static $postdata = null;
+	private static ?array $postdata = null;
 
 	/**
 	 * maybe unslash the post data and store for access

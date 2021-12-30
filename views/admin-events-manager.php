@@ -1,5 +1,5 @@
 <?php
-namespace webaware\eway_payment_gateway;
+use webaware\eway_payment_gateway\Logging;
 
 // custom fields for Events Manager admin page
 
@@ -72,16 +72,6 @@ if (!defined('ABSPATH')) {
 		<td>
 			<textarea name="em_eway_ecrypt_key" id="em_eway_ecrypt_key" class="large-text"
 				autocorrect="off" autocapitalize="off" spellcheck="false"><?= esc_html(get_option('em_eway_ecrypt_key')); ?></textarea>
-		</td>
-	</tr>
-
-	<tr valign="top">
-		<th scope="row">
-			<label for="em_eway_cust_id"><?= esc_html_x('Customer ID', 'settings field', 'eway-payment-gateway'); ?></label>
-		</th>
-		<td>
-			<input type="text" name="em_eway_cust_id" id="em_eway_cust_id" value="<?= esc_attr(get_option('em_eway_cust_id')); ?>" />
-			<em><?php esc_html_e('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'); ?></em>
 		</td>
 	</tr>
 

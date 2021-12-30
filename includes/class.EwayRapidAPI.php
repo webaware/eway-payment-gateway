@@ -563,7 +563,7 @@ trait SerialiseWithoutNull {
 /**
  * card details record
  */
-class CardDetails implements JsonSerializable {
+final class CardDetails implements JsonSerializable {
 
 	use SerialiseWithoutNull;
 
@@ -591,7 +591,7 @@ class CardDetails implements JsonSerializable {
 /**
  * Customer Details record
  */
-class CustomerDetails implements JsonSerializable {
+final class CustomerDetails implements JsonSerializable {
 
 	use SerialiseWithoutNull;
 
@@ -687,7 +687,7 @@ class CustomerDetails implements JsonSerializable {
 /**
  * Shipping Address record
  */
-class ShippingAddress implements JsonSerializable {
+final class ShippingAddress implements JsonSerializable {
 
 	use SerialiseWithoutNull;
 
@@ -769,7 +769,7 @@ class ShippingAddress implements JsonSerializable {
 /**
  * Payment record
  */
-class PaymentDetails implements JsonSerializable {
+final class PaymentDetails implements JsonSerializable {
 
 	use SerialiseWithoutNull;
 
@@ -804,7 +804,7 @@ class PaymentDetails implements JsonSerializable {
 /**
  * Direct Connection Transaction Request record
  */
-class TransactionRequest implements JsonSerializable {
+final class TransactionRequest implements JsonSerializable {
 
 	use SerialiseWithoutNull;
 

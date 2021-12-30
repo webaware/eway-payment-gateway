@@ -8,13 +8,17 @@ if (!defined('ABSPATH')) {
 /**
  * simple logging for plugin
  */
-class Logging {
+final class Logging {
 
-	protected $logFolder;
-	protected $integration;
-	protected $min_level;
-	protected $status;
-	protected $handle;
+	private string $logFolder;
+	private string $integration;
+	private string $min_level;
+	private string $status;
+
+	/**
+	 * @var resource
+	 */
+	private $handle;
 
 	/**
 	 * initialise logging
@@ -66,7 +70,7 @@ class Logging {
 	 * @param string $level
 	 * @param string $msg
 	 */
-	public function log(string $level, string $msg) {
+	public function log(string $level, string $msg) : void {
 		if (empty($this->logFolder)) {
 			// no log folder (e.g. error creating folder)
 			return;
@@ -104,7 +108,7 @@ class Logging {
 	/**
 	 * sanitise a logging message to obfuscate credit card details before storing in plain text!
 	 */
-	protected static function sanitiseLog(string $message) : string {
+	private static function sanitiseLog(string $message) : string {
 		// obfuscate anything that looks like credit card number: a string of at least 12 numeric digits
 		$message = preg_replace('#[0-9]{8,}([0-9]{4})#', '************$1', $message);
 

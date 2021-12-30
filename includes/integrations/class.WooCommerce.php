@@ -1,6 +1,7 @@
 <?php
 namespace webaware\eway_payment_gateway;
 
+use WC_Order;
 use WC_Payment_Gateway_CC;
 
 if (!defined('ABSPATH')) {
@@ -11,23 +12,21 @@ if (!defined('ABSPATH')) {
  * payment gateway integration for WooCommerce
  * @link https://docs.woothemes.com/document/payment-gateway-api/
  */
-class MethodWooCommerce extends WC_Payment_Gateway_CC {
+final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
-	protected $logger;
+	private Logging $logger;
 
 	/**
 	 * hook WooCommerce to register gateway integration
 	 */
-	public static function register_eway() {
+	public static function register_eway() : void {
 		add_filter('woocommerce_payment_gateways', [__CLASS__, 'register']);
 	}
 
 	/**
 	 * register new payment gateway
-	 * @param array $gateways array of registered gateways
-	 * @return array
 	 */
-	public static function register($gateways) {
+	public static function register(array $gateways) : array {
 		$gateways[] = __CLASS__;
 		return $gateways;
 	}
@@ -61,7 +60,6 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		$this->eway_api_key				= $this->settings['eway_api_key'];
 		$this->eway_password			= $this->settings['eway_password'];
 		$this->eway_ecrypt_key			= $this->settings['eway_ecrypt_key'];
-		$this->eway_customerid			= $this->settings['eway_customerid'];
 		$this->eway_sandbox				= $this->settings['eway_sandbox'];
 		$this->eway_sandbox_api_key		= $this->settings['eway_sandbox_api_key'];
 		$this->eway_sandbox_password	= $this->settings['eway_sandbox_password'];
@@ -73,8 +71,16 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		$this->eway_site_seal_code		= $this->settings['eway_site_seal_code'];
 		$this->eway_emails_show_txid	= $this->settings['eway_emails_show_txid'];
 
+		$creds = $this->getApiCredentials();
+
+		// maybe make this gateway unavailable if missing API credentials
+		if ($this->enabled === 'yes' && $creds->isMissingCredentials()) {
+			add_filter('woocommerce_available_payment_gateways', [$this, 'wooMakeUnavailable']);
+		}
+		add_action('woocommerce_settings_checkout', [$this, 'wooMaybeNotifyCreds']);
+
 		// handle support for standard WooCommerce credit card form instead of our custom template
-		if ($this->eway_card_form === 'yes') {
+		if ($this->enabled === 'yes' && $this->eway_card_form === 'yes' && !$creds->isMissingCredentials()) {
 			$this->supports[]			= 'default_credit_card_form';
 			add_filter('woocommerce_credit_card_form_fields', [$this, 'wooCcFormFields'], 10, 2);
 			add_action('woocommerce_credit_card_form_start', [$this, 'wooCcFormStart']);
@@ -91,7 +97,7 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	/**
 	 * initialise settings form fields
 	 */
-	public function initFormFields() {
+	private function initFormFields() : void {
 		// get recorded settings, so we can determine sane defaults when upgrading
 		$settings = get_option('woocommerce_eway_payments_settings');
 
@@ -170,13 +176,6 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 														'autocapitalize'	=> 'off',
 														'spellcheck'		=> 'false',
 												],
-			],
-
-			'eway_customerid' => [
-							'title' 		=> _x('Customer ID', 'settings field', 'eway-payment-gateway'),
-							'type' 			=> 'text',
-							'description' 	=> esc_html__('Legacy connections only; please add your API key/password and Client Side Encryption key instead.', 'eway-payment-gateway'),
-							'desc_tip'		=> true,
 			],
 
 			'eway_sandbox' => [
@@ -324,7 +323,7 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	/**
 	 * add page script for admin options
 	 */
-	public function adminSettingsScript() {
+	public function adminSettingsScript() : void {
 		$min	= SCRIPT_DEBUG ? '' : '.min';
 
 		echo '<script>';
@@ -333,12 +332,47 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	}
 
 	/**
-	 * add Name field to WooCommerce credit card form
-	 * @param array $fields
-	 * @param string $gateway
+	 * remove from list of available gateways, because credentials are not complete
+	 * @param array $available
 	 * @return array
 	 */
-	public function wooCcFormFields($fields, $gateway) {
+	public function wooMakeUnavailable(array $available) : array {
+		unset($available[$this->id]);
+		return $available;
+	}
+
+	/**
+	 * maybe notify admins that gateway is missing credentials
+	 */
+	public function wooMaybeNotifyCreds() : void {
+		static $first_time = true;
+
+		$tab = $_GET['tab'] ?? '';
+		$section = $_GET['section'] ?? '';
+
+		if ($first_time && $tab === 'checkout' && $section === $this->id && $this->enabled === 'yes') {
+			$first_time = false;
+
+			// check uncached settings
+			$settings = get_option($this->get_option_key(), null);
+
+			if (is_array($settings)) {
+				$sandbox = ($settings['eway_sandbox'] ?? '') === 'yes' ? 'sandbox_' : '';
+			}
+
+			$api_key	= $settings["eway_{$sandbox}api_key"] ?? '';
+			$password	= $settings["eway_{$sandbox}password"] ?? '';
+
+			if (empty($api_key) || empty($password)) {
+				require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-notice-missing-creds.php';
+			}
+		}
+	}
+
+	/**
+	 * add Name field to WooCommerce credit card form
+	 */
+	public function wooCcFormFields(array $fields, string $gateway) : array {
 		if ($gateway === $this->id) {
 			ob_start();
 			require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/woocommerce-ccfields-card-name.php';
@@ -352,9 +386,8 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 	/**
 	 * show message before fields in standard WooCommerce credit card form
-	 * @param string $gateway
 	 */
-	public function wooCcFormStart($gateway) {
+	public function wooCcFormStart(string $gateway) : void {
 		if ($gateway === $this->id) {
 			if (!empty($this->settings['eway_card_msg'])) {
 				printf('<span class="eway-credit-card-message">%s</span>', esc_html($this->settings['eway_card_msg']));
@@ -367,9 +400,9 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	/**
 	 * maybe enqueue the Client Side Encryption scripts for encrypting credit card details
 	 */
-	protected function maybeEnqueueCSE() {
+	private function maybeEnqueueCSE() : void {
 		$creds = $this->getApiCredentials();
-		if (!empty($creds['ecrypt_key'])) {
+		if ($creds->hasCSEKey()) {
 			wp_enqueue_script('eway-payment-gateway-ecrypt');
 			add_action('wp_footer', [$this, 'ecryptScript']);
 		}
@@ -378,12 +411,12 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	/**
 	 * configure the scripts for client-side encryption
 	 */
-	public function ecryptScript() {
+	public function ecryptScript() : void {
 		$creds	= $this->getApiCredentials();
 
 		$vars = [
 			'mode'		=> 'woocommerce',
-			'key'		=> $creds['ecrypt_key'],
+			'key'		=> $creds->ecrypt_key,
 			'form'		=> 'form.checkout',
 			'fields'	=> [
 							"#{$this->id}-card-number"	=> ['name' => "cse:{$this->id}-card-number", 'is_cardnum' => true],
@@ -398,9 +431,8 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 	/**
 	 * show site seal after fields in standard WooCommerce credit card form, if entered
-	 * @param string $gateway
 	 */
-	public function wooCcFormEnd($gateway) {
+	public function wooCcFormEnd(string $gateway) : void {
 		if ($gateway === $this->id) {
 			if (!empty($this->settings['eway_site_seal']) && !empty($this->settings['eway_site_seal_code']) && $this->settings['eway_site_seal'] === 'yes') {
 				echo $this->settings['eway_site_seal_code'];
@@ -411,7 +443,7 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	/**
 	 * display payment form on checkout page
 	 */
-	public function payment_fields() {
+	public function payment_fields() : void {
 		if ($this->eway_card_form === 'yes') {
 			// use standard WooCommerce credit card form
 			$this->form();
@@ -430,9 +462,8 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 	/**
 	 * get field values from credit card form -- either WooCommerce standard, or the old template
-	 * @return array
 	 */
-	protected function getCardFields() {
+	private function getCardFields() : array {
 		$postdata = new FormPost();
 
 		if ($this->eway_card_form === 'yes') {
@@ -500,13 +531,15 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		$capture	= ($this->eway_stored  !== 'yes');
 		$useSandbox	= ($this->eway_sandbox === 'yes');
 		$creds		= apply_filters('woocommerce_eway_credentials', $this->getApiCredentials(), $useSandbox, $order);
-		$eway		= get_api_wrapper($creds, $capture, $useSandbox);
 
-		if (!$eway) {
+		if ($creds->isMissingCredentials()) {
 			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
 			wc_add_notice(esc_html__('Eway payments is not configured for payments yet', 'eway-payment-gateway'), 'error');
 			return ['result' => 'failure'];
 		}
+
+		$eway		= new EwayRapidAPI($creds->api_key, $creds->password, $useSandbox);
+		$eway->capture = $capture;
 
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('woocommerce_eway_trans_number', $order_id);
@@ -532,7 +565,6 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		$eway->state					= $order->get_billing_state();
 		$eway->postcode					= $order->get_billing_postcode();
 		$eway->country					= $order->get_billing_country();
-		$eway->countryName				= $eway->country;									// for Eway legacy API
 		$eway->comments					= $order->get_customer_note();
 
 		// maybe send shipping details
@@ -546,12 +578,6 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 			$eway->shipState			= $order->get_shipping_state();
 			$eway->shipCountry			= $order->get_shipping_country();
 			$eway->shipPostcode			= $order->get_shipping_postcode();
-		}
-
-		// convert WooCommerce country code into country name (for Eway legacy API)
-		$countries = WC()->countries->countries;
-		if (isset($countries[$eway->country])) {
-			$eway->countryName = $countries[$eway->country];
 		}
 
 		// use cardholder name for last name if no customer name entered
@@ -635,24 +661,20 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	/**
 	 * get API credentials based on settings
 	 */
-	protected function getApiCredentials() : array {
-		$useSandbox	= ($this->eway_sandbox === 'yes');
-
-		if (!$useSandbox) {
-			$creds = [
-				'api_key'		=> $this->eway_api_key,
-				'password'		=> $this->eway_password,
-				'ecrypt_key'	=> $this->eway_ecrypt_key,
-				'customerid'	=> $this->eway_customerid,
-			];
+	private function getApiCredentials() : Credentials {
+		if ($this->eway_sandbox !== 'yes') {
+			$creds = new Credentials(
+				$this->eway_api_key,
+				$this->eway_password,
+				$this->eway_ecrypt_key,
+			);
 		}
 		else {
-			$creds = [
-				'api_key'		=> $this->eway_sandbox_api_key,
-				'password'		=> $this->eway_sandbox_password,
-				'ecrypt_key'	=> $this->eway_sandbox_ecrypt_key,
-				'customerid'	=> EWAY_PAYMENTS_TEST_CUSTOMER,
-			];
+			$creds = new Credentials(
+				$this->eway_sandbox_api_key,
+				$this->eway_sandbox_password,
+				$this->eway_sandbox_ecrypt_key,
+			);
 		}
 
 		return $creds;
@@ -660,12 +682,8 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 	/**
 	 * add the successful transaction ID to WooCommerce order emails
-	 * @param array $keys
-	 * @param bool $sent_to_admin
-	 * @param mixed $order
-	 * @return array
 	 */
-	public function wooEmailOrderMetaKeys($keys, $sent_to_admin, $order) {
+	public function wooEmailOrderMetaKeys(array $keys, bool $sent_to_admin, mixed $order) : array {
 		if (apply_filters('woocommerce_eway_email_show_trans_number', $this->eway_emails_show_txid === 'yes', $order)) {
 			$order			= self::getOrder($order);
 			$key			= 'Transaction ID';
@@ -684,9 +702,8 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	 * @param int|object|WC_Order $order
 	 * @return WC_Order
 	 */
-	protected static function getOrder($order) {
-		if (is_numeric($order)) {
-			// convert order number to order object
+	private static function getOrder($order) : WC_Order {
+		if (!($order instanceof WC_Order)) {
 			$order = wc_get_order($order);
 		}
 
@@ -695,10 +712,8 @@ class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 	/**
 	 * update order meta
-	 * @param WC_Order $order
-	 * @param array $meta
 	 */
-	protected static function updateOrderMeta($order, $meta) {
+	private static function updateOrderMeta(WC_Order $order, array $meta) : void {
 		foreach ($meta as $key => $value) {
 			$order->update_meta_data($key, $value);
 		}

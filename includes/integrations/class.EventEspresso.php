@@ -11,12 +11,12 @@ if (!defined('ABSPATH')) {
 /**
  * payment gateway integration for Event Espresso
  */
-class MethodEventEspresso extends EE_Addon {
+final class MethodEventEspresso extends EE_Addon {
 
 	/**
 	 * register gateway integration
 	 */
-	public static function register_eway() {
+	public static function register_eway() : void {
 		EE_Register_Addon::register(__CLASS__, [
 			'version'				=> EWAY_PAYMENTS_VERSION,
 			'min_core_version'		=> '4.6.0.dev.000',

@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 /**
  * extract billing information from Event Espresso
  */
-class BillingInfo {
+final class BillingInfo {
 
 	public string $card_name		= '';
 	public string $card_number		= '';
@@ -30,10 +30,7 @@ class BillingInfo {
 	public string $zip				= '';
 	public string $country			= '';
 
-	/**
-	 * @param array $billing_info
-	 */
-	public function __construct($billing_info) {
+	public function __construct(array $billing_info) {
 		// collect raw post data, to access CSE encrypted fields
 		$postdata = new FormPost();
 
@@ -66,7 +63,7 @@ class BillingInfo {
 	 * get country code from billing details posted by checkout
 	 * -- because Event Espresso has converted it to a country name to pass to the checkout ¯\_(ツ)_/¯
 	 */
-	protected function getPostedCountry() : string {
+	private function getPostedCountry() : string {
 		$billing_form = false;
 
 		$iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($_POST), RecursiveIteratorIterator::SELF_FIRST);

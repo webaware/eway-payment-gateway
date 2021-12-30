@@ -6,6 +6,8 @@
 
 * changed: requires minimum PHP version 7.4 (recommend version 8.0 or greater)
 * changed: requires minimum WooCommerce version 3.0
+* changed: requires Eway Rapid API key / password; legacy XML API is no longer supported
+* changed: filter hooks for modifying credentials must now accept / return a Credentials object
 * changed: major code refresh, developers with customisations will need to test their customisations
 
 ### 4.5.0, 2021-11-14

@@ -59,30 +59,6 @@ function get_year_options(string $current_year = '') : string {
 }
 
 /**
- * get API wrapper, based on available credentials and settings
- * @return EwayRapidAPI|EwayLegacyAPI|EwayLegacyStoredAPI
- */
-function get_api_wrapper(array $creds, bool $capture, bool $useSandbox) {
-	if (!empty($creds['api_key']) && !empty($creds['password'])) {
-		$eway = new EwayRapidAPI($creds['api_key'], $creds['password'], $useSandbox);
-		$eway->capture = $capture;
-	}
-	elseif (!empty($creds['customerid'])) {
-		if ($capture) {
-			$eway = new EwayLegacyAPI($creds['customerid'], !$useSandbox);
-		}
-		else {
-			$eway = new EwayLegacyStoredAPI($creds['customerid'], !$useSandbox);
-		}
-	}
-	else {
-		$eway = false;
-	}
-
-	return $eway;
-}
-
-/**
  * get the customer's IP address dynamically from server variables
  */
 function get_customer_IP(bool $is_live_site) : string {

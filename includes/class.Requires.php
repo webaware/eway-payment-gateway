@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 /**
  * collect and display admin notices for failed prerequisites
  */
-class EwayPaymentGatewayRequires {
+final class EwayPaymentGatewayRequires {
 
 	private static $notices;
 
@@ -15,7 +15,7 @@ class EwayPaymentGatewayRequires {
 	 * set up the notices container, and hook actions for displaying notices
 	 * only called when a notice is being added
 	 */
-	protected function init() {
+	private function init() {
 		if (!is_array(self::$notices)) {
 			self::$notices = array();
 
@@ -64,7 +64,7 @@ class EwayPaymentGatewayRequires {
 	 * test whether we can show admin-related notices
 	 * @return bool
 	 */
-	protected static function canShowAdminNotices() {
+	private static function canShowAdminNotices() {
 		global $hook_suffix;
 
 		// only on specific pages
