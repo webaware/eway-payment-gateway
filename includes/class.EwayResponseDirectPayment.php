@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
  * extend Eway response for Direct Connection payment request
  * @link https://eway.io/api-v3/
  */
-class EwayResponseDirectPayment extends EwayResponse {
+final class EwayResponseDirectPayment extends EwayResponse {
 
 	#region members
 
