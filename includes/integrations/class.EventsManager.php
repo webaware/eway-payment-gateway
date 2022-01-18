@@ -243,48 +243,49 @@ final class MethodEventsManager extends EM_Gateway {
 	 */
 	public function em_booking_save($result, $EM_Booking) {
 		// make sure booking save was successful before we try anything
-		if ($result) {
-			if ($EM_Booking->get_price() > 0) {
-				// handle results
-				if ($this->processPayment($EM_Booking)) {
-					// Set booking status, but no emails sent
-					if (!get_option("em_{$this->gateway}_manual_approval", false) || !get_option('dbem_bookings_approval')) {
-						$EM_Booking->set_status(1, false); // Approve
-					}
-					else {
-						$EM_Booking->set_status(0, false); // Set back to normal "pending"
-					}
-				}
-				else {
-					// not good.... error inserted into booking in capture function. Delete this booking from db
-					if (!is_user_logged_in() && get_option('dbem_bookings_anonymous') && !get_option('dbem_bookings_registration_disable') && !empty($EM_Booking->person_id)) {
-						// delete the user we just created, only if created after em_booking_add filter is called
-						// (which is when a new user for this booking would be created)
-						$EM_Person = $EM_Booking->get_person();
-						if (strtotime($EM_Person->data->user_registered) >= $this->registered_timer) {
-							if (is_multisite()) {
-								include_once(ABSPATH.'/wp-admin/includes/ms.php');
-								wpmu_delete_user($EM_Person->ID);
-							}
-							else {
-								include_once(ABSPATH.'/wp-admin/includes/user.php');
-								wp_delete_user($EM_Person->ID);
-							}
+		if (!$result || $EM_Booking->get_price() <= 0) {
+			return $result;
+		}
 
-							// remove email confirmation
-							global $EM_Notices;
-							$EM_Notices->notices['confirms'] = [];
-						}
-					}
-
-					$EM_Booking->manage_override = true;		// send emails even when admin books
-					$EM_Booking->delete();
-					$EM_Booking->manage_override = false;
-
-					return false;
-				}
+		// handle results
+		if ($this->processPayment($EM_Booking)) {
+			// Set booking status, but no emails sent
+			if (!get_option("em_{$this->gateway}_manual_approval", false) || !get_option('dbem_bookings_approval')) {
+				$EM_Booking->set_status(1, false); // Approve
+			}
+			else {
+				$EM_Booking->set_status(0, false); // Set back to normal "pending"
 			}
 		}
+		else {
+			// not good.... error inserted into booking in capture function. Delete this booking from db
+			if (!is_user_logged_in() && get_option('dbem_bookings_anonymous') && !get_option('dbem_bookings_registration_disable') && !empty($EM_Booking->person_id)) {
+				// delete the user we just created, only if created after em_booking_add filter is called
+				// (which is when a new user for this booking would be created)
+				$EM_Person = $EM_Booking->get_person();
+				if (strtotime($EM_Person->data->user_registered) >= $this->registered_timer) {
+					if (is_multisite()) {
+						include_once(ABSPATH.'/wp-admin/includes/ms.php');
+						wpmu_delete_user($EM_Person->ID);
+					}
+					else {
+						include_once(ABSPATH.'/wp-admin/includes/user.php');
+						wp_delete_user($EM_Person->ID);
+					}
+
+					// remove email confirmation
+					global $EM_Notices;
+					$EM_Notices->notices['confirms'] = [];
+				}
+			}
+
+			$EM_Booking->manage_override = true;		// send emails even when admin books
+			$EM_Booking->delete();
+			$EM_Booking->manage_override = false;
+
+			$result = false;
+		}
+
 		return $result;
 	}
 
