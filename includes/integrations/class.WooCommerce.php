@@ -544,61 +544,72 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('woocommerce_eway_trans_number', $order_id);
 
-		$eway->invoiceDescription		= get_bloginfo('name');
-		$eway->invoiceReference			= $order->get_order_number();						// customer invoice reference
-		$eway->transactionNumber		= $transactionID;
-		$eway->cardHoldersName			= $ccfields['card_name'];
-		$eway->cardNumber				= $ccfields['card_number'];
-		$eway->cardExpiryMonth			= $ccfields['expiry_month'];
-		$eway->cardExpiryYear			= $ccfields['expiry_year'];
-		$eway->cardVerificationNumber	= $ccfields['cvn'];
-		$eway->amount					= $order->get_total();
-		$eway->currencyCode				= $order->get_currency();
-		$eway->firstName				= $order->get_billing_first_name();
-		$eway->lastName					= $order->get_billing_last_name();
-		$eway->companyName				= $order->get_billing_company();
-		$eway->emailAddress				= $order->get_billing_email();
-		$eway->phone					= $order->get_billing_phone();
-		$eway->address1					= $order->get_billing_address_1();
-		$eway->address2					= $order->get_billing_address_2();
-		$eway->suburb					= $order->get_billing_city();
-		$eway->state					= $order->get_billing_state();
-		$eway->postcode					= $order->get_billing_postcode();
-		$eway->country					= $order->get_billing_country();
-		$eway->comments					= $order->get_customer_note();
+		$customer = new CustomerDetails;
+		$customer->setFirstName($order->get_billing_first_name());
+		$customer->setLastName($order->get_billing_last_name());
+		$customer->setStreet1($order->get_billing_address_1());
+		$customer->setStreet2($order->get_billing_address_2());
+		$customer->setCity($order->get_billing_city());
+		$customer->setState($order->get_billing_state());
+		$customer->setPostalCode($order->get_billing_postcode());
+		$customer->setCountry($order->get_billing_country());
+		$customer->setEmail($order->get_billing_email());
+		$customer->setCompanyName($order->get_billing_company());
+		$customer->setPhone($order->get_billing_phone());
+		$customer->setComments($order->get_customer_note());
 
-		// maybe send shipping details
-		if ($order->get_shipping_address_1() || $order->get_shipping_address_2()) {
-			$eway->hasShipping			= true;
-			$eway->shipFirstName		= $order->get_shipping_first_name();
-			$eway->shipLastName			= $order->get_shipping_last_name();
-			$eway->shipAddress1			= $order->get_shipping_address_1();
-			$eway->shipAddress2			= $order->get_shipping_address_2();
-			$eway->shipSuburb			= $order->get_shipping_city();
-			$eway->shipState			= $order->get_shipping_state();
-			$eway->shipCountry			= $order->get_shipping_country();
-			$eway->shipPostcode			= $order->get_shipping_postcode();
-		}
+		$customer->CardDetails = new CardDetails(
+			$ccfields['card_name'],
+			$ccfields['card_number'],
+			$ccfields['expiry_month'],
+			$ccfields['expiry_year'],
+			$ccfields['cvn'],
+		);
 
 		// use cardholder name for last name if no customer name entered
-		if (empty($eway->firstName) && empty($eway->lastName)) {
-			$eway->lastName				= $eway->cardHoldersName;
+		if (empty($customer->FirstName) && empty($customer->LastName)) {
+			$customer->setLastName($customer->CardDetails->Name);
 		}
 
-		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription		= apply_filters('woocommerce_eway_invoice_desc', $eway->invoiceDescription, $order_id);
-		$eway->invoiceReference			= apply_filters('woocommerce_eway_invoice_ref', $eway->invoiceReference, $order_id);
-		$eway->options					= array_filter([
-												apply_filters('woocommerce_eway_option1', '', $order_id),
-												apply_filters('woocommerce_eway_option2', '', $order_id),
-												apply_filters('woocommerce_eway_option3', '', $order_id),
-										  ], 'strlen');
+		// maybe send shipping details
+		$shipping = null;
+		if ($order->get_shipping_address_1() || $order->get_shipping_address_2()) {
+			$shipping = new ShippingAddress;
+			$shipping->setFirstName($order->get_shipping_first_name());
+			$shipping->setLastName($order->get_shipping_last_name());
+			$shipping->setStreet1($order->get_shipping_address_1());
+			$shipping->setStreet2($order->get_shipping_address_2());
+			$shipping->setCity($order->get_shipping_city());
+			$shipping->setState($order->get_shipping_state());
+			$shipping->setPostalCode($order->get_shipping_postcode());
+			$shipping->setCountry($order->get_shipping_country());
+		}
+
+		// only populate payment record if there's an amount value
+		$payment = new PaymentDetails;
+		$amount = $order->get_total();
+		$currency = $order->get_currency();
+		if ($amount > 0) {
+			$payment->setTotalAmount($amount, $currency);
+			$payment->setCurrencyCode($currency);
+			$payment->setInvoiceReference($transactionID);
+			$payment->setInvoiceDescription(apply_filters('woocommerce_eway_invoice_desc', get_bloginfo('name'), $order_id));
+			$payment->setInvoiceNumber(apply_filters('woocommerce_eway_invoice_ref', $order->get_order_number(), $order_id));
+		}
+
+		// allow plugins/themes to set option fields
+		$options = get_api_options([
+			apply_filters('woocommerce_eway_option1', '', $order_id),
+			apply_filters('woocommerce_eway_option2', '', $order_id),
+			apply_filters('woocommerce_eway_option3', '', $order_id),
+		]);
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live',
+			$payment->InvoiceNumber, $payment->InvoiceReference, $payment->TotalAmount, $customer->CardDetails->Number));
 
 		try {
-			$response = $eway->processPayment();
+			$response = $eway->processPayment($customer, $shipping, $payment, $options);
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record details and complete payment
@@ -630,7 +641,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 				];
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$eway->invoiceReference, $response->TransactionID, $this->eway_stored === 'yes' ? 'on-hold' : 'completed',
+					$payment->InvoiceNumber, $response->TransactionID, $this->eway_stored === 'yes' ? 'on-hold' : 'completed',
 					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 			}
 			else {
@@ -640,7 +651,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 				wc_add_notice($error_msg, 'error');
 				$result = ['result' => 'failure'];
 
-				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->getErrorsForLog()));
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $payment->InvoiceNumber, $response->getErrorsForLog()));
 				if ($response->BeagleScore > 0) {
 					$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
 				}

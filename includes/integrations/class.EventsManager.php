@@ -388,64 +388,67 @@ final class MethodEventsManager extends EM_Gateway {
 			return false;
 		}
 
-		$eway		= new EwayRapidAPI($creds->api_key, $creds->password, $useSandbox);
+		$eway = new EwayRapidAPI($creds->api_key, $creds->password, $useSandbox);
 		$eway->capture = $capture;
 
 		$postdata = new FormPost();
 
-		$eway->invoiceDescription			= $EM_Booking->get_event()->event_name;
-		$eway->invoiceReference				= $EM_Booking->booking_id;						// customer invoice reference
-		$eway->transactionNumber			= $transactionID;
-		$eway->amount						= $EM_Booking->get_price(false, false, true);
-		$eway->currencyCode					= get_option('dbem_bookings_currency', 'AUD');
-		$eway->cardHoldersName				= (string) $postdata->getValue('x_card_name');
-		$eway->cardNumber					= (string) $postdata->cleanCardnumber($postdata->getValue('x_card_num'));
-		$eway->cardExpiryMonth				= (string) $postdata->getValue('x_exp_date_month');
-		$eway->cardExpiryYear				= (string) $postdata->getValue('x_exp_date_year');
-		$eway->cardVerificationNumber		= (string) $postdata->getValue('x_card_code');
-		$eway->emailAddress					= $EM_Booking->get_person()->user_email;
-		$eway->address1						= EM_Gateways::get_customer_field('address', $EM_Booking);
-		$eway->address2						= EM_Gateways::get_customer_field('address_2', $EM_Booking);
-		$eway->suburb						= EM_Gateways::get_customer_field('city', $EM_Booking);
-		$eway->state						= EM_Gateways::get_customer_field('state', $EM_Booking);
-		$eway->postcode						= (string) $postdata->getValue('zip');
-		$eway->country						= EM_Gateways::get_customer_field('country', $EM_Booking);
-		$eway->countryName					= $eway->country;
-
-		// convert Events Manager country code into country name
-		if ($eway->country) {
-			$eway->countryName = self::getCountryName($eway->country);
-		}
+		$customer = new CustomerDetails;
+		$customer->setStreet1(EM_Gateways::get_customer_field('address', $EM_Booking));
+		$customer->setStreet2(EM_Gateways::get_customer_field('address_2', $EM_Booking));
+		$customer->setCity(EM_Gateways::get_customer_field('city', $EM_Booking));
+		$customer->setState(EM_Gateways::get_customer_field('state', $EM_Booking));
+		$customer->setPostalCode((string) $postdata->getValue('zip'));
+		$customer->setCountry(EM_Gateways::get_customer_field('country', $EM_Booking));
+		$customer->setEmail($EM_Booking->get_person()->user_email);
 
 		// attempt to split name into parts, and hope to not offend anyone!
 		$names = explode(' ', $EM_Booking->get_person()->get_name());
 		if (!empty($names[0])) {
-			$eway->firstName				= array_shift($names);		// remove first name from array
+			$customer->setFirstName(array_shift($names));		// remove first name from array
 		}
-		$eway->lastName						= trim(implode(' ', $names));
+		$customer->setLastName(trim(implode(' ', $names)));
+
+		$customer->CardDetails = new CardDetails(
+			(string) $postdata->getValue('x_card_name'),
+			(string) $postdata->cleanCardnumber($postdata->getValue('x_card_num')),
+			(string) $postdata->getValue('x_exp_date_month'),
+			(string) $postdata->getValue('x_exp_date_year'),
+			(string) $postdata->getValue('x_card_code'),
+		);
 
 		// use cardholder name for last name if no customer name entered
-		if (empty($eway->firstName) && empty($eway->lastName)) {
-			$eway->lastName = $eway->cardHoldersName;
+		if (empty($customer->FirstName) && empty($customer->LastName)) {
+			$customer->setLastName($customer->CardDetails->Name);
 		}
 
-		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->amount						= apply_filters('em_eway_amount', $eway->amount, $EM_Booking);
-		$eway->invoiceDescription			= apply_filters('em_eway_invoice_desc', $eway->invoiceDescription, $EM_Booking);
-		$eway->invoiceReference				= apply_filters('em_eway_invoice_ref', $eway->invoiceReference, $EM_Booking);
-		$eway->options						= array_filter([
-													apply_filters('em_eway_option1', '', $EM_Booking),
-													apply_filters('em_eway_option2', '', $EM_Booking),
-													apply_filters('em_eway_option3', '', $EM_Booking),
-											  ], 'strlen');
+		// only populate payment record if there's an amount value
+		$payment = new PaymentDetails;
+		$amount = $EM_Booking->get_price(false, false, true);
+		$currency = get_option('dbem_bookings_currency', 'AUD');
+		if ($amount > 0) {
+			$payment->setTotalAmount(apply_filters('em_eway_amount', $amount, $EM_Booking), $currency);
+			$payment->setCurrencyCode($currency);
+			$payment->setInvoiceReference($transactionID);
+			$payment->setInvoiceDescription(apply_filters('em_eway_invoice_desc', $EM_Booking->get_event()->event_name, $EM_Booking));
+			$payment->setInvoiceNumber(apply_filters('em_eway_invoice_ref', $EM_Booking->booking_id, $EM_Booking));
+		}
+
+		// allow plugins/themes to set option fields
+		$options = get_api_options([
+			apply_filters('em_eway_option1', '', $EM_Booking),
+			apply_filters('em_eway_option2', '', $EM_Booking),
+			apply_filters('em_eway_option3', '', $EM_Booking),
+		]);
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live',
+			$payment->InvoiceNumber, $payment->InvoiceReference, $payment->TotalAmount, $customer->CardDetails->Number));
 
 		// Get Payment
 		try {
 			$result = false;
-			$response = $eway->processPayment();
+			$response = $eway->processPayment($customer, null, $payment, $options);
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record transaction number and continue
@@ -465,11 +468,11 @@ final class MethodEventsManager extends EM_Gateway {
 				$note = implode("\n", $notes);
 
 				$status = get_option("em_{$this->gateway}_stored") ? 'Pending' : 'Completed';
-				$this->record_transaction($EM_Booking, $response->Payment->TotalAmount, $eway->currencyCode, date('Y-m-d H:i:s', current_time('timestamp')), $response->TransactionID, $status, $note);
+				$this->record_transaction($EM_Booking, $response->Payment->TotalAmount, $payment->CurrencyCode, date('Y-m-d H:i:s', current_time('timestamp')), $response->TransactionID, $status, $note);
 				$result = true;
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$eway->invoiceReference, $response->TransactionID, get_option("em_{$this->gateway}_stored") ? 'pending' : 'completed',
+					$payment->InvoiceNumber, $response->TransactionID, get_option("em_{$this->gateway}_stored") ? 'pending' : 'completed',
 					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 			}
 			else {
@@ -477,7 +480,7 @@ final class MethodEventsManager extends EM_Gateway {
 				$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
 				$EM_Booking->add_error($error_msg);
 
-				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->getErrorsForLog()));
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $payment->InvoiceNumber, $response->getErrorsForLog()));
 				if ($response->BeagleScore > 0) {
 					$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
 				}

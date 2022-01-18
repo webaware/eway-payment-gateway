@@ -57,7 +57,7 @@ class WooCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('document.querySelector(".add_to_cart_button").click()');
+		$this->web->driver->executeScript('document.querySelector(".product:not(.virtual) .add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
@@ -77,6 +77,16 @@ class WooCommerceTest extends TestCase {
 		$this->web->selectByValue('#billing_state', 'NSW');
 		$this->web->sendKeys('#billing_phone', '0123456789');
 		$this->web->sendKeys('#billing_email', 'test@example.com');
+
+		$this->web->checkboxTickByIndex('#ship-to-different-address-checkbox', 0);
+		$this->web->sendKeys('#shipping_first_name', 'Amos');
+		$this->web->sendKeys('#shipping_last_name', 'Squito');
+		$this->web->selectByValue('#shipping_country', 'AU');
+		$this->web->sendKeys('#shipping_address_1', '456 Example Boulevarde');
+		$this->web->sendKeys('#shipping_address_2', '"The Palace"');
+		$this->web->sendKeys('#shipping_city', 'Anothertown');
+		$this->web->sendKeys('#shipping_postcode', '2345');
+		$this->web->selectByValue('#shipping_state', 'NSW');
 
 		$this->web->driver->executeScript('document.getElementById("payment_method_eway_payments").click()');
 		$this->web->driver->wait()->until(
@@ -106,7 +116,7 @@ class WooCommerceTest extends TestCase {
 		$this->expectException(UnexpectedAlertOpenException::class);
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('document.querySelector(".add_to_cart_button").click()');
+		$this->web->driver->executeScript('document.querySelector(".product.virtual .add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
@@ -153,7 +163,7 @@ class WooCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('document.querySelector(".add_to_cart_button").click()');
+		$this->web->driver->executeScript('document.querySelector(".product.virtual .add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);

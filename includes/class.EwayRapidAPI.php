@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  * Class for dealing with an Eway Rapid API payment
  * @link https://eway.io/api-v3/
  */
-class EwayRapidAPI {
+final class EwayRapidAPI {
 
 	#region "constants"
 
@@ -25,8 +25,6 @@ class EwayRapidAPI {
 
 	#region "members"
 
-	#region "connection specific members"
-
 	/**
 	 * use Eway sandbox
 	 */
@@ -38,7 +36,7 @@ class EwayRapidAPI {
 	public bool $capture = true;
 
 	/**
-	 * whether to validate the remote SSL certificate
+	 * whether to validate the remote TLS/SSL certificate
 	 */
 	public bool $sslVerifyPeer = true;
 
@@ -50,12 +48,12 @@ class EwayRapidAPI {
 	/**
 	 * API key
 	 */
-	public string $apiKey;
+	private string $apiKey;
 
 	/**
 	 * API password
 	 */
-	public string $apiPassword;
+	private string $apiPassword;
 
 	/**
 	 * ID of device or application processing the transaction
@@ -67,230 +65,10 @@ class EwayRapidAPI {
 	 */
 	public string $httpUserAgent;
 
-	#endregion // "connection specific members"
-
-	#region "payment specific members"
-
-	/**
-	 * a unique transaction number from your site (NB: see transactionNumber which is intended for invoice number or similar)
-	 */
-	public string $transactionNumber;
-
-	/**
-	 * an invoice reference to track by
-	 */
-	public string $invoiceReference;
-
-	/**
-	 * description of what is being purchased / paid for
-	 */
-	public string $invoiceDescription;
-
-	/**
-	 * total amount of payment, in dollars and cents as a floating-point number (will be converted to just cents for transmission)
-	 * @var float
-	 */
-	public $amount;
-
-	/**
-	 * ISO 4217 currency code
-	 */
-	public string $currencyCode;
-
-	// customer and billing details
-
-	/**
-	 * customer's title
-	 */
-	public string $title = '';
-
-	/**
-	 * customer's first name
-	 */
-	public string $firstName = '';
-
-	/**
-	 * customer's last name
-	 */
-	public string $lastName = '';
-
-	/**
-	 * customer's company name
-	 */
-	public string $companyName = '';
-
-	/**
-	 * customer's job description (e.g. position)
-	 */
-	public string $jobDescription = '';
-
-	/**
-	 * customer's address line 1
-	 */
-	public string $address1 = '';
-
-	/**
-	 * customer's address line 2
-	 */
-	public string $address2 = '';
-
-	/**
-	 * customer's suburb/city/town
-	 */
-	public string $suburb = '';
-
-	/**
-	 * customer's state/province
-	 */
-	public string $state = '';
-
-	/**
-	 * customer's postcode
-	 */
-	public string $postcode = '';
-
-	/**
-	 * customer's country code
-	 */
-	public string $country = '';
-
-	/**
-	 * customer's email address
-	 */
-	public string $emailAddress = '';
-
-	/**
-	 * customer's phone number
-	 */
-	public string $phone = '';
-
-	/**
-	 * customer's mobile phone number
-	 */
-	public string $mobile = '';
-
-	/**
-	 * customer's fax number
-	 */
-	public string $fax = '';
-
-	/**
-	 * customer's website URL
-	 */
-	public string $website = '';
-
-	/**
-	 * comments about the customer
-	 */
-	public string $comments = '';
-
-	// card details
-
-	/**
-	 * name on credit card
-	 */
-	public string $cardHoldersName;
-
-	/**
-	 * credit card number, with no spaces
-	 */
-	public string $cardNumber;
-
-	/**
-	 * month of expiry, numbered from 1=January
-	 */
-	public int $cardExpiryMonth;
-
-	/**
-	 * year of expiry
-	 */
-	public int $cardExpiryYear;
-
-	/**
-	 * CVN (Creditcard Verification Number) for verifying physical card is held by buyer
-	 */
-	public string $cardVerificationNumber;
-
-	/**
-	 * true when there is shipping information
-	 */
-	public bool $hasShipping = false;
-
-	/**
-	 * shipping method: one of the SHIP_METHOD_* values
-	 */
-	public string $shipMethod = '';
-
-	/**
-	 * shipping first name
-	 */
-	public string $shipFirstName = '';
-
-	/**
-	 * shipping last name
-	 */
-	public string $shipLastName = '';
-
-	/**
-	 * shipping address line 1
-	 */
-	public string $shipAddress1 = '';
-
-	/**
-	 * shipping address line 2
-	 */
-	public string $shipAddress2 = '';
-
-	/**
-	 * shipping suburb/city/town
-	 */
-	public string $shipSuburb = '';
-
-	/**
-	 * shipping state/province
-	 */
-	public string $shipState = '';
-
-	/**
-	 * shipping postcode
-	 */
-	public string $shipPostcode = '';
-
-	/**
-	 * shipping country code
-	 */
-	public string $shipCountry = '';
-
-	/**
-	 * shipping email address
-	 */
-	public string $shipEmailAddress = '';
-
-	/**
-	 * shipping phone number
-	 */
-	public string $shipPhone = '';
-
-	/**
-	 * shipping fax number
-	 */
-	public string $shipFax = '';
-
-	/**
-	 * optional additional information for use in shopping carts, etc.
-	 * @var array[string] max. 254 characters each
-	 */
-	public array $options = [];
-
-	#endregion "payment specific members"
-
 	#endregion "members"
 
 	/**
 	 * populate members with defaults, and set account and environment information
-	 * @param string $apiKey Eway API key
-	 * @param string $apiPassword Eway API password
-	 * @param boolean $useSandbox use Eway sandbox
 	 */
 	public function __construct(string $apiKey, string $apiPassword, bool $useSandbox) {
 		$this->apiKey			= $apiKey;
@@ -303,14 +81,14 @@ class EwayRapidAPI {
 	 * process a payment against Eway; throws exception on error with error described in exception message.
 	 * @throws EwayPaymentsException
 	 */
-	public function processPayment() {
-		$errors = $this->validateAmount();
+	public function processPayment(CustomerDetails $customer, ?ShippingAddress $shipping, PaymentDetails $payment, array $options) : EwayResponseDirectPayment {
+		$errors = $this->validateAmount($payment->TotalAmount);
 
 		if (!empty($errors)) {
 			throw new EwayPaymentsException(implode("\n", $errors));
 		}
 
-		$request = $this->getPaymentDirect();
+		$request = $this->getPaymentDirect($customer, $shipping, $payment, $options);
 		$responseJSON = $this->apiPostRequest('Transaction', $request);
 
 		$response = new EwayResponseDirectPayment();
@@ -321,16 +99,12 @@ class EwayRapidAPI {
 
 	/**
 	 * validate the amount for processing
-	 * @return array list of errors in validation
 	 */
-	protected function validateAmount() {
+	protected function validateAmount($amount) : array {
 		$errors = [];
 
-		if (!is_numeric($this->amount) || $this->amount <= 0) {
+		if (!is_numeric($amount) || $amount <= 0) {
 			$errors[] = __('amount must be given as a number in dollars and cents', 'eway-payment-gateway');
-		}
-		else if (!is_float($this->amount)) {
-			$this->amount = (float) $this->amount;
 		}
 
 		return $errors;
@@ -338,119 +112,20 @@ class EwayRapidAPI {
 
 	/**
 	 * create JSON request document for direct payment
-	 * @return string
 	 */
-	public function getPaymentDirect() : string {
+	public function getPaymentDirect(CustomerDetails $customer, ?ShippingAddress $shipping, PaymentDetails $payment, array $options) : string {
 		$is_live_site = !$this->useSandbox;
 
 		$request = new TransactionRequest($is_live_site, self::PARTNER_ID, TransactionRequest::TRANS_PURCHASE, $this->capture);
-		$request->Customer				= $this->getCustomerRecord();
-		$request->Payment				= $this->getPaymentRecord();
+		$request->Customer			= $customer;
+		$request->Payment			= $payment;
+		$request->ShippingAddress	= $shipping;
 
-		if ($this->hasShipping) {
-			$request->ShippingAddress	= $this->getShippingAddressRecord();
-		}
-
-		if (!empty($this->options)) {
-			$request->Options			= $this->getOptionsRecord();
-		}
-
-		if (!empty($this->deviceID)) {
-			$request->setDeviceID($this->deviceID);
+		if (!empty($options)) {
+			$request->Options		= $options;
 		}
 
 		return wp_json_encode($request);
-	}
-
-	/**
-	 * build Customer record for request
-	 */
-	protected function getCustomerRecord() : CustomerDetails {
-		$record = new CustomerDetails;
-
-		$record->setTitle($this->title);
-		$record->setFirstName($this->firstName);
-		$record->setLastName($this->lastName);
-		$record->setStreet1($this->address1);
-		$record->setStreet2($this->address2);
-		$record->setCity($this->suburb);
-		$record->setState($this->state);
-		$record->setPostalCode($this->postcode);
-		$record->setCountry($this->country);
-		$record->setEmail($this->emailAddress);
-		$record->setCompanyName($this->companyName);
-		$record->setJobDescription($this->jobDescription);
-		$record->setPhone($this->phone);
-		$record->setMobile($this->mobile);
-		$record->setFax($this->fax);
-		$record->setUrl($this->website);
-		$record->setComments($this->comments);
-
-		$record->CardDetails = new CardDetails(
-			$this->cardHoldersName,
-			$this->cardNumber,
-			$this->cardExpiryMonth,
-			$this->cardExpiryYear,
-			$this->cardVerificationNumber,
-		);
-
-		return $record;
-	}
-
-	/**
-	 * build ShippindAddress record for request
-	 */
-	protected function getShippingAddressRecord() : ShippingAddress {
-		$record = new ShippingAddress;
-
-		$record->setShippingMethod($this->shipMethod);
-		$record->setFirstName($this->shipFirstName);
-		$record->setLastName($this->shipLastName);
-		$record->setStreet1($this->shipAddress1);
-		$record->setStreet2($this->shipAddress2);
-		$record->setCity($this->shipSuburb);
-		$record->setState($this->shipState);
-		$record->setPostalCode($this->shipPostcode);
-		$record->setCountry($this->shipCountry);
-		$record->setEmail($this->shipEmailAddress);
-		$record->setPhone($this->shipPhone);
-		$record->setFax($this->shipFax);
-
-		return $record;
-	}
-
-	/**
-	 * build Payment record for request
-	 */
-	protected function getPaymentRecord() : PaymentDetails {
-		$record = new PaymentDetails;
-
-		// only populate if there's an amount value, but still return a PaymentDetails record
-		if ($this->amount > 0) {
-			$record->setTotalAmount($this->amount, $this->currencyCode);
-			$record->setInvoiceReference($this->transactionNumber);
-			$record->setInvoiceDescription($this->invoiceDescription);
-			$record->setInvoiceNumber($this->invoiceReference);
-			$record->setCurrencyCode($this->currencyCode);
-		}
-
-		return $record;
-	}
-
-	/**
-	 * build Options record for request
-	 * @return array
-	 */
-	protected function getOptionsRecord() {
-		$options = [];
-
-		foreach ($this->options as $option) {
-			if (!empty($option)) {
-				$options[] = ['Value' => substr($option, 0, 254)];
-			}
-		}
-
-		return $options;
 	}
 
 	/**

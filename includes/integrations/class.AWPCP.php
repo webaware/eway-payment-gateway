@@ -465,36 +465,43 @@ final class MethodAWPCP extends AWPCP_PaymentGateway {
 
 		$postdata = new FormPost();
 
-		$eway->invoiceDescription			= $item->name;
-		$eway->invoiceReference				= $transaction->id;									// customer invoice reference
-		$eway->transactionNumber			= $transaction->id;									// transaction reference
-		$eway->currencyCode					= awpcp_get_currency_code();
-		$eway->cardHoldersName				= $postdata->getValue('eway_card_name');
-		$eway->cardNumber					= $postdata->cleanCardnumber($postdata->getValue('eway_card_number'));
-		$eway->cardExpiryMonth				= $postdata->getValue('eway_expiry_month');
-		$eway->cardExpiryYear				= $postdata->getValue('eway_expiry_year');
-		$eway->cardVerificationNumber		= $postdata->getValue('eway_cvn');
+		$customer = new CustomerDetails;
 
-		list($eway->firstName, $eway->lastName) = self::getContactNames($ad, $user, $eway->cardHoldersName);
+		$customer->CardDetails = new CardDetails(
+			$postdata->getValue('eway_card_name'),
+			$postdata->cleanCardnumber($postdata->getValue('eway_card_number')),
+			$postdata->getValue('eway_expiry_month'),
+			$postdata->getValue('eway_expiry_year'),
+			$postdata->getValue('eway_cvn'),
+		);
 
-		self::setTxContactDetails($eway, $ad, $user);
+		self::setTxContactDetails($customer, $ad, $user);
 
-		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription			= apply_filters('awpcp_eway_invoice_desc', $eway->invoiceDescription, $transaction);
-		$eway->invoiceReference				= apply_filters('awpcp_eway_invoice_ref', $eway->invoiceReference, $transaction);
-		$eway->options						= array_filter([
-													apply_filters('awpcp_eway_option1', '', $transaction),
-													apply_filters('awpcp_eway_option2', '', $transaction),
-													apply_filters('awpcp_eway_option3', '', $transaction),
-											  ], 'strlen');
-
+		// only populate payment record if there's an amount value
+		$payment = new PaymentDetails;
 		$totals = $transaction->get_totals();
-		$eway->amount = $totals['money'];
+		$amount = $totals['money'];
+		$currency = awpcp_get_currency_code();
+		if ($amount > 0) {
+			$payment->setTotalAmount($amount, $currency);
+			$payment->setCurrencyCode($currency);
+			$payment->setInvoiceReference($transaction->id);
+			$payment->setInvoiceDescription(apply_filters('awpcp_eway_invoice_desc', $item->name, $transaction));
+			$payment->setInvoiceNumber(apply_filters('awpcp_eway_invoice_ref', $transaction->id, $transaction));
+		}
+
+		// allow plugins/themes to set option fields
+		$options = get_api_options([
+			apply_filters('awpcp_eway_option1', '', $transaction),
+			apply_filters('awpcp_eway_option2', '', $transaction),
+			apply_filters('awpcp_eway_option3', '', $transaction),
+		]);
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live',
+			$payment->InvoiceNumber, $payment->InvoiceReference, $payment->TotalAmount, $customer->CardDetails->Number));
 
-		$response = $eway->processPayment();
+		$response = $eway->processPayment($customer, null, $payment, $options);
 
 		return $response;
 	}
@@ -568,338 +575,338 @@ final class MethodAWPCP extends AWPCP_PaymentGateway {
 	/**
 	 * attempt to get meaningful contact details from available data
 	 */
-	private static function setTxContactDetails(EwayRapidAPI $eway, object $ad, WP_User $user) : void {
+	private static function setTxContactDetails(CustomerDetails $customer, object $ad, WP_User $user) : void {
 		$profile = $user ? get_user_meta($user->ID, 'awpcp-profile', true) : false;
 
-		$eway->emailAddress			= '';
-		$eway->address1				= '';
-		$eway->address2				= '';
-		$eway->suburb				= '';
-		$eway->state				= '';
-		$eway->countryName			= '';
-		$eway->postcode				= '';
+		list($first_name, $last_name) = self::getContactNames($ad, $user, $customer->CardDetails->Name);
+		$customer->setFirstName($first_name);
+		$customer->setLastName($last_name);
 
 		$renderer = awpcp_listing_renderer();
 		$ad_contact_email	= $renderer->get_contact_email($ad);
 		$ad_region			= $renderer->get_first_region($ad);
 
 		if ($ad_contact_email) {
-			$eway->emailAddress		= $ad_contact_email;
+			$customer->setEmail($ad_contact_email);
 		}
 		elseif ($user) {
-			$eway->emailAddress		= $user->user_email;
+			$customer->setEmail($user->user_email);
 		}
 
 		if (!empty($ad_region['city']) || !empty($ad_region['state']) || !empty($ad_region['country'])) {
-			$eway->suburb			= $ad_region['city'];
-			$eway->state			= $ad_region['state'];
-			$eway->countryName		= $ad_region['country'];
+			$customer->setCity($ad_region['city']);
+			$customer->setState($ad_region['state']);
+			$customer->setCountry(self::getCountryCode($ad_region['country']));
 		}
 		elseif (method_exists('AWPCP_Ad', 'get_ad_regions')) {
 			$regions = AWPCP_Ad::get_ad_regions($ad->ad_id);
 			if (!empty($regions[0])) {
-				$eway->suburb		= $regions[0]['city'];
-				$eway->state		= $regions[0]['state'];
-				$eway->countryName	= $regions[0]['country'];
+				$customer->setCity($regions[0]['city']);
+				$customer->setState($regions[0]['state']);
+				$customer->setCountry(self::getCountryCode($regions[0]['country']));
 			}
 		}
 		elseif ($profile) {
 			if (isset($profile['address'])) {
-				$eway->address1		= $profile['address'];
+				$customer->setStreet1($profile['address']);
 			}
 			if (isset($profile['city'])) {
-				$eway->suburb		= $profile['city'];
+				$customer->setCity($profile['city']);
 			}
 			if (isset($profile['state'])) {
-				$eway->state		= $profile['state'];
+				$customer->setState($profile['state']);
 			}
 		}
+	}
 
-		// attempt to set country code
-		if (strlen($eway->countryName) === 2) {
-			$eway->country = $eway->countryName;
-		}
-		elseif ($eway->countryName) {
-			$countries = [
-				// ISO-3166-1 alpha-2 list of country names => codes, in lowercase
-				'afghanistan'								=> 'af',
-				'albania'									=> 'al',
-				'algeria'									=> 'dz',
-				'american samoa'							=> 'as',
-				'andorra'									=> 'ad',
-				'angola'									=> 'ao',
-				'anguilla'									=> 'ai',
-				'antarctica'								=> 'aq',
-				'antigua & barbuda'							=> 'ag',
-				'argentina'									=> 'ar',
-				'armenia'									=> 'am',
-				'aruba'										=> 'aw',
-				'australia'									=> 'au',
-				'austria'									=> 'at',
-				'azerbaijan'								=> 'az',
-				'bahamas'									=> 'bs',
-				'bahrain'									=> 'bh',
-				'bangladesh'								=> 'bd',
-				'barbados'									=> 'bb',
-				'belarus'									=> 'by',
-				'belgium'									=> 'be',
-				'belize'									=> 'bz',
-				'benin'										=> 'bj',
-				'bermuda'									=> 'bm',
-				'bhutan'									=> 'bt',
-				'bolivia'									=> 'bo',
-				'bosnia'									=> 'ba',
-				'botswana'									=> 'bw',
-				'bouvet island'								=> 'bv',
-				'brazil'									=> 'br',
-				'british indian ocean territory'			=> 'io',
-				'british virgin islands'					=> 'vg',
-				'brunei'									=> 'bn',
-				'bulgaria'									=> 'bg',
-				'burkina faso'								=> 'bf',
-				'burundi'									=> 'bi',
-				'cambodia'									=> 'kh',
-				'cameroon'									=> 'cm',
-				'canada'									=> 'ca',
-				'cape verde'								=> 'cv',
-				'caribbean netherlands'						=> 'bq',
-				'cayman islands'							=> 'ky',
-				'central african republic'					=> 'cf',
-				'chad'										=> 'td',
-				'chile'										=> 'cl',
-				'china'										=> 'cn',
-				'christmas island'							=> 'cx',
-				'cocos (keeling) islands'					=> 'cc',
-				'colombia'									=> 'co',
-				'comoros'									=> 'km',
-				'congo - brazzaville'						=> 'cg',
-				'congo - kinshasa'							=> 'cd',
-				'cook islands'								=> 'ck',
-				'costa rica'								=> 'cr',
-				'croatia'									=> 'hr',
-				'cuba'										=> 'cu',
-				'curaçao'									=> 'cw',
-				'cyprus'									=> 'cy',
-				'czech republic'							=> 'cz',
-				'côte d’ivoire'								=> 'ci',
-				'denmark'									=> 'dk',
-				'djibouti'									=> 'dj',
-				'dominica'									=> 'dm',
-				'dominican republic'						=> 'do',
-				'ecuador'									=> 'ec',
-				'egypt'										=> 'eg',
-				'el salvador'								=> 'sv',
-				'equatorial guinea'							=> 'gq',
-				'eritrea'									=> 'er',
-				'estonia'									=> 'ee',
-				'ethiopia'									=> 'et',
-				'falkland islands'							=> 'fk',
-				'faroe islands'								=> 'fo',
-				'fiji'										=> 'fj',
-				'finland'									=> 'fi',
-				'france'									=> 'fr',
-				'french guiana'								=> 'gf',
-				'french polynesia'							=> 'pf',
-				'french southern territories'				=> 'tf',
-				'gabon'										=> 'ga',
-				'gambia'									=> 'gm',
-				'georgia'									=> 'ge',
-				'germany'									=> 'de',
-				'ghana'										=> 'gh',
-				'gibraltar'									=> 'gi',
-				'greece'									=> 'gr',
-				'greenland'									=> 'gl',
-				'grenada'									=> 'gd',
-				'guadeloupe'								=> 'gp',
-				'guam'										=> 'gu',
-				'guatemala'									=> 'gt',
-				'guernsey'									=> 'gg',
-				'guinea'									=> 'gn',
-				'guinea-bissau'								=> 'gw',
-				'guyana'									=> 'gy',
-				'haiti'										=> 'ht',
-				'heard & mcdonald islands'					=> 'hm',
-				'honduras'									=> 'hn',
-				'hong kong'									=> 'hk',
-				'hungary'									=> 'hu',
-				'iceland'									=> 'is',
-				'india'										=> 'in',
-				'indonesia'									=> 'id',
-				'iran'										=> 'ir',
-				'iraq'										=> 'iq',
-				'ireland'									=> 'ie',
-				'isle of man'								=> 'im',
-				'israel'									=> 'il',
-				'italy'										=> 'it',
-				'jamaica'									=> 'jm',
-				'japan'										=> 'jp',
-				'jersey'									=> 'je',
-				'jordan'									=> 'jo',
-				'kazakhstan'								=> 'kz',
-				'kenya'										=> 'ke',
-				'kiribati'									=> 'ki',
-				'kuwait'									=> 'kw',
-				'kyrgyzstan'								=> 'kg',
-				'laos'										=> 'la',
-				'latvia'									=> 'lv',
-				'lebanon'									=> 'lb',
-				'lesotho'									=> 'ls',
-				'liberia'									=> 'lr',
-				'libya'										=> 'ly',
-				'liechtenstein'								=> 'li',
-				'lithuania'									=> 'lt',
-				'luxembourg'								=> 'lu',
-				'macau'										=> 'mo',
-				'macedonia'									=> 'mk',
-				'madagascar'								=> 'mg',
-				'malawi'									=> 'mw',
-				'malaysia'									=> 'my',
-				'maldives'									=> 'mv',
-				'mali'										=> 'ml',
-				'malta'										=> 'mt',
-				'marshall islands'							=> 'mh',
-				'martinique'								=> 'mq',
-				'mauritania'								=> 'mr',
-				'mauritius'									=> 'mu',
-				'mayotte'									=> 'yt',
-				'mexico'									=> 'mx',
-				'micronesia'								=> 'fm',
-				'moldova'									=> 'md',
-				'monaco'									=> 'mc',
-				'mongolia'									=> 'mn',
-				'montenegro'								=> 'me',
-				'montserrat'								=> 'ms',
-				'morocco'									=> 'ma',
-				'mozambique'								=> 'mz',
-				'myanmar'									=> 'mm',
-				'namibia'									=> 'na',
-				'nauru'										=> 'nr',
-				'nepal'										=> 'np',
-				'netherlands'								=> 'nl',
-				'new caledonia'								=> 'nc',
-				'new zealand'								=> 'nz',
-				'nicaragua'									=> 'ni',
-				'niger'										=> 'ne',
-				'nigeria'									=> 'ng',
-				'niue'										=> 'nu',
-				'norfolk island'							=> 'nf',
-				'north korea'								=> 'kp',
-				'northern mariana islands'					=> 'mp',
-				'norway'									=> 'no',
-				'oman'										=> 'om',
-				'pakistan'									=> 'pk',
-				'palau'										=> 'pw',
-				'palestine'									=> 'ps',
-				'panama'									=> 'pa',
-				'papua new guinea'							=> 'pg',
-				'paraguay'									=> 'py',
-				'peru'										=> 'pe',
-				'philippines'								=> 'ph',
-				'pitcairn islands'							=> 'pn',
-				'poland'									=> 'pl',
-				'portugal'									=> 'pt',
-				'puerto rico'								=> 'pr',
-				'qatar'										=> 'qa',
-				'romania'									=> 'ro',
-				'russia'									=> 'ru',
-				'rwanda'									=> 'rw',
-				'réunion'									=> 're',
-				'samoa'										=> 'ws',
-				'san marino'								=> 'sm',
-				'saudi arabia'								=> 'sa',
-				'senegal'									=> 'sn',
-				'serbia'									=> 'rs',
-				'seychelles'								=> 'sc',
-				'sierra leone'								=> 'sl',
-				'singapore'									=> 'sg',
-				'sint maarten'								=> 'sx',
-				'slovakia'									=> 'sk',
-				'slovenia'									=> 'si',
-				'solomon islands'							=> 'sb',
-				'somalia'									=> 'so',
-				'south africa'								=> 'za',
-				'south georgia & south sandwich islands'	=> 'gs',
-				'south korea'								=> 'kr',
-				'south sudan'								=> 'ss',
-				'spain'										=> 'es',
-				'sri lanka'									=> 'lk',
-				'st. barthélemy'							=> 'bl',
-				'st. helena'								=> 'sh',
-				'st. kitts & nevis'							=> 'kn',
-				'st. lucia'									=> 'lc',
-				'st. martin'								=> 'mf',
-				'st. pierre & miquelon'						=> 'pm',
-				'st. vincent & grenadines'					=> 'vc',
-				'sudan'										=> 'sd',
-				'suriname'									=> 'sr',
-				'svalbard & jan mayen'						=> 'sj',
-				'swaziland'									=> 'sz',
-				'sweden'									=> 'se',
-				'switzerland'								=> 'ch',
-				'syria'										=> 'sy',
-				'são tomé & príncipe'						=> 'st',
-				'taiwan'									=> 'tw',
-				'tajikistan'								=> 'tj',
-				'tanzania'									=> 'tz',
-				'thailand'									=> 'th',
-				'timor-leste'								=> 'tl',
-				'togo'										=> 'tg',
-				'tokelau'									=> 'tk',
-				'tonga'										=> 'to',
-				'trinidad & tobago'							=> 'tt',
-				'tunisia'									=> 'tn',
-				'turkey'									=> 'tr',
-				'turkmenistan'								=> 'tm',
-				'turks & caicos islands'					=> 'tc',
-				'tuvalu'									=> 'tv',
-				'u.s. outlying islands'						=> 'um',
-				'u.s. virgin islands'						=> 'vi',
-				'united kingdom'							=> 'gb',
-				'united states'								=> 'us',
-				'uganda'									=> 'ug',
-				'ukraine'									=> 'ua',
-				'united arab emirates'						=> 'ae',
-				'uruguay'									=> 'uy',
-				'uzbekistan'								=> 'uz',
-				'vanuatu'									=> 'vu',
-				'vatican city'								=> 'va',
-				'venezuela'									=> 've',
-				'vietnam'									=> 'vn',
-				'wallis & futuna'							=> 'wf',
-				'western sahara'							=> 'eh',
-				'yemen'										=> 'ye',
-				'zambia'									=> 'zm',
-				'zimbabwe'									=> 'zw',
-				'åland islands'								=> 'ax',
-
-				// some abbreviated names and common names for frequently used Eway countries
-				'aust'										=> 'au',
-				'aust.'										=> 'au',
-				'n.z.'										=> 'nz',
-				'u.k.'										=> 'gb',
-				'britain'									=> 'gb',
-				'england'									=> 'gb',
-				'scotland'									=> 'gb',
-				'wales'										=> 'gb',
-				'northern ireland'							=> 'gb',
-				'uae'										=> 'ae',
-				'usa'										=> 'us',
-				'u.s.a.'									=> 'us',
-				'united states of america'					=> 'us',
-			];
-
-			if (function_exists('mb_strtolower')) {
-				$countryLower = mb_strtolower($eway->countryName);
-			}
-			else {
-				$countryLower = strtolower($eway->countryName);
-			}
-
-			if (isset($countries[$countryLower])) {
-				$eway->country = $countries[$countryLower];
-			}
+	/**
+	 * get country code from name
+	 */
+	private static function getCountryCode(string $country_name) : ?string {
+		if (empty($country_name)) {
+			return null;
 		}
 
+		if (strlen($country_name) === 2) {
+			return $country_name;
+		}
+
+		$countries = [
+			// ISO-3166-1 alpha-2 list of country names => codes, in lowercase
+			'afghanistan'								=> 'af',
+			'albania'									=> 'al',
+			'algeria'									=> 'dz',
+			'american samoa'							=> 'as',
+			'andorra'									=> 'ad',
+			'angola'									=> 'ao',
+			'anguilla'									=> 'ai',
+			'antarctica'								=> 'aq',
+			'antigua & barbuda'							=> 'ag',
+			'argentina'									=> 'ar',
+			'armenia'									=> 'am',
+			'aruba'										=> 'aw',
+			'australia'									=> 'au',
+			'austria'									=> 'at',
+			'azerbaijan'								=> 'az',
+			'bahamas'									=> 'bs',
+			'bahrain'									=> 'bh',
+			'bangladesh'								=> 'bd',
+			'barbados'									=> 'bb',
+			'belarus'									=> 'by',
+			'belgium'									=> 'be',
+			'belize'									=> 'bz',
+			'benin'										=> 'bj',
+			'bermuda'									=> 'bm',
+			'bhutan'									=> 'bt',
+			'bolivia'									=> 'bo',
+			'bosnia'									=> 'ba',
+			'botswana'									=> 'bw',
+			'bouvet island'								=> 'bv',
+			'brazil'									=> 'br',
+			'british indian ocean territory'			=> 'io',
+			'british virgin islands'					=> 'vg',
+			'brunei'									=> 'bn',
+			'bulgaria'									=> 'bg',
+			'burkina faso'								=> 'bf',
+			'burundi'									=> 'bi',
+			'cambodia'									=> 'kh',
+			'cameroon'									=> 'cm',
+			'canada'									=> 'ca',
+			'cape verde'								=> 'cv',
+			'caribbean netherlands'						=> 'bq',
+			'cayman islands'							=> 'ky',
+			'central african republic'					=> 'cf',
+			'chad'										=> 'td',
+			'chile'										=> 'cl',
+			'china'										=> 'cn',
+			'christmas island'							=> 'cx',
+			'cocos (keeling) islands'					=> 'cc',
+			'colombia'									=> 'co',
+			'comoros'									=> 'km',
+			'congo - brazzaville'						=> 'cg',
+			'congo - kinshasa'							=> 'cd',
+			'cook islands'								=> 'ck',
+			'costa rica'								=> 'cr',
+			'croatia'									=> 'hr',
+			'cuba'										=> 'cu',
+			'curaçao'									=> 'cw',
+			'cyprus'									=> 'cy',
+			'czech republic'							=> 'cz',
+			'côte d’ivoire'								=> 'ci',
+			'denmark'									=> 'dk',
+			'djibouti'									=> 'dj',
+			'dominica'									=> 'dm',
+			'dominican republic'						=> 'do',
+			'ecuador'									=> 'ec',
+			'egypt'										=> 'eg',
+			'el salvador'								=> 'sv',
+			'equatorial guinea'							=> 'gq',
+			'eritrea'									=> 'er',
+			'estonia'									=> 'ee',
+			'ethiopia'									=> 'et',
+			'falkland islands'							=> 'fk',
+			'faroe islands'								=> 'fo',
+			'fiji'										=> 'fj',
+			'finland'									=> 'fi',
+			'france'									=> 'fr',
+			'french guiana'								=> 'gf',
+			'french polynesia'							=> 'pf',
+			'french southern territories'				=> 'tf',
+			'gabon'										=> 'ga',
+			'gambia'									=> 'gm',
+			'georgia'									=> 'ge',
+			'germany'									=> 'de',
+			'ghana'										=> 'gh',
+			'gibraltar'									=> 'gi',
+			'greece'									=> 'gr',
+			'greenland'									=> 'gl',
+			'grenada'									=> 'gd',
+			'guadeloupe'								=> 'gp',
+			'guam'										=> 'gu',
+			'guatemala'									=> 'gt',
+			'guernsey'									=> 'gg',
+			'guinea'									=> 'gn',
+			'guinea-bissau'								=> 'gw',
+			'guyana'									=> 'gy',
+			'haiti'										=> 'ht',
+			'heard & mcdonald islands'					=> 'hm',
+			'honduras'									=> 'hn',
+			'hong kong'									=> 'hk',
+			'hungary'									=> 'hu',
+			'iceland'									=> 'is',
+			'india'										=> 'in',
+			'indonesia'									=> 'id',
+			'iran'										=> 'ir',
+			'iraq'										=> 'iq',
+			'ireland'									=> 'ie',
+			'isle of man'								=> 'im',
+			'israel'									=> 'il',
+			'italy'										=> 'it',
+			'jamaica'									=> 'jm',
+			'japan'										=> 'jp',
+			'jersey'									=> 'je',
+			'jordan'									=> 'jo',
+			'kazakhstan'								=> 'kz',
+			'kenya'										=> 'ke',
+			'kiribati'									=> 'ki',
+			'kuwait'									=> 'kw',
+			'kyrgyzstan'								=> 'kg',
+			'laos'										=> 'la',
+			'latvia'									=> 'lv',
+			'lebanon'									=> 'lb',
+			'lesotho'									=> 'ls',
+			'liberia'									=> 'lr',
+			'libya'										=> 'ly',
+			'liechtenstein'								=> 'li',
+			'lithuania'									=> 'lt',
+			'luxembourg'								=> 'lu',
+			'macau'										=> 'mo',
+			'macedonia'									=> 'mk',
+			'madagascar'								=> 'mg',
+			'malawi'									=> 'mw',
+			'malaysia'									=> 'my',
+			'maldives'									=> 'mv',
+			'mali'										=> 'ml',
+			'malta'										=> 'mt',
+			'marshall islands'							=> 'mh',
+			'martinique'								=> 'mq',
+			'mauritania'								=> 'mr',
+			'mauritius'									=> 'mu',
+			'mayotte'									=> 'yt',
+			'mexico'									=> 'mx',
+			'micronesia'								=> 'fm',
+			'moldova'									=> 'md',
+			'monaco'									=> 'mc',
+			'mongolia'									=> 'mn',
+			'montenegro'								=> 'me',
+			'montserrat'								=> 'ms',
+			'morocco'									=> 'ma',
+			'mozambique'								=> 'mz',
+			'myanmar'									=> 'mm',
+			'namibia'									=> 'na',
+			'nauru'										=> 'nr',
+			'nepal'										=> 'np',
+			'netherlands'								=> 'nl',
+			'new caledonia'								=> 'nc',
+			'new zealand'								=> 'nz',
+			'nicaragua'									=> 'ni',
+			'niger'										=> 'ne',
+			'nigeria'									=> 'ng',
+			'niue'										=> 'nu',
+			'norfolk island'							=> 'nf',
+			'north korea'								=> 'kp',
+			'northern mariana islands'					=> 'mp',
+			'norway'									=> 'no',
+			'oman'										=> 'om',
+			'pakistan'									=> 'pk',
+			'palau'										=> 'pw',
+			'palestine'									=> 'ps',
+			'panama'									=> 'pa',
+			'papua new guinea'							=> 'pg',
+			'paraguay'									=> 'py',
+			'peru'										=> 'pe',
+			'philippines'								=> 'ph',
+			'pitcairn islands'							=> 'pn',
+			'poland'									=> 'pl',
+			'portugal'									=> 'pt',
+			'puerto rico'								=> 'pr',
+			'qatar'										=> 'qa',
+			'romania'									=> 'ro',
+			'russia'									=> 'ru',
+			'rwanda'									=> 'rw',
+			'réunion'									=> 're',
+			'samoa'										=> 'ws',
+			'san marino'								=> 'sm',
+			'saudi arabia'								=> 'sa',
+			'senegal'									=> 'sn',
+			'serbia'									=> 'rs',
+			'seychelles'								=> 'sc',
+			'sierra leone'								=> 'sl',
+			'singapore'									=> 'sg',
+			'sint maarten'								=> 'sx',
+			'slovakia'									=> 'sk',
+			'slovenia'									=> 'si',
+			'solomon islands'							=> 'sb',
+			'somalia'									=> 'so',
+			'south africa'								=> 'za',
+			'south georgia & south sandwich islands'	=> 'gs',
+			'south korea'								=> 'kr',
+			'south sudan'								=> 'ss',
+			'spain'										=> 'es',
+			'sri lanka'									=> 'lk',
+			'st. barthélemy'							=> 'bl',
+			'st. helena'								=> 'sh',
+			'st. kitts & nevis'							=> 'kn',
+			'st. lucia'									=> 'lc',
+			'st. martin'								=> 'mf',
+			'st. pierre & miquelon'						=> 'pm',
+			'st. vincent & grenadines'					=> 'vc',
+			'sudan'										=> 'sd',
+			'suriname'									=> 'sr',
+			'svalbard & jan mayen'						=> 'sj',
+			'swaziland'									=> 'sz',
+			'sweden'									=> 'se',
+			'switzerland'								=> 'ch',
+			'syria'										=> 'sy',
+			'são tomé & príncipe'						=> 'st',
+			'taiwan'									=> 'tw',
+			'tajikistan'								=> 'tj',
+			'tanzania'									=> 'tz',
+			'thailand'									=> 'th',
+			'timor-leste'								=> 'tl',
+			'togo'										=> 'tg',
+			'tokelau'									=> 'tk',
+			'tonga'										=> 'to',
+			'trinidad & tobago'							=> 'tt',
+			'tunisia'									=> 'tn',
+			'turkey'									=> 'tr',
+			'turkmenistan'								=> 'tm',
+			'turks & caicos islands'					=> 'tc',
+			'tuvalu'									=> 'tv',
+			'u.s. outlying islands'						=> 'um',
+			'u.s. virgin islands'						=> 'vi',
+			'united kingdom'							=> 'gb',
+			'united states'								=> 'us',
+			'uganda'									=> 'ug',
+			'ukraine'									=> 'ua',
+			'united arab emirates'						=> 'ae',
+			'uruguay'									=> 'uy',
+			'uzbekistan'								=> 'uz',
+			'vanuatu'									=> 'vu',
+			'vatican city'								=> 'va',
+			'venezuela'									=> 've',
+			'vietnam'									=> 'vn',
+			'wallis & futuna'							=> 'wf',
+			'western sahara'							=> 'eh',
+			'yemen'										=> 'ye',
+			'zambia'									=> 'zm',
+			'zimbabwe'									=> 'zw',
+			'åland islands'								=> 'ax',
+
+			// some abbreviated names and common names for frequently used Eway countries
+			'aust'										=> 'au',
+			'aust.'										=> 'au',
+			'n.z.'										=> 'nz',
+			'u.k.'										=> 'gb',
+			'britain'									=> 'gb',
+			'england'									=> 'gb',
+			'scotland'									=> 'gb',
+			'wales'										=> 'gb',
+			'northern ireland'							=> 'gb',
+			'uae'										=> 'ae',
+			'usa'										=> 'us',
+			'u.s.a.'									=> 'us',
+			'united states of america'					=> 'us',
+		];
+
+		if (function_exists('mb_strtolower')) {
+			$country_lower = mb_strtolower($country_name);
+		}
+		else {
+			$country_lower = strtolower($country_name);
+		}
+
+		return isset($countries[$country_lower]) ? $countries[$country_lower] : null;
 	}
 
 	/**

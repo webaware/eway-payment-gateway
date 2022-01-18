@@ -145,51 +145,58 @@ final class MethodWPeCommerce extends wpsc_merchant {
 		$eway		= new EwayRapidAPI($creds->api_key, $creds->password, $useSandbox);
 		$eway->capture = $capture;
 
-		$eway->invoiceDescription		= get_bloginfo('name');
-		$eway->invoiceReference			= $this->purchase_id;								// customer invoice reference
-		$eway->transactionNumber		= $transactionID;
-		$eway->amount					= $purchase_logs->get('totalprice');
-		$eway->currencyCode				= wpsc_get_currency_code();
-		$eway->cardHoldersName			= $this->collected_gateway_data['card_name'];
-		$eway->cardNumber				= $this->collected_gateway_data['card_number'];
-		$eway->cardExpiryMonth			= $this->collected_gateway_data['expiry_month'];
-		$eway->cardExpiryYear			= $this->collected_gateway_data['expiry_year'];
-		$eway->cardVerificationNumber	= $this->collected_gateway_data['c_v_n'];
-		$eway->firstName				= $this->collected_gateway_data['first_name'];
-		$eway->lastName					= $this->collected_gateway_data['last_name'];
-		$eway->emailAddress				= $this->collected_gateway_data['email'];
-		$eway->address1					= $this->collected_gateway_data['address'];
-		$eway->address2					= '';
-		$eway->suburb					= $this->collected_gateway_data['city'];
-		$eway->state					= $this->collected_gateway_data['state'];
-		$eway->postcode					= $this->collected_gateway_data['post_code'];
-		$eway->country					= $this->collected_gateway_data['country'];
-		$eway->countryName				= $this->collected_gateway_data['country'];
+		$customer = new CustomerDetails;
+		$customer->setFirstName($this->collected_gateway_data['first_name']);
+		$customer->setLastName($this->collected_gateway_data['last_name']);
+		$customer->setStreet1($this->collected_gateway_data['address']);
+		$customer->setCity($this->collected_gateway_data['city']);
+		$customer->setState($this->collected_gateway_data['state']);
+		$customer->setPostalCode($this->collected_gateway_data['post_code']);
+		$customer->setEmail($this->collected_gateway_data['email']);
+
+		$customer->CardDetails = new CardDetails(
+			$this->collected_gateway_data['card_name'],
+			$this->collected_gateway_data['card_number'],
+			$this->collected_gateway_data['expiry_month'],
+			$this->collected_gateway_data['expiry_year'],
+			$this->collected_gateway_data['c_v_n'],
+		);
 
 		// convert wp-e-commerce country code into country name
 		if ($this->collected_gateway_data['country']) {
-			$eway->countryName = wpsc_get_country($this->collected_gateway_data['country']);
+			$customer->setCountry(wpsc_get_country($this->collected_gateway_data['country']));
 		}
 
 		// use cardholder name for last name if no customer name entered
-		if (empty($eway->firstName) && empty($eway->lastName)) {
-			$eway->lastName				= $eway->cardHoldersName;
+		if (empty($customer->FirstName) && empty($customer->LastName)) {
+			$customer->setLastName($customer->CardDetails->Name);
 		}
 
-		// allow plugins/themes to modify invoice description and reference, and set option fields
-		$eway->invoiceDescription		= apply_filters('wpsc_merchant_eway_invoice_desc', $eway->invoiceDescription, $this->purchase_id);
-		$eway->invoiceReference			= apply_filters('wpsc_merchant_eway_invoice_ref', $eway->invoiceReference, $this->purchase_id);
-		$eway->options					= array_filter([
-												apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id),
-												apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id),
-												apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id),
-										  ], 'strlen');
+		// only populate payment record if there's an amount value
+		$payment = new PaymentDetails;
+		$amount = $purchase_logs->get('totalprice');
+		$currency = wpsc_get_currency_code();
+		if ($amount > 0) {
+			$payment->setTotalAmount($amount, $currency);
+			$payment->setCurrencyCode($currency);
+			$payment->setInvoiceReference($transactionID);
+			$payment->setInvoiceDescription(apply_filters('wpsc_merchant_eway_invoice_desc', get_bloginfo('name'), $this->purchase_id));
+			$payment->setInvoiceNumber(apply_filters('wpsc_merchant_eway_invoice_ref', $this->purchase_id, $this->purchase_id));
+		}
+
+		// allow plugins/themes to set option fields
+		$options = get_api_options([
+			apply_filters('wpsc_merchant_eway_option1', '', $this->purchase_id),
+			apply_filters('wpsc_merchant_eway_option2', '', $this->purchase_id),
+			apply_filters('wpsc_merchant_eway_option3', '', $this->purchase_id),
+		]);
 
 		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
-			$useSandbox ? 'test' : 'live', $eway->invoiceReference, $eway->transactionNumber, $eway->amount, $eway->cardNumber));
+			$useSandbox ? 'test' : 'live',
+			$payment->InvoiceNumber, $payment->InvoiceReference, $payment->TotalAmount, $customer->CardDetails->Number));
 
 		try {
-			$response = $eway->processPayment();
+			$response = $eway->processPayment($customer, null, $payment, $options);
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record transaction number and continue
@@ -212,7 +219,7 @@ final class MethodWPeCommerce extends wpsc_merchant {
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$eway->invoiceReference, $response->TransactionID, $capture ? 'accepted payment' : 'order received',
+					$payment->InvoiceNumber, $response->TransactionID, $capture ? 'accepted payment' : 'order received',
 					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 
 				$this->go_to_transaction_results($this->cart_data['session_id']);
@@ -229,7 +236,7 @@ final class MethodWPeCommerce extends wpsc_merchant {
 				];
 				wpsc_update_purchase_log_details($this->purchase_id, $log_details);
 
-				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $eway->invoiceReference, $response->getErrorsForLog()));
+				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $payment->InvoiceNumber, $response->getErrorsForLog()));
 				if ($response->BeagleScore > 0) {
 					$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
 				}

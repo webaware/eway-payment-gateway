@@ -169,3 +169,20 @@ function currency_has_decimals(string $currency_code) : bool {
 	];
 	return !in_array($currency_code, $no_decimals);
 }
+
+/**
+ * distill an array of option values down to minimum set, and build an API array of options for Eway
+ */
+function get_api_options(array $input) : array {
+	$output = [];
+
+	if (!empty($input)) {
+		foreach ($input as $option) {
+			if (!empty($option)) {
+				$output[] = ['Value' => substr($option, 0, 254)];
+			}
+		}
+	}
+
+	return $output;
+}
