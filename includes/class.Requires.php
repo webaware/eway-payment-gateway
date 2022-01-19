@@ -68,17 +68,14 @@ final class EwayPaymentGatewayRequires {
 		global $hook_suffix;
 
 		// only on specific pages
-		if ($hook_suffix !== 'woocommerce_page_wc-settings' && $hook_suffix !== 'woocommerce_page_wc-status') {
-			return false;
-		}
-
-		// only on specific pages
 		$settings_pages = array(
-			'settings_page_wpsc-settings',				// WP eCommerce
-			'woocommerce_page_wc-settings',				// WooCommerce
-			'woocommerce_page_wc-status',				// WooCommerce
-			'event_page_events-manager-gateways',		// Events Manager
-			'classifieds_page_awpcp-admin-settings',	// AWPCP
+			'settings_page_wpsc-settings',						// WP eCommerce
+			'woocommerce_page_wc-settings',						// WooCommerce
+			'woocommerce_page_wc-status',						// WooCommerce
+			'event-espresso_page_espresso_payment_settings',	// Event Espresso
+			'event_page_events-manager-gateways',				// Events Manager
+			'classified-ads_page_awpcp-admin-settings',			// AWPCP
+			'classifieds_page_awpcp-admin-settings',			// AWPCP (legacy)
 		);
 		if (!in_array($hook_suffix, $settings_pages)) {
 			return false;
