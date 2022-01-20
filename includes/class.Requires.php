@@ -75,7 +75,7 @@ final class EwayPaymentGatewayRequires {
 			'event-espresso_page_espresso_payment_settings',	// Event Espresso
 			'event_page_events-manager-gateways',				// Events Manager
 			'classified-ads_page_awpcp-admin-settings',			// AWPCP
-			'classifieds_page_awpcp-admin-settings',			// AWPCP (legacy)
+			'classifieds_page_awpcp-admin-settings',			// AWPCP -- legacy
 		);
 		if (!in_array($hook_suffix, $settings_pages)) {
 			return false;
