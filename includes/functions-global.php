@@ -23,7 +23,7 @@ function eway_payment_gateway_fail_php_version() {
 	);
 	$requires->addNotice(
 		/* translators: %s: minimum recommended version number */
-		sprintf(esc_html__('Please upgrade your website hosting. At least PHP %s is recommended.', 'eway-payment-gateway'), '7.3')
+		sprintf(esc_html__('Please upgrade your website hosting. At least PHP %s is recommended.', 'eway-payment-gateway'), '7.4')
 	);
 }
 

@@ -50,6 +50,18 @@ class Plugin {
 		add_action('plugins_loaded', [$this, 'maybeRegisterWooCommerce']);
 		add_action('plugins_loaded', [$this, 'maybeRegisterAWPCP']);
 		add_action('init', [$this, 'maybeRegisterEventsManager']);
+
+		// prerequisites for upgrading to v5.0
+		add_action('admin_init', [$this, 'manageUpgradeWarnings']);
+	}
+
+	/**
+	 * load the manager for upgrade warnings
+	 */
+	public function manageUpgradeWarnings() {
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/class.WarnUpgrade.php';
+		$warn = new WarnUpgrade();
+		$warn->addHooks();
 	}
 
 	/**
@@ -120,7 +132,7 @@ class Plugin {
 		if (version_compare(WC()->version, MIN_VERSION_WOOCOMMERCE, '<')) {
 			$requires->addNotice(
 				/* translators: %1$s: minimum required version number, %2$s: installed version number */
-				sprintf(esc_html__('Requires WooCommerce version %1$s or higher; your website has WooCommerce version %2$s', 'eway-payment-gateway'),
+				sprintf(esc_html__('It requires WooCommerce version %1$s or higher; your website has WooCommerce version %2$s.', 'eway-payment-gateway'),
 				esc_html(MIN_VERSION_WOOCOMMERCE), esc_html(WC()->version))
 			);
 			return;
