@@ -2,10 +2,10 @@
 
 ## Changelog
 
-### 4.5.1, soon...
+### 4.5.1, 2022-01-21
 
 * fixed: admin notices for missing prerequisites not displaying on non-WooCommerce integrations
-* added: warning notices for prerequisistes of the next major release
+* added: warning notices for prerequisites of the next major release
 
 ### 4.5.0, 2021-11-14
 
