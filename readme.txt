@@ -5,7 +5,7 @@ Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=Eway+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, event espresso, events manager, awpcp
-Requires at least: 4.9
+Requires at least: 5.1
 Tested up to: 5.8
 Requires PHP: 7.4
 Stable tag: 4.5.0
