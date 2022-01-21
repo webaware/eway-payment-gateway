@@ -51,8 +51,6 @@ final class WarnUpgrade {
 					esc_html(self::MIN_PHP), esc_html(PHP_VERSION)),
 				'https://www.php.net/supported-versions.php'
 			);
-			$this->notices[] = sprintf(esc_html__('Please upgrade your website hosting. At least PHP %s is recommended.', 'eway-payment-gateway'),
-				esc_html(self::MIN_PHP));
 		}
 
 		// check for use of legacy API in all integrations that support it (i.e. not Event Espresso)
@@ -87,7 +85,7 @@ final class WarnUpgrade {
 		check_ajax_referer(self::OPT_DISMISS, 'nonce');
 
 		update_option(self::OPT_DISMISS, '1');
-		wp_send_json_success(['status' => '1']);
+		wp_send_json_success(['status' => 1]);
 	}
 
 	/**
