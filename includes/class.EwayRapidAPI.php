@@ -226,8 +226,9 @@ trait SerialiseWithoutNull {
 	/**
 	 * convert object properties to array (stripping uninitialised properties)
 	 * and then filter out null properties
+	 * @return mixed
 	 */
-	public function jsonSerialize() : mixed {
+	public function jsonSerialize() {
 		return array_filter((array) $this, static function($var) {
 			return !is_null($var);
 		});
