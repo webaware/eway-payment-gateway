@@ -528,7 +528,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		$order		= self::getOrder($order_id);
 		$ccfields	= $this->getCardFields();
 
-		$capture	= ($this->eway_stored  !== 'yes');
+		$capture	= apply_filters('woocommerce_eway_method_capture', ($this->eway_stored  !== 'yes'), $order);
 		$useSandbox	= ($this->eway_sandbox === 'yes');
 		$creds		= apply_filters('woocommerce_eway_credentials', $this->getApiCredentials(), $useSandbox, $order);
 
