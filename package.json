@@ -1,25 +1,23 @@
 {
-  "name": "eway-payment-gateway",
-  "version": "5.0.0-dev",
-  "description": "Eway Payment Gateway",
-  "browserslist": [
-    "> 0.5%",
-    "not dead"
-  ],
-  "devDependencies": {
-    "@babel/cli": "^7.16.0",
-    "@babel/core": "^7.16.0",
-    "@babel/preset-env": "^7.16.0",
-    "grunt": "^1.4.1",
-    "grunt-babel": "^8.0.0",
-    "grunt-contrib-uglify": "^5.0.1",
-    "grunt-eslint": "^24.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/webaware/eway-payment-gateway"
-  },
-  "author": "WebAware https://shop.webaware.com.au/",
-  "license": "GPL-2.0",
-  "homepage": "https://shop.webaware.com.au/downloads/eway-payment-gateway/"
+	"name": "eway-payment-gateway",
+	"version": "5.0.0-dev",
+	"description": "Eway Payment Gateway",
+	"browserslist": [
+		"> 0.5%",
+		"not dead"
+	],
+	"devDependencies": {
+		"@babel/cli": "^7.17.10",
+		"@babel/core": "^7.18.5",
+		"@babel/preset-env": "^7.18.2",
+		"eslint": "^8.18.0",
+		"uglify-js": "^3.16.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/webaware/eway-payment-gateway"
+	},
+	"author": "WebAware https://shop.webaware.com.au/",
+	"license": "GPL-2.0",
+	"homepage": "https://shop.webaware.com.au/downloads/eway-payment-gateway/"
 }
