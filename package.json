@@ -2,7 +2,6 @@
   "name": "eway-payment-gateway",
   "version": "5.0.0-dev",
   "description": "Eway Payment Gateway",
-  "main": "Gruntfile.js",
   "browserslist": [
     "> 0.5%",
     "not dead"
