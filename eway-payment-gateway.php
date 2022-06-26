@@ -8,11 +8,11 @@ Author: WebAware
 Author URI: https://shop.webaware.com.au/
 Text Domain: eway-payment-gateway
 WC requires at least: 3.0
-WC tested up to: 5.9
+WC tested up to: 6.6
 */
 
 /*
-copyright (c) 2011-2021 WebAware Pty Ltd (email : support@webaware.com.au)
+copyright (c) 2011-2022 WebAware Pty Ltd (email : support@webaware.com.au)
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
