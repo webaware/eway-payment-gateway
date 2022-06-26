@@ -9,7 +9,7 @@
 
 
   function setVisibility() {
-    var useTest = $("#woocommerce_eway_payments_eway_sandbox:checked").val() === "1";
+    const useTest = $("#woocommerce_eway_payments_eway_sandbox:checked").val() === "1";
     display($("#woocommerce_eway_payments_eway_sandbox_api_key,#woocommerce_eway_payments_eway_sandbox_password,#woocommerce_eway_payments_eway_sandbox_ecrypt_key").closest("tr"), useTest);
   }
 
@@ -20,7 +20,7 @@
   */
 
   $("#woocommerce_eway_payments_eway_site_seal").on("change", function () {
-    var codeRow = $("#woocommerce_eway_payments_eway_site_seal_code").closest("tr");
+    const codeRow = $("#woocommerce_eway_payments_eway_site_seal_code").closest("tr");
     if (this.checked) codeRow.show();else codeRow.hide();
   }).trigger("change");
 })(jQuery);

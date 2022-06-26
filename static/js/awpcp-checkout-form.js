@@ -1,7 +1,7 @@
 (function ($) {
   $("#awpcp-eway-checkout").submit(function (event) {
-    var errors = [];
-    var messages = eway_awpcp_checkout.errors;
+    const errors = [];
+    const messages = eway_awpcp_checkout.errors;
 
     if ($("input[name='eway_card_number']").val().trim() === "") {
       errors.push(messages.card_number);

@@ -1,7 +1,7 @@
 // script supporting Eway's Client Side Encryption
 (function ($) {
-  var fields = eway_ecrypt_vars.fields;
-  var checkout = $(eway_ecrypt_vars.form);
+  const fields = eway_ecrypt_vars.fields;
+  let checkout = $(eway_ecrypt_vars.form);
   /**
   * basic card number validation using Luhn algorithm
   * @param {String} card_number
@@ -9,11 +9,11 @@
   */
 
   function cardnumberValid(card_number) {
-    var checksum = 0;
-    var multiplier = 1; // process each character, starting at the right
+    let checksum = 0;
+    let multiplier = 1; // process each character, starting at the right
 
-    for (var i = card_number.length - 1; i >= 0; i--) {
-      var digit = card_number.charAt(i) * multiplier;
+    for (let i = card_number.length - 1; i >= 0; i--) {
+      let digit = card_number.charAt(i) * multiplier;
       multiplier = multiplier === 1 ? 2 : 1; // digit can't be greater than 9
 
       if (digit >= 10) {
@@ -34,17 +34,17 @@
   */
 
 
-  var repeatString = function () {
+  const repeatString = function () {
     if (typeof String.prototype.repeat === "function") {
-      return function (character, length) {
+      return (character, length) => {
         return character.repeat(length);
       };
     }
 
-    return function (character, length) {
-      var s = character;
+    return (character, length) => {
+      let s = character;
 
-      for (var i = 1; i < length; i++) {
+      for (let i = 1; i < length; i++) {
         s += character;
       }
 
@@ -61,7 +61,7 @@
 
   function getPlaceholder(mask_character, length, is_cardnum) {
     if (is_cardnum) {
-      var fragment = repeatString(mask_character, 4);
+      const fragment = repeatString(mask_character, 4);
       return fragment + " " + fragment + " " + fragment + " " + fragment;
     }
 
@@ -75,11 +75,11 @@
 
 
   function maybeEncryptField(selector, fieldspec) {
-    var field = checkout.find(selector);
+    const field = checkout.find(selector);
 
     if (field.length) {
-      var value = field.val().replace(/[\s-]/g, "");
-      var length = value.length;
+      const value = field.val().replace(/[\s-]/g, "");
+      const length = value.length;
 
       if (length) {
         if (fieldspec.is_cardnum && !cardnumberValid(value)) {
@@ -90,8 +90,8 @@
           };
         }
 
-        var encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
-        var placeholder = getPlaceholder(eway_ecrypt_msg.ecrypt_mask, length, fieldspec.is_cardnum);
+        const encrypted = eCrypt.encryptValue(value, eway_ecrypt_vars.key);
+        const placeholder = getPlaceholder(eway_ecrypt_msg.ecrypt_mask, length, fieldspec.is_cardnum);
         checkout.find("input[name='" + fieldspec.name + "']").remove();
         $("<input type='hidden'>").attr("name", fieldspec.name).val(encrypted).appendTo(checkout);
 
@@ -111,7 +111,7 @@
 
   function processFields(event) {
     try {
-      Object.keys(fields).forEach(function (selector) {
+      Object.keys(fields).forEach(selector => {
         maybeEncryptField(selector, fields[selector]);
       });
     } catch (e) {
@@ -131,7 +131,7 @@
 
 
   function elementValue(name) {
-    var element = checkout.length ? checkout.get(0).elements[name] : false;
+    let element = checkout.length ? checkout.get(0).elements[name] : false;
     return element ? element.value : false;
   }
   /**
@@ -140,8 +140,8 @@
 
 
   function resetEncryptedFields() {
-    Object.keys(fields).forEach(function (selector) {
-      var field = checkout.find(selector);
+    Object.keys(fields).forEach(selector => {
+      let field = checkout.find(selector);
 
       if (field.length) {
         if (fields[selector].false_fill) {
@@ -188,8 +188,8 @@
   function handleEventEspresso() {
     // refresh checkout object, because form may have been destroyed after Ajax call
     checkout = $(eway_ecrypt_vars.form);
-    Object.keys(fields).forEach(function (selector) {
-      var field = $(selector); // if the field hasn't been encrypted yet, do so
+    Object.keys(fields).forEach(selector => {
+      let field = $(selector); // if the field hasn't been encrypted yet, do so
 
       if (field.length > 0 && field.val().substring(0, 1) !== eway_ecrypt_msg.ecrypt_mask) {
         try {

@@ -9,7 +9,7 @@
 
 
   function setVisibility() {
-    var useTest = $("input[name='eway_test']:checked").val() === "1";
+    const useTest = $("input[name='eway_test']:checked").val() === "1";
     display($(".eway_sandbox_field_row"), useTest);
   }
 

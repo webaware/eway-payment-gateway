@@ -9,7 +9,7 @@
 
 
   function setVisibility() {
-    var useTest = $("select[name='em_eway_mode']").val() === "sandbox";
+    const useTest = $("select[name='em_eway_mode']").val() === "sandbox";
     display($(".em_eway_sandbox_row"), useTest);
   }
 
