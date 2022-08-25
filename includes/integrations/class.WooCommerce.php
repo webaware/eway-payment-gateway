@@ -622,7 +622,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 				}
 				self::updateOrderMeta($order, $meta);
 
-				if ($this->eway_stored === 'yes') {
+				if (!$capture) {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
 					wc_reduce_stock_levels($order_id);
 					$order->update_status('on-hold', __('Payment authorized', 'eway-payment-gateway'));
@@ -641,7 +641,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 				];
 
 				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$payment->InvoiceNumber, $response->TransactionID, $this->eway_stored === 'yes' ? 'on-hold' : 'completed',
+					$payment->InvoiceNumber, $response->TransactionID, $capture ? 'completed' : 'on-hold',
 					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 			}
 			else {
