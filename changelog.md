@@ -9,6 +9,7 @@
 * changed: requires Eway Rapid API key / password; legacy XML API is no longer supported
 * changed: filter hooks for modifying credentials must now accept / return a Credentials object
 * changed: major code refresh, developers with customisations will need to test their customisations
+* fixed: Client Side Encryption was not working on customer payment page (manual orders)
 * added: filter hook `woocommerce_eway_method_capture` to allow per-order capture or authorise
 
 ### 4.5.0, 2021-11-14
