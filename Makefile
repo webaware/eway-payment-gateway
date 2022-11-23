@@ -62,8 +62,16 @@ lint-php:
 
 # tests
 
-test: /tmp/wordpress-tests-lib /tmp/.web-driver
+test: test-php80
+
+test-php74: /tmp/wordpress-tests-lib /tmp/.web-driver
+	php7.4 vendor/bin/phpunit
+
+test-php80: /tmp/wordpress-tests-lib /tmp/.web-driver
 	php8.0 vendor/bin/phpunit
+
+test-php81: /tmp/wordpress-tests-lib /tmp/.web-driver
+	php8.1 vendor/bin/phpunit
 
 /tmp/wordpress-tests-lib:
 	bin/install-wp-tests.sh wp_test website website localhost nightly
