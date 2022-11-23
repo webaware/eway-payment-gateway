@@ -212,7 +212,14 @@
 	switch (eway_ecrypt_vars.mode) {
 
 		case "woocommerce":
-			checkout.on("checkout_place_order_eway_payments", processFields);
+			if (checkout.prop("id") === "order_review") {
+				// customer payment page, from a link in an email
+				checkout.on("submit", processFields);
+			}
+			else {
+				// regular WooCommerce checkout page
+				checkout.on("checkout_place_order_eway_payments", processFields);
+			}
 			$(document.body).on("checkout_error", resetEncryptedFields);
 			break;
 

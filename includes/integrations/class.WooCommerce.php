@@ -417,7 +417,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		$vars = [
 			'mode'		=> 'woocommerce',
 			'key'		=> $creds->ecrypt_key,
-			'form'		=> 'form.checkout',
+			'form'		=> 'form.checkout,form#order_review',
 			'fields'	=> [
 							"#{$this->id}-card-number"	=> ['name' => "cse:{$this->id}-card-number", 'is_cardnum' => true],
 							"#{$this->id}-card-cvc"		=> ['name' => "cse:{$this->id}-card-cvc", 'is_cardnum' => false],
