@@ -6,6 +6,9 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
+/**
+ * @group wp-e-commerce
+ */
 class WPeCommerceTest extends TestCase {
 
 	public WebDriverRunner $web;

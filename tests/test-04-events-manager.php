@@ -5,6 +5,9 @@ use Yoast\WPTestUtils\BrainMonkey\TestCase;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
+/**
+ * @group events-manager
+ */
 class EventsManagerTest extends TestCase {
 
 	public WebDriverRunner $web;

@@ -5,6 +5,9 @@ use Yoast\WPTestUtils\BrainMonkey\TestCase;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
+/**
+ * @group awpcp
+ */
 class AWPCPTest extends TestCase {
 
 	public WebDriverRunner $web;

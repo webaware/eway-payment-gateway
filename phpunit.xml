@@ -12,4 +12,13 @@
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
+	<groups>
+		<exclude>
+			<!-- <group>woocommerce</group> -->
+			<!-- <group>wp-e-commerce</group> -->
+			<group>events-manager</group>
+			<!-- <group>event-espresso</group> -->
+			<!-- <group>awpcp</group> -->
+		</exclude>
+	</groups>
 </phpunit>

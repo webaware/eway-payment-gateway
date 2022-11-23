@@ -9,6 +9,7 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 /**
  * - WooCommerce webdriver tests require JavaScript to click buttons, due to delegated event listeners
  * - some credit card fields must also be set via JavaScript due to event listeners
+ * @group woocommerce
  */
 class WooCommerceTest extends TestCase {
 
@@ -57,7 +58,7 @@ class WooCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('document.querySelector(".product:not(.virtual) .add_to_cart_button").click()');
+		$this->web->driver->executeScript('document.querySelector(".product.featured .add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
@@ -116,7 +117,7 @@ class WooCommerceTest extends TestCase {
 		$this->expectException(UnexpectedAlertOpenException::class);
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('document.querySelector(".product.virtual .add_to_cart_button").click()');
+		$this->web->driver->executeScript('document.querySelector(".product.featured .add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
@@ -163,7 +164,7 @@ class WooCommerceTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_woo_shop']);
-		$this->web->driver->executeScript('document.querySelector(".product.virtual .add_to_cart_button").click()');
+		$this->web->driver->executeScript('document.querySelector(".product.featured .add_to_cart_button").click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.added_to_cart'))
 		);
