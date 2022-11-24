@@ -648,7 +648,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 				// transaction was unsuccessful, so record transaction number and the error
 				$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
 				$order->update_status('failed', $error_msg);
-				wc_add_notice($error_msg, 'error');
+				wc_add_notice(apply_filters('woocommerce_eway_error_msg', $error_msg, $response), 'error');
 				$result = ['result' => 'failure'];
 
 				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $payment->InvoiceNumber, $response->getErrorsForLog()));

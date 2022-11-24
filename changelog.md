@@ -11,6 +11,7 @@
 * changed: major code refresh, developers with customisations will need to test their customisations
 * fixed: Client Side Encryption was not working on customer payment page (manual orders)
 * added: filter hook `woocommerce_eway_method_capture` to allow per-order capture or authorise
+* added: filter hook `woocommerce_eway_error_msg` to allow developers to provide richer error messages
 
 ### 4.5.0, 2021-11-14
 
