@@ -194,6 +194,8 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 * `woocommerce_eway_invoice_ref` for modifying the invoice reference
 * `woocommerce_eway_icon` for changing the payment gateway icon
 * `woocommerce_eway_credentials` for modifying the Eway credentials used in the transaction
+* `woocommerce_eway_method_capture` to allow per-order capture or authorize
+* `woocommerce_eway_error_msg` to allow developers to provide richer error messages
 
 ### Another WordPress Classifieds Plugin filter hooks
 
@@ -250,7 +252,7 @@ Released 2022-12-01
 * changed: requires minimum WooCommerce version 3.0
 * changed: requires Eway Rapid API key / password; legacy XML API is no longer supported
 * changed: filter hooks for modifying credentials must now accept / return a Credentials object
-* changed: major code refresh, developers with customisations will need to test their customisations
+* changed: major code refresh, developers with customizations will need to test their customizations
 * fixed: Client Side Encryption was not working on customer payment page (manual orders)
-* added: filter hook `woocommerce_eway_method_capture` to allow per-order capture or authorise
+* added: filter hook `woocommerce_eway_method_capture` to allow per-order capture or authorize
 * added: filter hook `woocommerce_eway_error_msg` to allow developers to provide richer error messages
