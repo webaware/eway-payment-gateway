@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 5.0.0, soon...
+### 5.0.0, 2022-12-01
 
 * changed: requires minimum PHP version 7.4 (recommend version 8.0 or greater)
 * changed: requires minimum WooCommerce version 3.0

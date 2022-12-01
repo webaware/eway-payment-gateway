@@ -6,9 +6,9 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=Eway+Payment+Gateway
 Tags: eway, payment, credit cards, woocommerce, wp e-commerce, event espresso, events manager, awpcp
 Requires at least: 5.1
-Tested up to: 5.8
+Tested up to: 6.1
 Requires PHP: 7.4
-Stable tag: 4.5.0
+Stable tag: 5.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,17 +234,23 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 4.5.0
+### 5.0.0
 
-updated eWAY to Eway and replaced logo images for new Eway branding; tested up to WooCommerce 5.9
+requires PHP 7.4+, WooCommerce 3.0+; requires Eway Rapid API key / password; legacy XML API is no longer supported; see changelog for more details.
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 4.5.0
+### 5.0.0
 
-Released 2021-11-14
+Released 2022-12-01
 
-* changed: update eWAY to Eway and replaced logo images for new Eway branding
-* changed: marked as tested up to WooCommerce 5.9
+* changed: requires minimum PHP version 7.4 (recommend version 8.0 or greater)
+* changed: requires minimum WooCommerce version 3.0
+* changed: requires Eway Rapid API key / password; legacy XML API is no longer supported
+* changed: filter hooks for modifying credentials must now accept / return a Credentials object
+* changed: major code refresh, developers with customisations will need to test their customisations
+* fixed: Client Side Encryption was not working on customer payment page (manual orders)
+* added: filter hook `woocommerce_eway_method_capture` to allow per-order capture or authorise
+* added: filter hook `woocommerce_eway_error_msg` to allow developers to provide richer error messages
