@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 5.0.1, 2022-12-06
+
+* fixed: don't break when another plugin passed null to filter hook `woocommerce_email_order_meta_fields`
+
 ### 5.0.0, 2022-12-01
 
 * changed: requires minimum PHP version 7.4 (recommend version 8.0 or greater)

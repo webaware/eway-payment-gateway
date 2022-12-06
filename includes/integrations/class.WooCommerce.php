@@ -694,7 +694,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	/**
 	 * add the successful transaction ID to WooCommerce order emails
 	 */
-	public function wooEmailOrderMetaKeys(array $keys, bool $sent_to_admin, /* mixed */ $order) : array {
+	public function wooEmailOrderMetaKeys(?array $keys, bool $sent_to_admin, /* mixed */ $order) : array {
 		if (apply_filters('woocommerce_eway_email_show_trans_number', $this->eway_emails_show_txid === 'yes', $order)) {
 			$order			= self::getOrder($order);
 			$key			= 'Transaction ID';
