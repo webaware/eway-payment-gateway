@@ -1,6 +1,6 @@
 {
 	"name": "eway-payment-gateway",
-	"version": "5.0.0",
+	"version": "5.0.1",
 	"description": "Eway Payment Gateway",
 	"browserslist": [
 		"> 0.5%",
