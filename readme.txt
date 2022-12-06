@@ -244,7 +244,9 @@ crash fix; requires PHP 7.4+, WooCommerce 3.0+; requires Eway Rapid API key / pa
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 5.0.1, 2022-12-06
+### 5.0.1
+
+Released 2022-12-06
 
 * fixed: don't crash when another plugin passes null to filter hook `woocommerce_email_order_meta_fields`
 
