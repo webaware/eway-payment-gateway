@@ -2,9 +2,10 @@
 
 ## Changelog
 
-### 5.0.2, soon...
+### 5.0.2, 2023-05-21
 
 * fixed: update list of Eway error codes with descriptions
+* changed: marked as tested up to WooCommerce 7.7
 
 ### 5.0.1, 2022-12-06
 
