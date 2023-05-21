@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 5.0.2, soon...
+
+* fixed: update list of Eway error codes with descriptions
+
 ### 5.0.1, 2022-12-06
 
 * fixed: don't crash when another plugin passes null to filter hook `woocommerce_email_order_meta_fields`
