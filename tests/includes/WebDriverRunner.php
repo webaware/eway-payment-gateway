@@ -1,6 +1,7 @@
 <?php
 namespace webaware\eway_payment_gateway\Tests;
 
+use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
@@ -17,10 +18,14 @@ class WebDriverRunner {
 
 	/**
 	 * create handle to a browser driver
+	 * NB: run Chrome in private browsing (incognito) mode so that it doesn't ask to save credit card details
 	 */
 	public function __construct() {
 		$host = 'http://localhost:4444/';
+		$options = new ChromeOptions();
+		$options->addArguments(['--incognito']);
 		$capabilities = DesiredCapabilities::chrome();
+		$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		$this->driver = RemoteWebDriver::create($host, $capabilities);
 	}
 
