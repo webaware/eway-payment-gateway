@@ -1,16 +1,16 @@
 {
 	"name": "eway-payment-gateway",
-	"version": "5.0.1",
+	"version": "5.0.2",
 	"description": "Eway Payment Gateway",
 	"browserslist": [
 		"> 0.5%",
 		"not dead"
 	],
 	"devDependencies": {
-		"@babel/cli": "^7.19.3",
-		"@babel/core": "^7.20.2",
-		"@babel/preset-env": "^7.20.2",
-		"eslint": "^8.28.0",
+		"@babel/cli": "^7.21.5",
+		"@babel/core": "^7.21.8",
+		"@babel/preset-env": "^7.21.5",
+		"eslint": "^8.41.0",
 		"uglify-js": "^3.17.4"
 	},
 	"repository": {
