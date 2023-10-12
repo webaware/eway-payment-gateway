@@ -109,7 +109,11 @@ function notice_woocommerce_version() : void {
 /**
  * sanitise the customer title, to avoid error V6058: Invalid Customer Title
  */
-function sanitise_customer_title(string $title) : string {
+function sanitise_customer_title(?string $title) : string {
+	if (empty($title)) {
+		return '';
+	}
+
 	$valid = [
 		'mr'			=> 'Mr.',
 		'master'		=> 'Mr.',
@@ -126,7 +130,7 @@ function sanitise_customer_title(string $title) : string {
 
 	$simple = rtrim(strtolower(trim($title)), '.');
 
-	return isset($valid[$simple]) ? $valid[$simple] : '';
+	return $valid[$simple] ?? '';
 }
 
 /**
