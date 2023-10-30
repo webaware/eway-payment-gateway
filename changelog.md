@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### 5.1.0, 2023-10-30
+
+* fixed: support for WooCommerce HPOS (high performance order storage)
+* changed: marked as tested up to WooCommerce 8.2
+
 ### 5.0.2, 2023-05-21
 
 * fixed: update list of Eway error codes with descriptions

@@ -3,6 +3,7 @@ namespace webaware\eway_payment_gateway;
 
 use WC_Order;
 use WC_Payment_Gateway_CC;
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -21,6 +22,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	 */
 	public static function register_eway() : void {
 		add_filter('woocommerce_payment_gateways', [__CLASS__, 'register']);
+		add_action('before_woocommerce_init', [__CLASS__, 'declareCompatibleHPOS']);
 	}
 
 	/**
@@ -29,6 +31,15 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 	public static function register(array $gateways) : array {
 		$gateways[] = __CLASS__;
 		return $gateways;
+	}
+
+	/**
+	 * declare compatibility with HPOS (high performance order storage, i.e. custom tables)
+	 */
+	public static function declareCompatibleHPOS() {
+		if (class_exists(FeaturesUtil::class)) {
+			FeaturesUtil::declare_compatibility('custom_order_tables', EWAY_PAYMENTS_PLUGIN_FILE, true);
+		}
 	}
 
 	/**
@@ -701,7 +712,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 			$keys[$key]		= [
 				'label'		=> wptexturize($key),
-				'value'		=> wptexturize(get_post_meta($order->get_id(), $key, true)),
+				'value'		=> wptexturize($order->get_meta($key, true)),
 			];
 		}
 
