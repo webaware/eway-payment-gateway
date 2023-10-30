@@ -128,6 +128,10 @@ final class MethodWPeCommerce extends wpsc_merchant {
 			$this->set_error_message(__('No cart ID and no active session!', 'eway-payment-gateway'));
 			return;
 		}
+		if ($purchase_logs->get('totalprice') <= 0) {
+			$this->set_error_message(__('Purchase amount must be greater than zero.', 'eway-payment-gateway'));
+			return;
+		}
 
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('wpsc_merchant_eway_trans_number', $this->purchase_id);
