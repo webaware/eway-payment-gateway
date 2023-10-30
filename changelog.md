@@ -4,6 +4,7 @@
 
 ### 5.1.0, 2023-10-30
 
+* fixed: prevent fatal error in Event Espresso when no Client Side Encryption key is present
 * fixed: support for WooCommerce HPOS (high performance order storage)
 * changed: marked as tested up to WooCommerce 8.2
 

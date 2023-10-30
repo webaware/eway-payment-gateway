@@ -38,11 +38,21 @@ final class BillingInfo {
 			switch ($key) {
 
 				case 'card_number':
-					$this->card_number = $postdata->cleanCardnumber($postdata->getValue('card_number'));
+					// handle condition where no Client Side Encryption key has been installed
+					$card_number = $postdata->getValue($key);
+					if (empty($card_number)) {
+						$card_number = $billing_info[$key] ?? '';
+					}
+					$this->card_number = $postdata->cleanCardnumber($card_number);
 					break;
 
 				case 'cvn':
-					$this->cvn = $postdata->getValue('cvn');
+					// handle condition where no Client Side Encryption key has been installed
+					$cvn = $postdata->getValue($key);
+					if (empty($cvn)) {
+						$cvn = $billing_info[$key] ?? '';
+					}
+					$this->cvn = $cvn;
 					break;
 
 				case 'country':
