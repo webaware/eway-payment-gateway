@@ -4,7 +4,8 @@
 		"squizlabs/php_codesniffer": "*",
 		"dealerdirect/phpcodesniffer-composer-installer": "*",
 		"yoast/wp-test-utils": "^1.0",
-		"php-webdriver/webdriver": "^1.12"
+		"php-webdriver/webdriver": "*",
+		"phpcsstandards/phpcsextra": "*"
 	},
 	"prefer-stable" : true,
 	"config": {

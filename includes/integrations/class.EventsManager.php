@@ -291,11 +291,11 @@ final class MethodEventsManager extends EM_Gateway {
 
 	/**
 	 * Intercepts return data after a booking has been made and adds eway vars, modifies feedback message.
-	 * @param array $return
+	 * @param array $value
 	 * @param EM_Booking $EM_Booking
 	 * @return array
 	 */
-	public function booking_form_feedback( $return, $EM_Booking = false ) {
+	public function booking_form_feedback( $value, $EM_Booking = false ) {
 		// Double check $EM_Booking is an EM_Booking object and that we have a booking awaiting payment.
 		if (!empty($return['result'])) {
 			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] === $this->gateway && $EM_Booking->get_price() > 0) {
@@ -306,7 +306,7 @@ final class MethodEventsManager extends EM_Gateway {
 				$return['message'] = get_option("em_{$this->gateway}_booking_feedback_free");
 			}
 		}
-		return $return;
+		return $value;
 	}
 
 	/*

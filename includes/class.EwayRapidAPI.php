@@ -230,8 +230,8 @@ trait SerialiseWithoutNull {
 	 */
 	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
-		return array_filter((array) $this, static function($var) {
-			return !is_null($var);
+		return array_filter((array) $this, static function($value) {
+			return !is_null($value);
 		});
 	}
 
