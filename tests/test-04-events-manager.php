@@ -54,7 +54,8 @@ class EventsManagerTest extends TestCase {
 		global $plugin_test_env;
 
 		$this->web->driver->get($plugin_test_env['url_em_events']);
-		$this->web->driver->findElement(WebDriverBy::cssSelector('.events-table tbody a'))->click();
+		// need to focus on element before clicking
+		$this->web->driver->executeScript('var e = document.querySelector(".events-table tbody a");e.focus();e.click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.em-booking-form-details'))
 		);
@@ -72,7 +73,7 @@ class EventsManagerTest extends TestCase {
 		$this->web->sendKeys('#dbem_fax', '9876543210');
 		$this->web->sendKeys('#booking_comment', 'Automated testing: ' . __FUNCTION__);
 
-		$this->web->checkboxTickByIndex('input[name="data_privacy_consent"]', 0);
+		$this->web->driver->executeScript('var e = document.querySelector(\'input[name="data_privacy_consent"]\'); e.checked = true;');
 
 		$this->web->sendKeys('#eway_card_num', '4444333322221111');
 		$this->web->sendKeys('#eway_card_name', 'Test Only');
@@ -80,10 +81,11 @@ class EventsManagerTest extends TestCase {
 		$this->web->selectByValue('#eway_exp_date_year', date('Y') + 9);
 		$this->web->sendKeys('#eway_card_code', '123');
 
-		$this->web->driver->findElement(WebDriverBy::id('em-booking-submit'))->click();
+		// need to focus on element before clicking
+		$this->web->driver->executeScript('var e = document.querySelector(".em-booking-submit");e.focus();e.click()');
 
 		$this->web->driver->wait()->until(
-			WebDriverExpectedCondition::invisibilityOfElementLocated(WebDriverBy::cssSelector('form.em-booking-form'))
+			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.em-booking-message-success'))
 		);
 
 		$this->assertTrue(true);

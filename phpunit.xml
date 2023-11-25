@@ -16,8 +16,8 @@
 		<exclude>
 			<!-- <group>woocommerce</group> -->
 			<!-- <group>wp-e-commerce</group> -->
-			<group>events-manager</group>
-			<!-- <group>event-espresso</group> -->
+			<!-- <group>events-manager</group> -->
+			<group>event-espresso</group>
 			<!-- <group>awpcp</group> -->
 		</exclude>
 	</groups>
