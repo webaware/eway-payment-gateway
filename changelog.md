@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### 5.2.0, soon...
+
+* changed: upgraded Events Manager Pro integration to v3.2+ Gateway API
+* changed: Events Manager Pro legacy gateway no longer supported
+
 ### 5.1.0, 2023-10-30
 
 * fixed: prevent fatal error in Event Espresso when no Client Side Encryption key is present
