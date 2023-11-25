@@ -10,27 +10,6 @@ if (!defined('ABSPATH')) {
 
 <table class="form-table">
 <tbody>
-  <tr valign="top">
-	  <th scope="row"><label for="em_eway_booking_feedback"><?= translate('Success Message', 'em-pro'); ?></label></th>
-	  <td>
-		<input type="text" name="em_eway_booking_feedback" id="em_eway_booking_feedback" value="<?= esc_attr(get_option('em_eway_booking_feedback')); ?>" class="large-text" />
-		<em><?= translate('The message that is shown to a user when a booking is successful and payment has been taken.','em-pro'); ?></em>
-	  </td>
-  </tr>
-  <tr valign="top">
-	  <th scope="row"><label for="em_eway_booking_feedback_free"><?= translate('Success Free Message', 'em-pro'); ?></label></th>
-	  <td>
-		<input type="text" name="em_eway_booking_feedback_free" id="em_eway_booking_feedback_free" value="<?= esc_attr(get_option('em_eway_booking_feedback_free')); ?>" class="large-text" />
-		<em><?= translate('If some cases if you allow a free ticket (e.g. pay at gate) as well as paid tickets, this message will be shown and the user will not be charged.','em-pro'); ?></em>
-	  </td>
-  </tr>
-</tbody>
-</table>
-
-<h3><?php printf(translate('%s Options', 'events-manager'), 'Eway'); ?></h3>
-
-<table class="form-table">
-<tbody>
 
 	<tr valign="top">
 		<th scope="row">
@@ -158,17 +137,6 @@ if (!defined('ABSPATH')) {
 			</select>
 			<em><?php esc_html_e("Capture processes the payment immediately. Authorize holds the amount on the customer's card for processing later.", 'eway-payment-gateway'); ?></em>
 		</td>
-	</tr>
-
-	<tr><th colspan="2"><?php printf(translate('%s Options', 'events-manager'), translate('Advanced', 'em-pro')); ?></th></tr>
-
-	<tr valign="top">
-	  <th scope="row"><label for="em_eway_manual_approval"><?= translate('Manually approve completed transactions?', 'em-pro') ?></label></th>
-	  <td>
-		<input type="checkbox" name="em_eway_manual_approval" id="em_eway_manual_approval" value="1" <?= (get_option('em_eway_manual_approval')) ? 'checked="checked"':''; ?> />
-		<em><?= translate('By default, when someone pays for a booking, it gets automatically approved once the payment is confirmed. If you would like to manually verify and approve bookings, tick this box.','em-pro'); ?></em>
-		<em><?php printf(translate('Approvals must also be required for all bookings in your <a href="%s">settings</a> for this to work properly.','em-pro'),EM_ADMIN_URL.'&amp;page=events-manager-options'); ?></em>
-	  </td>
 	</tr>
 
 </tbody>

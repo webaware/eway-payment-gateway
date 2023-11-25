@@ -305,7 +305,7 @@ final class MethodAWPCP extends AWPCP_PaymentGateway {
 		$form = ob_get_clean();
 
 		$min = SCRIPT_DEBUG ? ''     : '.min';
-		$ver = SCRIPT_DEBUG ? time() : EWAY_PAYMENTS_VERSION;
+		$ver = get_cache_buster();
 
 		if ($creds->hasCSEKey()) {
 			add_action('wp_enqueue_scripts', [$this, 'ecryptEnqueue'], 20);	// can't enqueue yet, so wait until plugin has enqueued script

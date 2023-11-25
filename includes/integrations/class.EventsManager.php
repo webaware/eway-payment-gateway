@@ -3,8 +3,8 @@ namespace webaware\eway_payment_gateway;
 
 use EM_Booking;
 use EM_Event;
-use EM_Gateway;
 use EM_Gateways;
+use EM\Payments\Gateway;
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -12,38 +12,31 @@ if (!defined('ABSPATH')) {
 
 /**
  * payment gateway integration for Events Manager
- * with thanks to EM_Gateway_Authorize_AIM for showing the way...
  */
-final class MethodEventsManager extends EM_Gateway {
+final class MethodEventsManager extends Gateway {
 
-	private $logger;
+	private static Logging $logger;
 
-	private $registered_timer = 0;
+	private static int $registered_timer = 0;
 
 	/**
 	 * register gateway integration
 	 */
-	public static function register_eway() : void {
-		EM_Gateways::register_gateway('eway', __CLASS__);
-	}
-
-	/**
-	 * Set up gateaway and add relevant actions/filters
-	 */
-	public function __construct() {
-		$this->gateway						= 'eway';
-		$this->title						= _x('Eway', 'Events Manager payment method title', 'eway-payment-gateway');
-		$this->status						= 4;
-		$this->status_txt					= _x('Processing (Eway)', 'Events Manager status text', 'eway-payment-gateway');
-		$this->button_enabled				= false;
-		$this->supports_multiple_bookings	= true;
+	public static function init() {
+		$gateway							= 'eway';
+		self::$gateway						= $gateway;
+		self::$title						= _x('Eway', 'Events Manager payment method title', 'eway-payment-gateway');
+		self::$status						= 4;
+		self::$status_txt					= _x('Processing (Eway)', 'Events Manager status text', 'eway-payment-gateway');
+		self::$button_enabled				= false;
+		self::$supports_multiple_bookings	= true;
 
 		// ensure options are present, set to defaults if not
 		$defaults = [
-			"em_{$this->gateway}_option_name"				=> _x('Credit Card', 'Events Manager payment method name', 'eway-payment-gateway'),
-			"em_{$this->gateway}_booking_feedback"			=> _x('Booking successful.', 'Events Manager booking feedback', 'eway-payment-gateway'),
-			"em_{$this->gateway}_booking_feedback_free"		=> _x('Booking successful. You have not been charged for this booking.', 'Events Manager booking feedback free', 'eway-payment-gateway'),
-			"em_{$this->gateway}_mode"						=> 'sandbox',
+			"em_{$gateway}_option_name"				=> _x('Credit Card', 'Events Manager payment method name', 'eway-payment-gateway'),
+			"em_{$gateway}_booking_feedback"		=> _x('Booking successful.', 'Events Manager booking feedback', 'eway-payment-gateway'),
+			"em_{$gateway}_booking_feedback_free"	=> _x('Booking successful. You have not been charged for this booking.', 'Events Manager booking feedback free', 'eway-payment-gateway'),
+			"em_{$gateway}_mode"					=> 'sandbox',
 		];
 		foreach ($defaults as $option => $value) {
 			if (get_option($option) === false) {
@@ -52,33 +45,32 @@ final class MethodEventsManager extends EM_Gateway {
 		}
 
 		// create a logger
-		$this->logger = new Logging('events-manager', get_option("em_{$this->gateway}_logging", 'off'));
+		self::$logger = new Logging('events-manager', get_option("em_{$gateway}_logging", 'off'));
 
-		// initialise the parent class
-		parent::__construct();
+		parent::init();
 
-		add_action('admin_print_styles-event_page_events-manager-gateways', [$this, 'adminSettingsStyles']);
+		add_action('admin_print_styles-event_page_events-manager-gateways', [__CLASS__, 'adminSettingsStyles']);
 
-		if ($this->is_active()) {
-			add_action('em_cart_js_footer', [$this, 'maybeEnqueueEcrypt']);
-			add_action('em_booking_js_footer', [$this, 'maybeEnqueueEcrypt']);
+		if (self::is_active()) {
+			add_action('em_cart_js_footer', [__CLASS__, 'maybeEnqueueEcrypt']);
+			add_action('em_booking_js_footer', [__CLASS__, 'maybeEnqueueEcrypt']);
 
 			// force SSL for booking submissions on live site, because credit card details need to be encrypted
-			if (get_option("em_{$this->gateway}_mode") === 'live') {
+			if (get_option("em_{$gateway}_mode") === 'live') {
 				add_filter('em_wp_localize_script', [__CLASS__, 'forceBookingAjaxSSL']);
 				add_filter('em_booking_form_action_url', [__CLASS__, 'force_ssl']);
 			}
 
 			// force whole bookings page to SSL if settings require
-			if (get_option("em_{$this->gateway}_ssl_force", 1)) {
+			if (get_option("em_{$gateway}_ssl_force", 1)) {
 				add_action('template_redirect', [__CLASS__, 'redirect_ssl']);
 			}
 
 			// perform additional form post validation
 			// but only from front -- payment form won't be there in Bookings admin!
-			if (!is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
-				add_filter('em_booking_validate', [$this, 'emBookingValidate'], 10, 2);
-				add_filter('em_multiple_booking_validate', [$this, 'emBookingValidate'], 10, 2);
+			if (!is_admin() || wp_doing_ajax()) {
+				add_filter('em_booking_validate', [__CLASS__, 'emBookingValidate'], 10, 2);
+				add_filter('em_multiple_booking_validate', [__CLASS__, 'emBookingValidate'], 10, 2);
 			}
 		}
 	}
@@ -86,45 +78,16 @@ final class MethodEventsManager extends EM_Gateway {
 	/**
 	 * load custom styles for settings page
 	 */
-	public function adminSettingsStyles() : void {
+	public static function adminSettingsStyles() : void {
 		// only for Eway settings page
-		if (empty($_GET['gateway']) || $_GET['gateway'] !== $this->gateway) {
+		$gateway = $_GET['gateway'] ?? '';
+		if ($gateway !== self::$gateway) {
 			return;
 		}
 
 		echo '<style>';
 		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . 'static/css/admin-events-manager-settings.css');
 		echo '</style>';
-	}
-
-	/**
-	 * add page script for admin options
-	 */
-	public function adminSettingsScript() : void {
-		$min	= SCRIPT_DEBUG ? '' : '.min';
-
-		echo '<script>';
-		readfile(EWAY_PAYMENTS_PLUGIN_ROOT . "static/js/admin-events-manager-settings$min.js");
-		echo '</script>';
-	}
-
-	/**
-	 * attempt to map country code to name
-	 * @param string $countryCode
-	 */
-	private static function getCountryName($countryCode) : string {
-		$name = '';
-
-		// check for country code as non-empty string
-		// NB: Events Manager Pro up to at least v2.3.6 returns array when Country field doesn't exist
-		if ($countryCode && is_string($countryCode)) {
-			$countries = em_get_countries();
-			if (isset($countries[$countryCode])) {
-				$name = $countries[$countryCode];
-			}
-		}
-
-		return $name;
 	}
 
 	/*
@@ -136,12 +99,12 @@ final class MethodEventsManager extends EM_Gateway {
 	/**
 	 * perform additional booking form post validation, to check for required credit card fields
 	 */
-	public function emBookingValidate(bool $result, $EM_Booking) : bool {
+	public static function emBookingValidate(bool $result, $EM_Booking) : bool {
 		// only perform validation if this payment method has been selected
-		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] === $this->gateway) {
+		if (isset($_REQUEST['gateway']) && $_REQUEST['gateway'] === self::$gateway) {
 
-			if ($this->getApiCredentials()->isMissingCredentials()) {
-				$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
+			if (self::getApiCredentials()->isMissingCredentials()) {
+				self::$logger->log('error', 'credentials need to be defined before transactions can be processed.');
 				$EM_Booking->add_error(__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
 				return false;
 			}
@@ -170,7 +133,7 @@ final class MethodEventsManager extends EM_Gateway {
 	}
 
 	/**
-	 * This function intercepts the previous booking form URL from the JavaScript localised array of EM variables and forces it to be an HTTPS url.
+	 * This function intercepts the previous booking form URL from the JavaScript localised array of EM variables and forces it to be an HTTPS URL.
 	 */
 	public static function forceBookingAjaxSSL(array $localized_array) : array {
 		$localized_array['bookingajaxurl'] = self::force_ssl($localized_array['bookingajaxurl']);
@@ -178,28 +141,21 @@ final class MethodEventsManager extends EM_Gateway {
 	}
 
 	/**
-	 * Turns any url into an HTTPS url.
+	 * force URL to be HTTPS
 	 */
 	public static function force_ssl(string $url) : string {
-		// only fix if source URL starts with http://
-		if (stripos($url, 'http://') === 0) {
-			$url = 'https' . substr($url, 4);
-		}
-
-		return $url;
+		return set_url_scheme($url, 'https');
 	}
 
 	/**
 	 * if page is an event and it has a booking form, make sure it's on SSL
 	 */
 	public static function redirect_ssl() : void {
-		global $post;
-
-		// only if we're on an event page, and not SSL
-		if (!empty($post->post_type) && $post->post_type === EM_POST_TYPE_EVENT && !is_ssl()) {
+		// only if we're on an event page, and not HTTPS
+		if (!is_singular(EM_POST_TYPE_EVENT) && !is_ssl()) {
 			try {
 				// create event object, check that it has bookings
-				$event = new EM_Event($post);
+				$event = new EM_Event(get_post());
 				if ($event->event_rsvp) {
 					// redirect to SSL
 					$url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -219,17 +175,17 @@ final class MethodEventsManager extends EM_Gateway {
 	 * @param EM_Booking $EM_Booking
 	 * @param boolean $post_validation
 	 */
-	public function booking_add($EM_Event, $EM_Booking, $post_validation = false) {
-		$this->registered_timer = current_time('timestamp', 1);
+	public static function booking_add($EM_Event, $EM_Booking, $post_validation = false) {
+		self::$registered_timer = current_time('timestamp', 1);
 
 		parent::booking_add($EM_Event, $EM_Booking, $post_validation);
 
 		if ($post_validation && empty($EM_Booking->booking_id)) {
 			if (get_option('dbem_multiple_bookings') && get_class($EM_Booking) === 'EM_Multiple_Booking' ) {
-				add_filter('em_multiple_booking_save', [$this, 'em_booking_save'], 2, 2);
+				add_filter('em_multiple_booking_save', [__CLASS__, 'em_booking_save'], 2, 2);
 			}
 			else {
-				add_filter('em_booking_save', [$this, 'em_booking_save'], 2, 2);
+				add_filter('em_booking_save', [__CLASS__, 'em_booking_save'], 2, 2);
 			}
 		}
 	}
@@ -241,16 +197,17 @@ final class MethodEventsManager extends EM_Gateway {
 	 * @param EM_Booking $EM_Booking
 	 * @return bool
 	 */
-	public function em_booking_save($result, $EM_Booking) {
+	public static function em_booking_save($result, $EM_Booking) {
 		// make sure booking save was successful before we try anything
 		if (!$result || $EM_Booking->get_price() <= 0) {
 			return $result;
 		}
 
 		// handle results
-		if ($this->processPayment($EM_Booking)) {
+		if (self::processPayment($EM_Booking)) {
 			// Set booking status, but no emails sent
-			if (!get_option("em_{$this->gateway}_manual_approval", false) || !get_option('dbem_bookings_approval')) {
+			$gateway = self::$gateway;
+			if (!get_option("em_{$gateway}_manual_approval", false) || !get_option('dbem_bookings_approval')) {
 				$EM_Booking->set_status(1, false); // Approve
 			}
 			else {
@@ -263,7 +220,7 @@ final class MethodEventsManager extends EM_Gateway {
 				// delete the user we just created, only if created after em_booking_add filter is called
 				// (which is when a new user for this booking would be created)
 				$EM_Person = $EM_Booking->get_person();
-				if (strtotime($EM_Person->data->user_registered) >= $this->registered_timer) {
+				if (strtotime($EM_Person->data->user_registered) >= self::$registered_timer) {
 					if (is_multisite()) {
 						include_once(ABSPATH.'/wp-admin/includes/ms.php');
 						wpmu_delete_user($EM_Person->ID);
@@ -295,15 +252,17 @@ final class MethodEventsManager extends EM_Gateway {
 	 * @param EM_Booking $EM_Booking
 	 * @return array
 	 */
-	public function booking_form_feedback( $value, $EM_Booking = false ) {
+	public static function booking_form_feedback($value, $EM_Booking = false) {
+		$gateway = self::$gateway;
+
 		// Double check $EM_Booking is an EM_Booking object and that we have a booking awaiting payment.
 		if (!empty($return['result'])) {
-			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] === $this->gateway && $EM_Booking->get_price() > 0) {
-				$return['message'] = get_option("em_{$this->gateway}_booking_feedback");
+			if (!empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_meta['gateway'] === $gateway && $EM_Booking->get_price() > 0) {
+				$return['message'] = get_option("em_{$gateway}_booking_feedback");
 			}
 			else {
 				// returning a free message
-				$return['message'] = get_option("em_{$this->gateway}_booking_feedback_free");
+				$return['message'] = get_option("em_{$gateway}_booking_feedback_free");
 			}
 		}
 		return $value;
@@ -316,15 +275,16 @@ final class MethodEventsManager extends EM_Gateway {
 	 */
 
 	/**
-	 * Outputs custom content and credit card information.
+	 * output the credit card fields
 	 */
-	public function booking_form() {
-		if ($this->getApiCredentials()->isMissingCredentials()) {
+	public static function payment_form($id) {
+		if (self::getApiCredentials()->isMissingCredentials()) {
 			printf('<p class="error"><strong>%s</strong></p>', esc_html__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
 			return;
 		}
 
-		$card_msg	= esc_html(get_option("em_{$this->gateway}_card_msg"));
+		$gateway	= self::$gateway;
+		$card_msg	= esc_html(get_option("em_{$gateway}_card_msg"));
 
 		$postdata = new FormPost();
 
@@ -342,19 +302,19 @@ final class MethodEventsManager extends EM_Gateway {
 	/**
 	 * maybe set up Client Side Encryption
 	 */
-	public function maybeEnqueueEcrypt() : void {
-		$creds	= $this->getApiCredentials();
+	public static function maybeEnqueueEcrypt() : void {
+		$creds	= self::getApiCredentials();
 		if ($creds->hasCSEKey() && ! $creds->isMissingCredentials()) {
 			// hook wp_footer at priority 110, because this function was called on wp_footer at priority 20 or 100
-			add_action('wp_footer', [$this, 'ecryptScript'], 110);
+			add_action('wp_footer', [__CLASS__, 'ecryptScript'], 110);
 		}
 	}
 
 	/**
 	 * maybe set up Client Side Encryption
 	 */
-	public function ecryptScript() : void {
-		$creds	= $this->getApiCredentials();
+	public static function ecryptScript() : void {
+		$creds	= self::getApiCredentials();
 
 		wp_enqueue_script('eway-payment-gateway-ecrypt');
 
@@ -375,16 +335,17 @@ final class MethodEventsManager extends EM_Gateway {
 	/**
 	 * attempt to process payment
 	 */
-	public function processPayment(EM_Booking $EM_Booking) : bool {
+	public static function processPayment(EM_Booking $EM_Booking) : bool {
 		// allow plugins/themes to modify transaction ID; NB: must remain unique for Eway account!
 		$transactionID = apply_filters('em_eway_trans_number', $EM_Booking->booking_id);
 
-		$capture	= !get_option("em_{$this->gateway}_stored");
-		$useSandbox	= (get_option("em_{$this->gateway}_mode") === 'sandbox');
-		$creds		= apply_filters('em_eway_credentials', $this->getApiCredentials(), $useSandbox, $EM_Booking);
+		$gateway	= self::$gateway;
+		$capture	= !get_option("em_{$gateway}_stored");
+		$useSandbox	= (get_option("em_{$gateway}_mode") === 'sandbox');
+		$creds		= apply_filters('em_eway_credentials', self::getApiCredentials(), $useSandbox, $EM_Booking);
 
 		if ($creds->isMissingCredentials()) {
-			$this->logger->log('error', 'credentials need to be defined before transactions can be processed.');
+			self::$logger->log('error', 'credentials need to be defined before transactions can be processed.');
 			$EM_Booking->add_error(__('Eway payments is not configured for payments yet', 'eway-payment-gateway'));
 			return false;
 		}
@@ -442,7 +403,7 @@ final class MethodEventsManager extends EM_Gateway {
 			apply_filters('em_eway_option3', '', $EM_Booking),
 		]);
 
-		$this->logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
+		self::$logger->log('info', sprintf('%1$s gateway, invoice ref: %2$s, transaction: %3$s, amount: %4$s, cc: %5$s',
 			$useSandbox ? 'test' : 'live',
 			$payment->InvoiceNumber, $payment->InvoiceReference, $payment->TotalAmount, $customer->CardDetails->Number));
 
@@ -453,7 +414,7 @@ final class MethodEventsManager extends EM_Gateway {
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record transaction number and continue
-				$EM_Booking->booking_meta[$this->gateway] = [
+				$EM_Booking->booking_meta[$gateway] = [
 					'txn_id'	=> $response->TransactionID,
 					'authcode'	=> $response->AuthorisationCode,
 					'amount'	=> $response->Payment->TotalAmount,
@@ -468,12 +429,12 @@ final class MethodEventsManager extends EM_Gateway {
 				}
 				$note = implode("\n", $notes);
 
-				$status = get_option("em_{$this->gateway}_stored") ? 'Pending' : 'Completed';
-				$this->record_transaction($EM_Booking, $response->Payment->TotalAmount, $payment->CurrencyCode, date('Y-m-d H:i:s', current_time('timestamp')), $response->TransactionID, $status, $note);
+				$status = get_option("em_{$gateway}_stored") ? 'Pending' : 'Completed';
+				self::record_transaction($EM_Booking, $response->Payment->TotalAmount, $payment->CurrencyCode, date('Y-m-d H:i:s', current_time('timestamp')), $response->TransactionID, $status, $note);
 				$result = true;
 
-				$this->logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
-					$payment->InvoiceNumber, $response->TransactionID, get_option("em_{$this->gateway}_stored") ? 'pending' : 'completed',
+				self::$logger->log('info', sprintf('success, invoice ref: %1$s, transaction: %2$s, status = %3$s, amount = %4$s, authcode = %5$s, Beagle = %6$s',
+					$payment->InvoiceNumber, $response->TransactionID, get_option("em_{$gateway}_stored") ? 'pending' : 'completed',
 					$response->Payment->TotalAmount, $response->AuthorisationCode, $response->BeagleScore));
 			}
 			else {
@@ -481,21 +442,21 @@ final class MethodEventsManager extends EM_Gateway {
 				$error_msg = $response->getErrorMessage(esc_html__('Transaction failed', 'eway-payment-gateway'));
 				$EM_Booking->add_error($error_msg);
 
-				$this->logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $payment->InvoiceNumber, $response->getErrorsForLog()));
+				self::$logger->log('info', sprintf('failed; invoice ref: %1$s, error: %2$s', $payment->InvoiceNumber, $response->getErrorsForLog()));
 				if ($response->BeagleScore > 0) {
-					$this->logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
+					self::$logger->log('info', sprintf('BeagleScore = %s', $response->BeagleScore));
 				}
 			}
 		}
 		catch (Exception $e) {
 			// an exception occured, so record the error
 			$EM_Booking->add_error(nl2br($e->getMessage()));
-			$this->logger->log('error', $e->getMessage());
+			self::$logger->log('error', $e->getMessage());
 			return false;
 		}
 
 		// Return status
-		return apply_filters('em_gateway_eway_authorize', $result, $EM_Booking, $this);
+		return apply_filters('em_gateway_eway_authorize', $result, $EM_Booking, __CLASS__);
 	}
 
 	/*
@@ -505,78 +466,23 @@ final class MethodEventsManager extends EM_Gateway {
 	 */
 
 	/**
-	 * Outputs custom fields in the settings page
-	 */
-	public function mysettings() {
-		add_action('admin_print_footer_scripts', [$this, 'adminSettingsScript']);
-
-		if ($this->getApiCredentials()->isMissingCredentials()) {
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-notice-missing-creds.php';
-		}
-
-		include EWAY_PAYMENTS_PLUGIN_ROOT . 'views/admin-events-manager.php';
-	}
-
-	/**
-	 * Run when saving settings, saves the settings available in self::mysettings()
-	 * return boolean
-	 */
-	public function update() {
-		$options = [
-			"em_{$this->gateway}_mode",
-			"em_{$this->gateway}_api_key",
-			"em_{$this->gateway}_password",
-			"em_{$this->gateway}_ecrypt_key",
-			"em_{$this->gateway}_sandbox_api_key",
-			"em_{$this->gateway}_sandbox_password",
-			"em_{$this->gateway}_sandbox_ecrypt_key",
-			"em_{$this->gateway}_stored",
-			"em_{$this->gateway}_ssl_force",
-			"em_{$this->gateway}_logging",
-			"em_{$this->gateway}_card_msg",
-			"em_{$this->gateway}_manual_approval",
-			"em_{$this->gateway}_booking_feedback",
-			"em_{$this->gateway}_booking_feedback_free",
-		];
-
-		// filters for specific data
-		add_filter("gateway_update_em_{$this->gateway}_mode", 'sanitize_text_field');
-		add_filter("gateway_update_em_{$this->gateway}_card_msg", 'sanitize_text_field');
-		add_filter("gateway_update_em_{$this->gateway}_logging", 'sanitize_text_field');
-
-		add_filter("gateway_update_em_{$this->gateway}_api_key", 'strip_tags');
-		add_filter("gateway_update_em_{$this->gateway}_password", 'strip_tags');
-		add_filter("gateway_update_em_{$this->gateway}_ecrypt_key", 'strip_tags');
-		add_filter("gateway_update_em_{$this->gateway}_sandbox_api_key", 'strip_tags');
-		add_filter("gateway_update_em_{$this->gateway}_sandbox_password", 'strip_tags');
-		add_filter("gateway_update_em_{$this->gateway}_sandbox_ecrypt_key", 'strip_tags');
-
-		add_filter("gateway_update_em_{$this->gateway}_booking_feedback", 'wp_kses_data');
-		add_filter("gateway_update_em_{$this->gateway}_booking_feedback_free", 'wp_kses_data');
-
-		add_filter("gateway_update_em_{$this->gateway}_stored", 'intval');
-		add_filter("gateway_update_em_{$this->gateway}_ssl_force", 'intval');
-		add_filter("gateway_update_em_{$this->gateway}_manual_approval", 'intval');
-
-		return parent::update($options);
-	}
-
-	/**
 	 * get API credentials based on settings
 	 */
-	private function getApiCredentials() : Credentials {
-		if (get_option("em_{$this->gateway}_mode") !== 'sandbox') {
+	public static function getApiCredentials() : Credentials {
+		$gateway = self::$gateway;
+
+		if (get_option("em_{$gateway}_mode") !== 'sandbox') {
 			$creds = new Credentials(
-				get_option("em_{$this->gateway}_api_key"),
-				get_option("em_{$this->gateway}_password"),
-				get_option("em_{$this->gateway}_ecrypt_key"),
+				get_option("em_{$gateway}_api_key"),
+				get_option("em_{$gateway}_password"),
+				get_option("em_{$gateway}_ecrypt_key"),
 			);
 		}
 		else {
 			$creds = new Credentials(
-				get_option("em_{$this->gateway}_sandbox_api_key"),
-				get_option("em_{$this->gateway}_sandbox_password"),
-				get_option("em_{$this->gateway}_sandbox_ecrypt_key"),
+				get_option("em_{$gateway}_sandbox_api_key"),
+				get_option("em_{$gateway}_sandbox_password"),
+				get_option("em_{$gateway}_sandbox_ecrypt_key"),
 			);
 		}
 

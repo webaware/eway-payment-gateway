@@ -190,3 +190,26 @@ function get_api_options(array $input) : array {
 
 	return $output;
 }
+
+/**
+ * get the script / stylesheet cache buster
+ */
+function get_cache_buster() : string {
+	static $cache_buster;
+
+	if (empty($cache_buster)) {
+		if (!SCRIPT_DEBUG) {
+			$cache_buster = EWAY_PAYMENTS_VERSION;
+		}
+		else {
+			$time_file = EWAY_PAYMENTS_PLUGIN_ROOT . '.make-flag-js';
+			if (!file_exists($time_file)) {
+				$time_file = EWAY_PAYMENTS_PLUGIN_FILE;
+			}
+			$time = filemtime($time_file);
+			$cache_buster = base_convert($time, 10, 36);
+		}
+	}
+
+	return $cache_buster;
+}

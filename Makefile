@@ -3,9 +3,6 @@ PKG_VERSION			:= $(shell sed -rn 's/^Version: (.*)/\1/p' $(PKG_NAME).php)
 
 ZIP					:= .dist/$(PKG_NAME)-$(PKG_VERSION).zip
 FIND_PHP			:= find . -path ./vendor -prune -o -path ./node_modules -prune -o -path './.*' -o -name '*.php'
-LINT_PHP			:= $(FIND_PHP) -exec php -l '{}' \; >/dev/null
-SNIFF_PHP			:= vendor/bin/phpcs -ps
-SNIFF_PHP_5			:= $(SNIFF_PHP) --standard=phpcs-5.2.xml
 SRC_PHP				:= $(shell $(FIND_PHP) -print)
 
 # environment variables for unit tests
@@ -40,7 +37,10 @@ JS_TGT_DIR		:= static/js
 JS_SRCS			:= $(shell find $(JS_SRC_DIR) -name '*.js' -print)
 JS_TGTS			:= $(subst $(JS_SRC_DIR),$(JS_TGT_DIR),$(JS_SRCS))
 
-js: $(JS_TGTS)
+js: .make-flag-js
+
+.make-flag-js: $(JS_TGTS)
+	@touch .make-flag-js
 
 $(JS_TGTS): $(JS_TGT_DIR)/%.js: $(JS_SRC_DIR)/%.js
 	npx babel --source-type script --presets @babel/preset-env --out-file $@ $<
@@ -56,9 +56,9 @@ lint-js:
 
 lint-php:
 	@echo PHP lint...
-	@$(LINT_PHP)
-	@$(SNIFF_PHP)
-	@$(SNIFF_PHP_5)
+	@$(FIND_PHP) -exec php7.4 -l '{}' \; >/dev/null
+	@vendor/bin/phpcs -ps
+	@vendor/bin/phpcs -ps --standard=phpcs-5.2.xml
 
 # tests
 

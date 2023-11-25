@@ -12,6 +12,7 @@ const EWAY_PAYMENTS_TEST_CUSTOMER		= '87654321';
 
 // prerequisites
 const MIN_VERSION_WOOCOMMERCE			= '3.0';
+const MIN_VERSION_EVENTS_MANAGER		= '3.2';
 
 /**
  * custom exceptons
@@ -42,6 +43,7 @@ spl_autoload_register(function($class_name) {
 		'EwayResponseDirectPayment'			=> 'includes/class.EwayResponseDirectPayment.php',
 		'Logging'							=> 'includes/class.Logging.php',
 
+		'MethodEventsManager_Admin'			=> 'includes/integrations/class.EventsManager-admin.php',
 		'event_espresso\\BillingInfo'		=> 'includes/integrations/event_espresso_eway/class.BillingInfo.php',
 	];
 

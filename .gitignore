@@ -3,6 +3,7 @@
 /.vscode/
 /.wordpress.org/
 /.dist/
+/.make-flag*
 /bin/
 /node_modules/
 /vendor/

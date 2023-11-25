@@ -3,6 +3,8 @@ namespace webaware\eway_payment_gateway;
 
 use EwayPaymentGatewayRequires as Requires;
 
+use EM_Options;
+
 if (!defined('ABSPATH')) {
 	exit;
 }
@@ -48,7 +50,7 @@ final class Plugin {
 		add_action('AHEE__EE_System__load_espresso_addons', [$this, 'registerEventEspresso']);
 		add_action('plugins_loaded', [$this, 'maybeRegisterWooCommerce']);
 		add_action('plugins_loaded', [$this, 'maybeRegisterAWPCP']);
-		add_action('init', [$this, 'maybeRegisterEventsManager']);
+		add_action('em_gateways_init', [$this, 'maybeRegisterEventsManager']);
 	}
 
 	/**
@@ -77,7 +79,7 @@ final class Plugin {
 	 */
 	public function registerScripts() : void {
 		$min = SCRIPT_DEBUG ? '' : '.min';
-		$ver = SCRIPT_DEBUG ? time() : EWAY_PAYMENTS_VERSION;
+		$ver = get_cache_buster();
 
 		wp_register_script('eway-ecrypt', "https://secure.ewaypayments.com/scripts/eCrypt$min.js", [], null, true);
 		wp_register_script('eway-payment-gateway-ecrypt', plugins_url("static/js/ecrypt$min.js", EWAY_PAYMENTS_PLUGIN_FILE), ['jquery','eway-ecrypt'], $ver, true);
@@ -112,9 +114,8 @@ final class Plugin {
 			return;
 		}
 
-		$requires = new Requires();
-
 		if (version_compare(WC()->version, MIN_VERSION_WOOCOMMERCE, '<')) {
+			$requires = new Requires();
 			$requires->addNotice(
 				/* translators: %1$s: minimum required version number, %2$s: installed version number */
 				sprintf(esc_html__('Requires WooCommerce version %1$s or higher; your website has WooCommerce version %2$s', 'eway-payment-gateway'),
@@ -131,10 +132,29 @@ final class Plugin {
 	 * maybe register with Events Manager
 	 */
 	public function maybeRegisterEventsManager() : void {
-		if (class_exists('EM_Gateways')) {
-			require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EventsManager.php';
-			MethodEventsManager::register_eway();
+		if (!defined('EMP_VERSION')) {
+			return;
 		}
+
+		if (version_compare(EMP_VERSION, MIN_VERSION_EVENTS_MANAGER, '<')) {
+			$requires = new Requires();
+			$requires->addNotice(
+				/* translators: %1$s: minimum required version number, %2$s: installed version number */
+				sprintf(esc_html__('Requires Events Manager Pro version %1$s or higher; your website has Events Manager Pro version %2$s', 'eway-payment-gateway'),
+				esc_html(MIN_VERSION_EVENTS_MANAGER), esc_html(EMP_VERSION))
+			);
+			return;
+		}
+
+		// don't proceed if EM is configured for legacy gateways only
+		if (EM_Options::site_get('legacy-gateways', false) || em_constant('EMP_GATEWAY_LEGACY')) {
+			$requires = new Requires();
+			$requires->addNotice(esc_html__('Does not support Events Manager Pro legacy gateways mode', 'eway-payment-gateway'));
+			return;
+		}
+
+		require EWAY_PAYMENTS_PLUGIN_ROOT . 'includes/integrations/class.EventsManager.php';
+		MethodEventsManager::init();
 	}
 
 	/**
