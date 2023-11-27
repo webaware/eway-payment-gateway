@@ -55,7 +55,7 @@ class EventsManagerTest extends TestCase {
 
 		$this->web->driver->get($plugin_test_env['url_em_events']);
 		// need to focus on element before clicking
-		$this->web->driver->executeScript('var e = document.querySelector(".events-table tbody a");e.focus();e.click()');
+		$this->web->driver->executeScript('var e = document.querySelector(".em-item-actions a.em-item-read-more");e.focus();e.click()');
 		$this->web->driver->wait()->until(
 			WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('.em-booking-form-details'))
 		);
