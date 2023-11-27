@@ -2,10 +2,11 @@
 
 ## Changelog
 
-### 5.2.0, soon...
+### 5.2.0, 2023-11-23
 
 * changed: upgraded Events Manager Pro integration to v3.2+ Gateway API
 * changed: Events Manager Pro legacy gateway no longer supported
+* fixed: deprecation warnings in PHP 8.1+
 
 ### 5.1.0, 2023-10-30
 

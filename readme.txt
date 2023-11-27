@@ -8,7 +8,7 @@ Tags: eway, payment, credit cards, woocommerce, wp e-commerce, event espresso, e
 Requires at least: 5.1
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 5.1.0
+Stable tag: 5.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -236,13 +236,21 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 5.1.0
+### 5.2.0
 
-prevent fatal error in Event Espresso with no CSE key; support WooCommerce HPOS; tested to WooCommerce 8.2
+Breaking: upgraded Events Manager Pro integration to v3.2+ Gateway API; Events Manager Pro legacy gateway is no longer supported
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
+
+### 5.2.0
+
+Released 2023-11-23
+
+* changed: upgraded Events Manager Pro integration to v3.2+ Gateway API
+* changed: Events Manager Pro legacy gateway no longer supported
+* fixed: deprecation warnings in PHP 8.1+
 
 ### 5.1.0
 
