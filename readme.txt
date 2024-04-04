@@ -236,9 +236,9 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 5.2.0
+### 5.2.1
 
-Breaking: upgraded Events Manager Pro integration to v3.2+ Gateway API; Events Manager Pro legacy gateway is no longer supported
+fixed a crash loading the Payment Settings page in Event Espresso
 
 ## Changelog
 
