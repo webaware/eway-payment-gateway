@@ -23,7 +23,10 @@ class WebDriverRunner {
 	public function __construct() {
 		$host = 'http://localhost:4444/';
 		$options = new ChromeOptions();
-		$options->addArguments(['--incognito']);
+		$options->addArguments([
+			'--incognito',
+			'--ignore-certificate-errors',
+		]);
 		$capabilities = DesiredCapabilities::chrome();
 		$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		$this->driver = RemoteWebDriver::create($host, $capabilities);
