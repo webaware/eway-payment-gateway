@@ -3,6 +3,8 @@ use webaware\eway_payment_gateway\Credentials;
 use webaware\eway_payment_gateway\Logging;
 use webaware\eway_payment_gateway\event_espresso\Gateway;
 
+use function webaware\eway_payment_gateway\get_cache_buster;
+
 if (!defined('ABSPATH')) {
 	exit;
 }

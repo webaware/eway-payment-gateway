@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 5.2.1, 2024-04-04
+
+* fixed: crash loading the Payment Settings page in Event Espresso
+
 ### 5.2.0, 2023-11-23
 
 * changed: upgraded Events Manager Pro integration to v3.2+ Gateway API
