@@ -4,11 +4,11 @@ Plugin Name: Eway Payment Gateway
 Plugin URI: https://shop.webaware.com.au/downloads/eway-payment-gateway/
 Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=Eway+Payment+Gateway
-Tags: eway, payment, credit cards, woocommerce, wp e-commerce, event espresso, events manager, awpcp
+Tags: eway, woocommerce, event espresso, events manager, awpcp
 Requires at least: 5.1
-Tested up to: 6.4
+Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 5.2.0
+Stable tag: 5.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -244,44 +244,9 @@ Breaking: upgraded Events Manager Pro integration to v3.2+ Gateway API; Events M
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
 
-### 5.2.0
+### 5.2.1
 
-Released 2023-11-23
+Released 2024-04-04
 
-* changed: upgraded Events Manager Pro integration to v3.2+ Gateway API
-* changed: Events Manager Pro legacy gateway no longer supported
-* fixed: deprecation warnings in PHP 8.1+
-
-### 5.1.0
-
-Released 2023-10-30
-
-* fixed: prevent fatal error in Event Espresso when no Client Side Encryption key is present
-* fixed: support for WooCommerce HPOS (high performance order storage)
-* changed: marked as tested up to WooCommerce 8.2
-
-### 5.0.2
-
-Released 2023-05-21
-
-* fixed: update list of Eway error codes with descriptions
-* changed: marked as tested up to WooCommerce 7.7
-
-### 5.0.1
-
-Released 2022-12-06
-
-* fixed: don't crash when another plugin passes null to filter hook `woocommerce_email_order_meta_fields`
-
-### 5.0.0
-
-Released 2022-12-01
-
-* changed: requires minimum PHP version 7.4 (recommend version 8.0 or greater)
-* changed: requires minimum WooCommerce version 3.0
-* changed: requires Eway Rapid API key / password; legacy XML API is no longer supported
-* changed: filter hooks for modifying credentials must now accept / return a Credentials object
-* changed: major code refresh, developers with customizations will need to test their customizations
-* fixed: Client Side Encryption was not working on customer payment page (manual orders)
-* added: filter hook `woocommerce_eway_method_capture` to allow per-order capture or authorize
-* added: filter hook `woocommerce_eway_error_msg` to allow developers to provide richer error messages
+* fixed: crash loading the Payment Settings page in Event Espresso
+* changed: marked as tested up to WooCommerce 8.7

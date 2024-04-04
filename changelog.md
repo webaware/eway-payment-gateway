@@ -5,6 +5,7 @@
 ### 5.2.1, 2024-04-04
 
 * fixed: crash loading the Payment Settings page in Event Espresso
+* changed: marked as tested up to WooCommerce 8.7
 
 ### 5.2.0, 2023-11-23
 
