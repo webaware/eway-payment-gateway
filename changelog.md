@@ -2,9 +2,9 @@
 
 ## Changelog
 
-### 5.3.0, soon...
+### 5.3.0, 2024-06-07
 
-* changed: set the order transaction ID property; still also setting custom Transaction ID meta data, for now
+* changed: set the WooCommerce order transaction ID property; still also setting custom Transaction ID meta data, for now
 * changed: marked as tested up to WooCommerce 8.9
 
 ### 5.2.1, 2024-04-04
