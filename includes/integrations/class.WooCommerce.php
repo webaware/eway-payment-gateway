@@ -614,14 +614,15 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 			if ($response->TransactionStatus) {
 				// transaction was successful, so record details and complete payment
-				$meta = ['Transaction ID' => $response->TransactionID];
+				$order->set_transaction_id($response->TransactionID);
+				$order->update_meta_data('Transaction ID', $response->TransactionID);	// TODO: remove deprecated custom field
 				if (!empty($response->AuthorisationCode)) {
-					$meta['Authcode'] = $response->AuthorisationCode;
+					$order->update_meta_data('Authcode', $response->AuthorisationCode);
 				}
 				if ($response->BeagleScore >= 0) {
-					$meta['Beagle score'] = $response->BeagleScore;
+					$order->update_meta_data('Beagle score', $response->BeagleScore);
 				}
-				self::updateOrderMeta($order, $meta);
+				$order->save();
 
 				if (!$capture) {
 					// payment hasn't happened yet, so record status as 'on-hold' and reduce stock in anticipation
@@ -702,7 +703,7 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 
 			$keys[$key]		= [
 				'label'		=> wptexturize($key),
-				'value'		=> wptexturize($order->get_meta($key, true)),
+				'value'		=> wptexturize($order->get_transaction_id()),
 			];
 		}
 
@@ -720,16 +721,6 @@ final class MethodWooCommerce extends WC_Payment_Gateway_CC {
 		}
 
 		return $order;
-	}
-
-	/**
-	 * update order meta
-	 */
-	private static function updateOrderMeta(WC_Order $order, array $meta) : void {
-		foreach ($meta as $key => $value) {
-			$order->update_meta_data($key, $value);
-		}
-		$order->save_meta_data();
 	}
 
 }

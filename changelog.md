@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### 5.3.0, soon...
+
+* changed: set the order transaction ID property; still also setting custom Transaction ID meta data, for now
+* changed: marked as tested up to WooCommerce 8.9
+
 ### 5.2.1, 2024-04-04
 
 * fixed: crash loading the Payment Settings page in Event Espresso
