@@ -52,7 +52,7 @@ lint: lint-js lint-php
 
 lint-js:
 	@echo JavaScript lint...
-	@npx eslint --ext js $(JS_SRC_DIR)
+	@npx eslint $(JS_SRC_DIR)
 
 lint-php:
 	@echo PHP lint...
