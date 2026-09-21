@@ -43,8 +43,8 @@ js: .make-flag-js
 	@touch .make-flag-js
 
 $(JS_TGTS): $(JS_TGT_DIR)/%.js: $(JS_SRC_DIR)/%.js
-	npx babel --source-type script --presets @babel/preset-env --out-file $@ $<
-	npx uglify-js $@ --output $(basename $@).min.js -b beautify=false,ascii_only -c -m --comments '/^!/'
+	npx -s babel --source-type script --presets @babel/preset-env --out-file $@ $<
+	npx -s uglify-js $@ --output $(basename $@).min.js -b beautify=false,ascii_only -c -m --comments '/^!/'
 
 # code linters
 
@@ -52,18 +52,18 @@ lint: lint-js lint-php
 
 lint-js:
 	@echo JavaScript lint...
-	@npx eslint $(JS_SRC_DIR)
+	@npx -s eslint $(JS_SRC_DIR)
 
 lint-php:
 	@echo PHP lint...
 	@$(FIND_PHP) -exec php7.4 -l '{}' \; >/dev/null
-	@$(FIND_PHP) -exec php8.3 -l '{}' \; >/dev/null
+	@$(FIND_PHP) -exec php8.5 -l '{}' \; >/dev/null
 	@vendor/bin/phpcs -ps
 	@vendor/bin/phpcs -ps --standard=phpcs-5.2.xml
 
 # tests
 
-test: test-php74 test-php83
+test: test-php74 test-php85
 
 test-php74: /tmp/wordpress-tests-lib /tmp/.web-driver
 	php7.4 vendor/bin/phpunit
@@ -79,6 +79,12 @@ test-php82: /tmp/wordpress-tests-lib /tmp/.web-driver
 
 test-php83: /tmp/wordpress-tests-lib /tmp/.web-driver
 	php8.3 vendor/bin/phpunit
+
+test-php84: /tmp/wordpress-tests-lib /tmp/.web-driver
+	php8.4 vendor/bin/phpunit
+
+test-php85: /tmp/wordpress-tests-lib /tmp/.web-driver
+	php8.5 vendor/bin/phpunit
 
 /tmp/wordpress-tests-lib:
 	bin/install-wp-tests.sh wp_test website website localhost nightly
