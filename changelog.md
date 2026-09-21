@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 5.3.1, soon…
+
+* fixed: cardholder name in WooCommerce not auto-filling from 1Password
+
 ### 5.3.0, 2024-06-07
 
 * changed: set the WooCommerce order transaction ID property; still also setting custom Transaction ID meta data, for now
