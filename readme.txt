@@ -6,9 +6,9 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=Eway+Payment+Gateway
 Tags: eway, woocommerce, event espresso, events manager, awpcp
 Requires at least: 5.1
-Tested up to: 6.5
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 5.3.0
+Stable tag: 5.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -236,13 +236,20 @@ Developers can [refer to the code](https://github.com/webaware/eway-payment-gate
 
 ## Upgrade Notice
 
-### 5.3.0
+### 5.3.1
 
-set the WooCommerce order transaction ID property; still also setting custom Transaction ID meta data, for now
+fixed cardholder name in WooCommerce not auto-filling from 1Password; let WordPress auto-load the text domain
 
 ## Changelog
 
 [The full changelog can be found on GitHub](https://github.com/webaware/eway-payment-gateway/blob/master/changelog.md). Recent entries:
+
+### 5.3.1
+
+Released 2026-09-24
+
+* fixed: cardholder name in WooCommerce not auto-filling from 1Password
+* changed: let WordPress auto-load the text domain
 
 ### 5.3.0
 

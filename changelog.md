@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 5.3.1, soon…
+### 5.3.1, 2026-09-24
 
 * fixed: cardholder name in WooCommerce not auto-filling from 1Password
 * changed: let WordPress auto-load the text domain
