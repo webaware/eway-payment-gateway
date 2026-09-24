@@ -88,6 +88,7 @@ class WooCommerceTest extends TestCase {
 		$this->web->sendKeys('#shipping_city', 'Anothertown');
 		$this->web->sendKeys('#shipping_postcode', '2345');
 		$this->web->selectByValue('#shipping_state', 'NSW');
+		$this->web->sendKeys('#shipping_phone', '0123456789');
 
 		$this->web->driver->executeScript('document.getElementById("payment_method_eway_payments").click()');
 		$this->web->driver->wait()->until(
