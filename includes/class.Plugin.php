@@ -36,7 +36,6 @@ final class Plugin {
 	 * initialise plugin, hooked on plugins_loaded at priority 0
 	 */
 	public function pluginStart() : void {
-		add_action('init', 'eway_payment_gateway_load_text_domain');
 		add_filter('plugin_row_meta', [$this, 'addPluginDetailsLinks'], 10, 2);
 
 		if (!$this->checkPrerequisites()) {
